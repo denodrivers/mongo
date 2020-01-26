@@ -20,7 +20,6 @@ jobs:
         uses: hecrj/setup-rust-action@v1
         with:
           rust-version: "1.40.0"
-        run: cargo install sccache
 
       - name: Install clippy and rustfmt
         if: matrix.kind == 'lint'
@@ -52,7 +51,9 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           SCCACHE_BUCKET: manyuanrong
           SCCACHE_IDLE_TIMEOUT: 0
-        run: sccache --start-server
+        run: |
+          cargo install sccache
+          sccache --start-server
 
       - name: Clippy
         if: matrix.kind == 'lint'
