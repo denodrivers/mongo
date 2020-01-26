@@ -108,15 +108,11 @@ fn command_connect_with_options(data: Option<PinnedBuf>) -> CoreOp {
         .hosts
         .into_iter()
         .map(|host: String| {
-            let host: Vec<&str> = host.as_str().split(":").collect();
-            let addr = StreamAddress {
+            let host: Vec<&str> = host.as_str().split(':').collect();
+            StreamAddress {
                 hostname: String::from(host[0]),
-                port: host.get(1).map(|port| {
-                    let port: u16 = port.parse().unwrap();
-                    port
-                }),
-            };
-            addr
+                port: host.get(1).map(|port| port.parse().unwrap()),
+            }
         })
         .collect();
     let mut options: ClientOptions = ClientOptions::default();

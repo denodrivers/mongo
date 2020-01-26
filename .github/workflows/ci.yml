@@ -32,6 +32,12 @@ jobs:
         with:
           deno-version: 0.x
 
+      - name: Start MongoDB
+        if: matrix.kind == 'test'
+        uses: superchargejs/mongodb-github-action@v1
+        with:
+          mongodb-version: 4.2
+
       - name: Environment (common)
         run: |
           echo ::set-env name=GH_ACTIONS::1
