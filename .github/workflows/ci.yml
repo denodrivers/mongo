@@ -35,7 +35,6 @@ jobs:
       - name: Environment (common)
         run: |
           echo ::set-env name=GH_ACTIONS::1
-          echo ::set-env name=RUSTC_WRAPPER::sccache
           echo ::set-env name=DENO_BUILD_MODE::release
           echo ::set-env name=RUST_BACKTRACE::full
 
