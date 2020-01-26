@@ -34,9 +34,9 @@ jobs:
 
       - name: Start MongoDB
         if: matrix.kind == 'test'
-        uses: superchargejs/mongodb-github-action@v1
+        uses: wbari/start-mongoDB@v0.2
         with:
-          mongodb-version: 4.2
+          mongoDBVersion: 4.2
 
       - name: Environment (common)
         run: |
