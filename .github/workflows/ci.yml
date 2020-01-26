@@ -36,6 +36,7 @@ jobs:
         run: |
           echo ::set-env name=GH_ACTIONS::1
           echo ::set-env name=DENO_BUILD_MODE::release
+          echo ::set-env name=RUSTC_WRAPPER::sccache
           echo ::set-env name=RUST_BACKTRACE::full
 
       - name: Log versions
@@ -43,6 +44,14 @@ jobs:
           node -v
           rustc --version
           cargo --version
+
+      - name: Start sccache
+        env:
+          AWS_ACCESS_KEY_ID: AKIAIK6FQDEHHJYJAHZQ
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          SCCACHE_BUCKET: manyuanrong
+          SCCACHE_IDLE_TIMEOUT: 0
+        run: sccache --start-server
 
       - name: Clippy
         if: matrix.kind == 'lint'
@@ -59,3 +68,6 @@ jobs:
       - name: Test TS
         if: matrix.kind == 'test'
         run: deno run -A ./test.ts
+      
+      - name: Stop sccache
+        run: sccache --stop-server
