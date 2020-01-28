@@ -1,51 +1,6 @@
-const Mongo = Deno.openPlugin("./target/debug/libdeno_mongo.dylib");
-
-const dispatcher = Mongo.ops["mongo_command"];
-const decoder = new TextDecoder();
-const encoder = new TextEncoder();
-const pendingCommands: Map<number, (data: unknown) => void> = new Map();
-
-let nextCommandId = 0;
-
-enum CommandType {
-  ConnectWithUri = "ConnectWithUri",
-  ConnectWithOptions = "ConnectWithOptions",
-  ListDatabases = "ListDatabases"
-}
-
-interface Command {
-  command_type: CommandType;
-  client_id?: number;
-  command_id?: number;
-}
-
-dispatcher.setAsyncHandler((msg: Uint8Array) => {
-  const { command_id, data } = JSON.parse(decoder.decode(msg));
-  const resolver = pendingCommands.get(command_id);
-  resolver(data);
-});
-
-function dispatch(command: Command, data?: ArrayBufferView): Uint8Array {
-  const control = encoder.encode(JSON.stringify(command));
-  return dispatcher.dispatch(control, data);
-}
-
-function dispatchAsync(
-  command: Command,
-  data?: ArrayBufferView
-): Promise<unknown> {
-  return new Promise(resolve => {
-    const commandId = nextCommandId++;
-    pendingCommands.set(commandId, resolve);
-    const control = encoder.encode(
-      JSON.stringify({
-        ...command,
-        command_id: commandId
-      })
-    );
-    dispatcher.dispatch(control, data);
-  });
-}
+import { dispatch, encode, decode, dispatchAsync } from "./util.ts";
+import { CommandType } from "./types.ts";
+import { Database } from "./database.ts";
 
 export interface ClientOptions {
   /**
@@ -132,22 +87,22 @@ export interface ClientOptions {
 }
 
 export class MongoClient {
-  private clientId: number;
+  public clientId: number;
 
   connectWithUri(uri: string) {
     const data = dispatch(
       { command_type: CommandType.ConnectWithUri },
-      encoder.encode(uri)
+      encode(uri)
     );
-    this.clientId = parseInt(decoder.decode(data));
+    this.clientId = parseInt(decode(data));
   }
 
   connectWithOptions(options: ClientOptions) {
     const data = dispatch(
       { command_type: CommandType.ConnectWithOptions },
-      encoder.encode(JSON.stringify(options))
+      encode(JSON.stringify(options))
     );
-    this.clientId = parseInt(decoder.decode(data));
+    this.clientId = parseInt(decode(data));
   }
 
   async listDatabases(): Promise<string[]> {
@@ -155,5 +110,9 @@ export class MongoClient {
       command_type: CommandType.ListDatabases,
       client_id: this.clientId
     })) as string[];
+  }
+
+  database(name: string): Database {
+    return new Database(this, name);
   }
 }

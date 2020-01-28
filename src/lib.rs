@@ -19,6 +19,7 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 use std::{collections::HashMap, sync::Mutex, sync::MutexGuard};
 
 mod command;
+mod util;
 
 lazy_static! {
     static ref CLIENTS: Mutex<HashMap<usize, Client>> = Mutex::new(HashMap::new());
@@ -32,6 +33,7 @@ pub enum CommandType {
     ConnectWithOptions,
     ConnectWithUri,
     ListDatabases,
+    ListCollectionNames,
 }
 
 #[derive(Deserialize)]
@@ -63,20 +65,6 @@ impl Command {
     fn get_client(&self) -> Client {
         get_client(self.args.client_id.unwrap())
     }
-
-    fn async_result<T>(&self, data: T) -> Buf
-    where
-        T: Serialize,
-    {
-        let result = AsyncResult {
-            command_id: self.args.command_id.unwrap(),
-            data,
-        };
-        let json = json!(result);
-        let mut data = serde_json::to_vec(&json).unwrap();
-        data.resize((data.len() + 3) & !3, b' ');
-        Buf::from(data)
-    }
 }
 
 impl CommandArgs {
@@ -100,6 +88,7 @@ fn op_command(data: &[u8], zero_copy: Option<PinnedBuf>) -> CoreOp {
         CommandType::ConnectWithOptions => command::connect_with_options,
         CommandType::ConnectWithUri => command::connect_with_uri,
         CommandType::ListDatabases => command::list_database_names,
+        CommandType::ListCollectionNames => command::list_collection_names,
     };
 
     executor(Command::new(args, zero_copy))
