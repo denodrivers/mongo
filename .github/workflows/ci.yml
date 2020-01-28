@@ -16,16 +16,16 @@ jobs:
       - name: Clone repository
         uses: actions/checkout@v1
 
-      # - name: Install rust
-      #   uses: hecrj/setup-rust-action@v1
-      #   with:
-      #     rust-version: "1.40.0"
+      - name: Install rust
+        uses: hecrj/setup-rust-action@v1
+        with:
+          rust-version: "1.40.0"
 
-      # - name: Install clippy and rustfmt
-      #   if: matrix.kind == 'lint'
-      #   run: |
-      #     rustup component add clippy
-      #     rustup component add rustfmt
+      - name: Install clippy and rustfmt
+        if: matrix.kind == 'lint'
+        run: |
+          rustup component add clippy
+          rustup component add rustfmt
 
       - name: Install Deno
         uses: denolib/setup-deno@master
@@ -51,51 +51,51 @@ jobs:
           choco install mongodb --version=4.2.0 --no-progress
           "C:\Program Files\MongoDB\Server\4.2.0\bin\mongo.exe"
 
-      # - name: Environment (common)
-      #   run: |
-      #     echo ::set-env name=GH_ACTIONS::1
-      #     echo ::set-env name=DENO_BUILD_MODE::release
-      #     echo ::set-env name=RUSTC_WRAPPER::sccache
-      #     echo ::set-env name=RUST_BACKTRACE::full
-      # - name: Log versions
-      #   run: |
-      #     node -v
-      #     rustc --version
-      #     cargo --version
-      # - name: Install and start sccache
-      #   shell: pwsh
-      #   working-directory: ${{ runner.temp }}
-      #   env:
-      #     AWS_ACCESS_KEY_ID: AKIAIK6FQDEHHJYJAHZQ
-      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #     SCCACHE_BUCKET: manyuanrong
-      #     SCCACHE_IDLE_TIMEOUT: 0
-      #   run: |
-      #     $version = "0.2.12"
-      #     $platform =
-      #       @{ "macOS"   = "x86_64-apple-darwin"
-      #          "Linux"   = "x86_64-unknown-linux-musl"
-      #          "Windows" = "x86_64-pc-windows-msvc"
-      #        }.${{ runner.os }}
-      #     $basename = "sccache-$version-$platform"
-      #     $url = "https://github.com/mozilla/sccache/releases/download/" +
-      #            "$version/$basename.tar.gz"
-      #     curl -LO $url
-      #     tar -xzvf "$basename.tar.gz"
-      #     . $basename/sccache --start-server
-      #     echo "::add-path::$(pwd)/$basename"
-      #     echo "::set-env name=RUSTC_WRAPPER::sccache"
-      # - name: Clippy
-      #   if: matrix.kind == 'lint'
-      #   run: cargo clippy --all-targets --release --locked -- -D clippy::all
-      # - name: Build
-      #   if: matrix.kind == 'test'
-      #   run: cargo build --release --locked --all-targets
-      # - name: Test Rust
-      #   if: matrix.kind == 'test'
-      #   run: cargo test --release --locked --all-targets
-      # - name: Test TS
-      #   if: matrix.kind == 'test'
-      #   run: deno run -A ./test.ts
-      # - name: Stop sccache
-      #   run: sccache --stop-server
+      - name: Environment (common)
+        run: |
+          echo ::set-env name=GH_ACTIONS::1
+          echo ::set-env name=DENO_BUILD_MODE::release
+          echo ::set-env name=RUSTC_WRAPPER::sccache
+          echo ::set-env name=RUST_BACKTRACE::full
+      - name: Log versions
+        run: |
+          node -v
+          rustc --version
+          cargo --version
+      - name: Install and start sccache
+        shell: pwsh
+        working-directory: ${{ runner.temp }}
+        env:
+          AWS_ACCESS_KEY_ID: AKIAIK6FQDEHHJYJAHZQ
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          SCCACHE_BUCKET: manyuanrong
+          SCCACHE_IDLE_TIMEOUT: 0
+        run: |
+          $version = "0.2.12"
+          $platform =
+            @{ "macOS"   = "x86_64-apple-darwin"
+               "Linux"   = "x86_64-unknown-linux-musl"
+               "Windows" = "x86_64-pc-windows-msvc"
+             }.${{ runner.os }}
+          $basename = "sccache-$version-$platform"
+          $url = "https://github.com/mozilla/sccache/releases/download/" +
+                 "$version/$basename.tar.gz"
+          curl -LO $url
+          tar -xzvf "$basename.tar.gz"
+          . $basename/sccache --start-server
+          echo "::add-path::$(pwd)/$basename"
+          echo "::set-env name=RUSTC_WRAPPER::sccache"
+      - name: Clippy
+        if: matrix.kind == 'lint'
+        run: cargo clippy --all-targets --release --locked -- -D clippy::all
+      - name: Build
+        if: matrix.kind == 'test'
+        run: cargo build --release --locked --all-targets
+      - name: Test Rust
+        if: matrix.kind == 'test'
+        run: cargo test --release --locked --all-targets
+      - name: Test TS
+        if: matrix.kind == 'test'
+        run: deno run -A ./test.ts
+      - name: Stop sccache
+        run: sccache --stop-server

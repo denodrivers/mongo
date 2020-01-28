@@ -1,6 +1,7 @@
 import { CommandType } from "./types.ts";
+import { pluginFilename } from "https://raw.githubusercontent.com/denoland/deno/fe26c4253da9cf769301b1c78a5eed127b996c6e/std/plugins/plugin_filename.ts";
 
-const Mongo = Deno.openPlugin("./target/debug/libdeno_mongo.dylib");
+const Mongo = Deno.openPlugin(`./target/debug/${pluginFilename("deno_mongo")}`);
 
 const dispatcher = Mongo.ops["mongo_command"];
 const decoder = new TextDecoder();
