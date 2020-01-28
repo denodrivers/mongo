@@ -48,8 +48,8 @@ jobs:
       - name: Start MongoDB (Windows)
         if: matrix.kind == 'test' && startsWith(matrix.os, 'windows')
         run: |
-          choco install mongodb --version=4.2.0
-          C:\Program Files\MongoDB\Server\4.2.0\bin\mongo.exe
+          choco install mongodb --version=4.2.0 --no-progress
+          "C:\Program Files\MongoDB\Server\4.2.0\bin\mongo.exe"
 
       # - name: Environment (common)
       #   run: |
