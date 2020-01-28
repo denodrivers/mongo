@@ -40,7 +40,7 @@ jobs:
           brew services start mongodb-community@4.2
 
       - name: Start MongoDB (Linux)
-        if: matrix.kind == 'test' && startsWith(matrix.os, 'unbuntu')
+        if: matrix.kind == 'test' && startsWith(matrix.os, 'ubuntu')
         uses: wbari/start-mongoDB@v0.2
         with:
           mongoDBVersion: 4.2
@@ -49,6 +49,7 @@ jobs:
         if: matrix.kind == 'test' && startsWith(matrix.os, 'windows')
         run: |
           choco install mongodb
+          mongod
 
       # - name: Environment (common)
       #   run: |
