@@ -49,6 +49,7 @@ jobs:
         if: matrix.kind == 'test' && startsWith(matrix.os, 'windows')
         run: |
           choco install mongodb
+          refreshenv
           mongod
 
       # - name: Environment (common)
