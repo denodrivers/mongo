@@ -30,7 +30,7 @@ jobs:
       - name: Install Deno
         uses: denolib/setup-deno@master
         with:
-          deno-version: 0.x
+          deno-version: 0.34.0
 
       - name: Start MongoDB (MacOs)
         if: matrix.kind == 'test' && startsWith(matrix.os, 'mac')
