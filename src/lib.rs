@@ -6,6 +6,8 @@ extern crate lazy_static;
 extern crate serde_json;
 extern crate mongodb;
 extern crate serde;
+#[macro_use]
+extern crate bson;
 
 use deno_core::CoreOp;
 use deno_core::PluginInitContext;
@@ -32,6 +34,7 @@ pub enum CommandType {
     ConnectWithOptions,
     ConnectWithUri,
     ListDatabases,
+    FindOne,
     ListCollectionNames,
 }
 
@@ -88,6 +91,7 @@ fn op_command(data: &[u8], zero_copy: Option<ZeroCopyBuf>) -> CoreOp {
         CommandType::ConnectWithUri => command::connect_with_uri,
         CommandType::ListDatabases => command::list_database_names,
         CommandType::ListCollectionNames => command::list_collection_names,
+        CommandType::FindOne => command::find_one,
     };
 
     executor(Command::new(args, zero_copy))

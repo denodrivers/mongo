@@ -33,4 +33,15 @@ test(async function testListCollectionNames() {
   assertEquals(names, ["startup_log"]);
 });
 
+test(async function testFindOne() {
+  const db = getClient().database("local");
+  const startupLogs = db.collection("startup_log");
+  const data = await startupLogs.findOne({});
+
+  assert(data instanceof Object);
+  assert(Object.keys(data).length > 0);
+
+  // TODO check data stuct
+});
+
 await runTests({ exitOnFail: true });

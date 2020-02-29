@@ -231,6 +231,7 @@ dependencies = [
 name = "deno_mongo"
 version = "0.1.0"
 dependencies = [
+ "bson",
  "deno_core",
  "futures 0.3.4",
  "lazy_static",
