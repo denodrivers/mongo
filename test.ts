@@ -1,5 +1,7 @@
+import { assert, assertEquals } from "https://deno.land/std/testing/asserts.ts";
 import { MongoClient } from "./mod.ts";
-import { test, runTests } from "https://deno.land/std/testing/mod.ts";
+
+const { test, runTests } = Deno;
 
 function getClient(): MongoClient {
   const client = new MongoClient();
@@ -11,7 +13,8 @@ test(async function testConnectWithUri() {
   const client = new MongoClient();
   client.connectWithUri("mongodb://localhost:27017");
   const names = await client.listDatabases();
-  console.log(names);
+  assert(names instanceof Array);
+  assert(names.length > 0);
 });
 
 test(async function testConnectWithOptions() {
@@ -20,13 +23,14 @@ test(async function testConnectWithOptions() {
     hosts: ["localhost:27017"]
   });
   const names = await client.listDatabases();
-  console.log(names);
+  assert(names instanceof Array);
+  assert(names.length > 0);
 });
 
 test(async function testListCollectionNames() {
   const db = getClient().database("local");
   const names = await db.listCollectionNames();
-  console.log(names);
+  assertEquals(names, ["startup_log"]);
 });
 
-runTests();
+await runTests({ exitOnFail: true });

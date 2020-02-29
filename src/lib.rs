@@ -7,10 +7,9 @@ extern crate serde_json;
 extern crate mongodb;
 extern crate serde;
 
-use deno_core::Buf;
 use deno_core::CoreOp;
-use deno_core::PinnedBuf;
 use deno_core::PluginInitContext;
+use deno_core::{Buf, ZeroCopyBuf};
 use futures::FutureExt;
 use mongodb::Client;
 use serde::{Deserialize, Serialize};
@@ -45,7 +44,7 @@ pub struct CommandArgs {
 
 pub struct Command {
     args: CommandArgs,
-    data: Option<PinnedBuf>,
+    data: Option<ZeroCopyBuf>,
 }
 
 #[derive(Serialize)]
@@ -58,7 +57,7 @@ where
 }
 
 impl Command {
-    fn new(args: CommandArgs, data: Option<PinnedBuf>) -> Command {
+    fn new(args: CommandArgs, data: Option<ZeroCopyBuf>) -> Command {
         Command { args, data }
     }
 
@@ -82,7 +81,7 @@ pub(crate) fn get_client(client_id: usize) -> Client {
     map.get(&client_id).unwrap().clone()
 }
 
-fn op_command(data: &[u8], zero_copy: Option<PinnedBuf>) -> CoreOp {
+fn op_command(data: &[u8], zero_copy: Option<ZeroCopyBuf>) -> CoreOp {
     let args = CommandArgs::new(data);
     let executor = match args.command_type {
         CommandType::ConnectWithOptions => command::connect_with_options,

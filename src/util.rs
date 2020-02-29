@@ -9,7 +9,6 @@ where
         data,
     };
     let json = json!(result);
-    let mut data = serde_json::to_vec(&json).unwrap();
-    data.resize((data.len() + 3) & !3, b' ');
+    let data = serde_json::to_vec(&json).unwrap();
     Buf::from(data)
 }

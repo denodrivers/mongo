@@ -1,6 +1,6 @@
-import { dispatch, encode, decode, dispatchAsync } from "./util.ts";
-import { CommandType } from "./types.ts";
 import { Database } from "./database.ts";
+import { CommandType } from "./types.ts";
+import { decode, dispatch, dispatchAsync, encode } from "./util.ts";
 
 export interface ClientOptions {
   /**
@@ -87,14 +87,18 @@ export interface ClientOptions {
 }
 
 export class MongoClient {
-  public clientId: number;
+  private _clientId: number = 0;
+
+  get clientId() {
+    return this._clientId;
+  }
 
   connectWithUri(uri: string) {
     const data = dispatch(
       { command_type: CommandType.ConnectWithUri },
       encode(uri)
     );
-    this.clientId = parseInt(decode(data));
+    this._clientId = parseInt(decode(data));
   }
 
   connectWithOptions(options: ClientOptions) {
@@ -102,13 +106,13 @@ export class MongoClient {
       { command_type: CommandType.ConnectWithOptions },
       encode(JSON.stringify(options))
     );
-    this.clientId = parseInt(decode(data));
+    this._clientId = parseInt(decode(data));
   }
 
   async listDatabases(): Promise<string[]> {
     return (await dispatchAsync({
       command_type: CommandType.ListDatabases,
-      client_id: this.clientId
+      client_id: this._clientId
     })) as string[];
   }
 
