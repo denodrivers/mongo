@@ -19,7 +19,7 @@ jobs:
       - name: Install rust
         uses: hecrj/setup-rust-action@v1
         with:
-          rust-version: "1.40.0"
+          rust-version: "1.41.0"
 
       - name: Install clippy and rustfmt
         if: matrix.kind == 'lint'
@@ -30,7 +30,7 @@ jobs:
       - name: Install Deno
         uses: denolib/setup-deno@master
         with:
-          deno-version: 0.34.0
+          deno-version: 0.35.0
 
       - name: Start MongoDB (MacOs)
         if: matrix.kind == 'test' && startsWith(matrix.os, 'mac')
@@ -61,6 +61,16 @@ jobs:
           node -v
           rustc --version
           cargo --version
+      - name: Cache cargo registry
+        uses: actions/cache@v1
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+      - name: Cache cargo index
+        uses: actions/cache@v1
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
       - name: Cache cargo build
         uses: actions/cache@v1
         with:
