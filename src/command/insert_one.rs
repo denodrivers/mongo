@@ -4,31 +4,30 @@ use serde_json::Value;
 
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct FindOnetArgs {
+struct InsertOnetArgs {
     db_name: String,
     collection_name: String,
-    filter: Value,
+    doc: Value,
 }
 
-pub fn find_one(command: Command) -> CoreOp {
+pub fn insert_one(command: Command) -> CoreOp {
     let fut = async move {
         let client = command.get_client();
         let data = command.data;
-        let args: FindOnetArgs = serde_json::from_slice(data.unwrap().as_ref()).unwrap();
+        let args: InsertOnetArgs = serde_json::from_slice(data.unwrap().as_ref()).unwrap();
         let db_name = args.db_name;
         let collection_name = args.collection_name;
-        let filter = args.filter;
+        let doc = args.doc;
         let database = client.database(&db_name);
         let collection = database.collection(&collection_name);
 
-        let filter_doc: Bson = filter.into();
-        let filter_doc = match filter_doc {
-            Bson::Document(doc) => Some(doc),
-            _ => None,
-        };
-
-        let doc = collection.find_one(filter_doc, None).unwrap();
-        Ok(util::async_result(&command.args, doc))
+        let insert_doc: Bson = doc.into();
+        if let Bson::Document(insert_doc) = insert_doc {
+            let insert_result = collection.insert_one(insert_doc, None).unwrap();
+            Ok(util::async_result(&command.args, insert_result.inserted_id))
+        } else {
+            Err(())
+        }
     };
     CoreOp::Async(fut.boxed())
 }

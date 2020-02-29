@@ -8,6 +8,7 @@ export class Collection {
     private readonly dbName: string,
     private readonly collectionName: string
   ) {}
+
   public async findOne(filter: Object): Promise<any> {
     const doc = await dispatchAsync(
       {
@@ -23,5 +24,22 @@ export class Collection {
       )
     );
     return doc;
+  }
+
+  public async insertOne(doc: Object): Promise<any> {
+    const _id = await dispatchAsync(
+      {
+        command_type: CommandType.InsertOne,
+        client_id: this.client.clientId
+      },
+      encode(
+        JSON.stringify({
+          dbName: this.dbName,
+          collectionName: this.collectionName,
+          doc
+        })
+      )
+    );
+    return _id;
   }
 }

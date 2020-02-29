@@ -33,15 +33,36 @@ test(async function testListCollectionNames() {
   assertEquals(names, ["startup_log"]);
 });
 
-test(async function testFindOne() {
-  const db = getClient().database("local");
-  const startupLogs = db.collection("startup_log");
-  const data = await startupLogs.findOne({});
+test(async function testInsertOne() {
+  const db = getClient().database("test");
+  const users = db.collection("mongo_test_users");
+  const insertId = await users.insertOne({
+    username: "user1",
+    password: "pass1"
+  });
 
-  assert(data instanceof Object);
-  assert(Object.keys(data).length > 0);
+  assertEquals(Object.keys(insertId), ["$oid"]);
 
-  // TODO check data stuct
+  const user1 = await users.findOne({
+    _id: insertId
+  });
+
+  assertEquals(user1, {
+    _id: insertId,
+    username: "user1",
+    password: "pass1"
+  });
 });
 
-await runTests({ exitOnFail: true });
+test(async function testFindOne() {
+  const db = getClient().database("test");
+  const users = db.collection("mongo_test_users");
+  const user1 = await users.findOne({});
+  assert(user1 instanceof Object);
+  assertEquals(Object.keys(user1), ["_id", "username", "password"]);
+
+  const findNull = await users.findOne({ test: 1 });
+  assertEquals(findNull, null);
+});
+
+await runTests();
