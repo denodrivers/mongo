@@ -25,9 +25,10 @@ pub fn delete(command: Command) -> CoreOp {
 
         let query_doc: Bson = query.into();
         if let Bson::Document(query_doc) = query_doc {
-            let delete_result = match delete_one {
-                true => collection.delete_one(query_doc, None).unwrap(),
-                false => collection.delete_many(query_doc, None).unwrap(),
+            let delete_result = if delete_one {
+                collection.delete_one(query_doc, None).unwrap()
+            } else {
+                collection.delete_many(query_doc, None).unwrap()
             };
             Ok(util::async_result(
                 &command.args,
