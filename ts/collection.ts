@@ -42,4 +42,33 @@ export class Collection {
     );
     return _id;
   }
+
+  private async _delete(
+    query: Object,
+    deleteOne: boolean = false
+  ): Promise<number> {
+    const deleteCount = await dispatchAsync(
+      {
+        command_type: CommandType.Delete,
+        client_id: this.client.clientId
+      },
+      encode(
+        JSON.stringify({
+          dbName: this.dbName,
+          collectionName: this.collectionName,
+          query,
+          deleteOne
+        })
+      )
+    );
+    return deleteCount as number;
+  }
+
+  public deleteOne(query: Object): Promise<number> {
+    return this._delete(query, true);
+  }
+
+  public deleteMany(query: Object): Promise<number> {
+    return this._delete(query, false);
+  }
 }

@@ -36,6 +36,7 @@ pub enum CommandType {
     FindOne,
     ListCollectionNames,
     InsertOne,
+    Delete,
 }
 
 #[derive(Deserialize)]
@@ -93,6 +94,7 @@ fn op_command(data: &[u8], zero_copy: Option<ZeroCopyBuf>) -> CoreOp {
         CommandType::ListCollectionNames => command::list_collection_names,
         CommandType::FindOne => command::find_one,
         CommandType::InsertOne => command::insert_one,
+        CommandType::Delete => command::delete,
     };
 
     executor(Command::new(args, zero_copy))

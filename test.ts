@@ -65,4 +65,11 @@ test(async function testFindOne() {
   assertEquals(findNull, null);
 });
 
+test(async function testDeleteOne() {
+  const db = getClient().database("test");
+  const users = db.collection("mongo_test_users");
+  const deleteCount = await users.deleteOne({});
+  assertEquals(deleteCount, 1);
+});
+
 await runTests();
