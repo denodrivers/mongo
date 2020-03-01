@@ -2,7 +2,7 @@ import { pluginFilename } from "https://raw.githubusercontent.com/denoland/deno/
 import { CommandType } from "./types.ts";
 
 const Mongo = Deno.openPlugin(
-  `./target/debug/${pluginFilename("deno_mongo")}`
+  `./target/release/${pluginFilename("deno_mongo")}`
 );
 
 const dispatcher = Mongo.ops["mongo_command"];
