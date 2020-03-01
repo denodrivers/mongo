@@ -76,7 +76,7 @@ jobs:
         uses: actions/cache@v1
         with:
           path: target
-          key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ matrix.kind }}-${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
       - name: Clippy
         if: matrix.kind == 'lint'
         run: cargo clippy --all-targets --release --locked -- -D clippy::all
