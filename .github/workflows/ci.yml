@@ -89,3 +89,15 @@ jobs:
       - name: Test TS
         if: matrix.kind == 'test'
         run: deno run -A ./test.ts
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: |
+            target/release/libdeno_mongo.dylib
+            target/release/libdeno_mongo.so
+            target/release/deno_mongo.dll
+          draft: true
