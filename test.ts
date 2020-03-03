@@ -1,5 +1,6 @@
 import { assert, assertEquals } from "https://deno.land/std/testing/asserts.ts";
-import { MongoClient } from "./mod.ts";
+import { cargoBuild } from "./build.ts";
+import { init, MongoClient } from "./mod.ts";
 
 const { test, runTests } = Deno;
 
@@ -72,4 +73,6 @@ test(async function testDeleteOne() {
   assertEquals(deleteCount, 1);
 });
 
+await cargoBuild();
+await init();
 await runTests();

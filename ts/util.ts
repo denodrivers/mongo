@@ -1,11 +1,10 @@
-import { pluginFilename } from "https://raw.githubusercontent.com/denoland/deno/fe26c4253da9cf769301b1c78a5eed127b996c6e/std/plugins/plugin_filename.ts";
+import { prepare } from "https://raw.githubusercontent.com/manyuanrong/deno-plugin-prepare/master/mod.ts";
 import { CommandType } from "./types.ts";
 
-const Mongo = Deno.openPlugin(
-  `./target/release/${pluginFilename("deno_mongo")}`
-);
+const PLUGIN_NAME = "deno_mongo";
 
-const dispatcher = Mongo.ops["mongo_command"];
+let dispatcher: Deno.PluginOp | null = null;
+
 const decoder = new TextDecoder();
 const encoder = new TextEncoder();
 const pendingCommands: Map<number, (data: unknown) => void> = new Map();
@@ -18,11 +17,27 @@ interface Command {
   command_id?: number;
 }
 
-dispatcher.setAsyncHandler((msg: Uint8Array) => {
-  const { command_id, data } = JSON.parse(decoder.decode(msg));
-  const resolver = pendingCommands.get(command_id);
-  resolver && resolver(data);
-});
+export async function init() {
+  let releaseUrl =
+    "https://github.com/manyuanrong/deno_mongo/releases/download/master";
+
+  const options = {
+    name: PLUGIN_NAME,
+    urls: {
+      mac: `${releaseUrl}/lib${PLUGIN_NAME}.dylib`,
+      win: `${releaseUrl}/${PLUGIN_NAME}.dll`,
+      linux: `${releaseUrl}/lib${PLUGIN_NAME}`
+    }
+  };
+
+  const Mongo = await prepare(options);
+  dispatcher = Mongo.ops["mongo_command"];
+  dispatcher.setAsyncHandler((msg: Uint8Array) => {
+    const { command_id, data } = JSON.parse(decoder.decode(msg));
+    const resolver = pendingCommands.get(command_id);
+    resolver && resolver(data);
+  });
+}
 
 export function encode(str: string): Uint8Array {
   return encoder.encode(str);
@@ -34,6 +49,9 @@ export function decode(data: Uint8Array): string {
 
 export function dispatch(command: Command, data?: ArrayBufferView): Uint8Array {
   const control = encoder.encode(JSON.stringify(command));
+  if (!dispatcher) {
+    throw new Error("The plugin must be initialized before use");
+  }
   return dispatcher.dispatch(control, data)!;
 }
 
@@ -50,6 +68,11 @@ export function dispatchAsync(
         command_id: commandId
       })
     );
+    if (!dispatcher) {
+      if (!dispatcher) {
+        throw new Error("The plugin must be initialized before use");
+      }
+    }
     dispatcher.dispatch(control, data);
   });
 }
