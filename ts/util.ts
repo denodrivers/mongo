@@ -26,7 +26,7 @@ export async function init() {
     urls: {
       mac: `${releaseUrl}/lib${PLUGIN_NAME}.dylib`,
       win: `${releaseUrl}/${PLUGIN_NAME}.dll`,
-      linux: `${releaseUrl}/lib${PLUGIN_NAME}`
+      linux: `${releaseUrl}/lib${PLUGIN_NAME}.so`
     }
   };
 
