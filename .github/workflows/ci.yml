@@ -9,8 +9,7 @@ jobs:
     timeout-minutes: 60
     strategy:
       matrix:
-        os: [macOS-latest, ubuntu-16.04]
-        # os: [macOS-latest, windows-2019, ubuntu-16.04]
+        os: [macOS-latest, windows-2019, ubuntu-16.04]
         kind: ["test", "lint"]
 
     steps:
@@ -62,6 +61,7 @@ jobs:
           node -v
           rustc --version
           cargo --version
+
       - name: Cache cargo registry
         uses: actions/cache@v1
         with:
@@ -77,6 +77,13 @@ jobs:
         with:
           path: target
           key: ${{ matrix.kind }}-${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Install python
+        uses: actions/setup-python@v1
+        with:
+          python-version: "2.7.x"
+          architecture: x64
+
       - name: Clippy
         if: matrix.kind == 'lint'
         run: cargo clippy --all-targets --release --locked -- -D clippy::all
@@ -101,3 +108,15 @@ jobs:
             target/release/libdeno_mongo.so
             target/release/deno_mongo.dll
           draft: true
+
+      - name: Release Master
+        uses: softprops/action-gh-release@v1
+        if: matrix.kind == 'test' && startsWith(github.ref, 'refs/heads/master')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: master
+          files: |
+            target/release/libdeno_mongo.dylib
+            target/release/libdeno_mongo.so
+            target/release/deno_mongo.dll
