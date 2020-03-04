@@ -17,7 +17,7 @@ interface Command {
   command_id?: number;
 }
 
-export async function init(binVer: string = "master") {
+export async function init(binVer: string) {
   let releaseUrl = `https://github.com/manyuanrong/deno_mongo/releases/download/${binVer}`;
 
   const options = {
