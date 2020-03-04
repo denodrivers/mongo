@@ -121,8 +121,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: https://uploads.github.com/repos/manyuanrong/deno_mongo/releases/master/assets{?name,label}
-          release_id: master
+          upload_url: https://uploads.github.com/repos/manyuanrong/deno_mongo/releases/24155879/assets{?name,label}
+          release_id: 24155879
           asset_path: target/release/libdeno_mongo.so
           asset_name: libdeno_mongo.so
           asset_content_type: application/octet-stream
@@ -134,8 +134,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: https://uploads.github.com/repos/manyuanrong/deno_mongo/releases/master/assets{?name,label}
-          release_id: master
+          upload_url: https://uploads.github.com/repos/manyuanrong/deno_mongo/releases/24155879/assets{?name,label}
+          release_id: 24155879
           asset_path: target/release/libdeno_mongo.dylib
           asset_name: libdeno_mongo.dylib
           asset_content_type: application/octet-stream
@@ -147,8 +147,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: https://uploads.github.com/repos/manyuanrong/deno_mongo/releases/master/assets{?name,label}
-          release_id: master
+          upload_url: https://uploads.github.com/repos/manyuanrong/deno_mongo/releases/24155879/assets{?name,label}
+          release_id: 24155879
           asset_path: target/release/deno_mongo.dll
           asset_name: deno_mongo.dll
           asset_content_type: application/octet-stream
