@@ -7,7 +7,7 @@ pub fn list_collection_names(command: Command) -> CoreOp {
         let db_name: Vec<u8> = data.unwrap().as_ref().to_vec();
         let db_name = String::from_utf8(db_name).unwrap();
         let database = client.database(&db_name);
-        let collection_names = database.list_collection_names(None);
+        let collection_names = database.list_collection_names(None::<bson::Document>);
 
         Ok(util::async_result(&command.args, collection_names.unwrap()))
     };

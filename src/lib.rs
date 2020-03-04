@@ -35,6 +35,7 @@ pub enum CommandType {
     ListDatabases,
     FindOne,
     ListCollectionNames,
+    InsertMany,
     InsertOne,
     Delete,
 }
@@ -94,6 +95,7 @@ fn op_command(data: &[u8], zero_copy: Option<ZeroCopyBuf>) -> CoreOp {
         CommandType::ListCollectionNames => command::list_collection_names,
         CommandType::FindOne => command::find_one,
         CommandType::InsertOne => command::insert_one,
+        CommandType::InsertMany => command::insert_many,
         CommandType::Delete => command::delete,
     };
 

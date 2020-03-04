@@ -9,7 +9,7 @@ export class Collection {
     private readonly collectionName: string
   ) {}
 
-  public async findOne(filter: Object): Promise<any> {
+  public async findOne(filter?: Object): Promise<any> {
     const doc = await dispatchAsync(
       {
         command_type: CommandType.FindOne,
@@ -41,6 +41,23 @@ export class Collection {
       )
     );
     return _id;
+  }
+
+  public async insertMany(docs: Object[]): Promise<any> {
+    const _ids = await dispatchAsync(
+      {
+        command_type: CommandType.InsertMany,
+        client_id: this.client.clientId
+      },
+      encode(
+        JSON.stringify({
+          dbName: this.dbName,
+          collectionName: this.collectionName,
+          docs
+        })
+      )
+    );
+    return _ids;
   }
 
   private async _delete(

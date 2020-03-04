@@ -1,5 +1,4 @@
 use crate::*;
-use bson::Bson;
 use serde_json::Value;
 
 #[derive(Deserialize, Debug)]
@@ -19,24 +18,19 @@ pub fn delete(command: Command) -> CoreOp {
         let db_name = args.db_name;
         let collection_name = args.collection_name;
         let delete_one = args.delete_one;
-        let query = args.query;
+        let query = util::json_to_document(args.query).expect("query canot be null");
         let database = client.database(&db_name);
         let collection = database.collection(&collection_name);
 
-        let query_doc: Bson = query.into();
-        if let Bson::Document(query_doc) = query_doc {
-            let delete_result = if delete_one {
-                collection.delete_one(query_doc, None).unwrap()
-            } else {
-                collection.delete_many(query_doc, None).unwrap()
-            };
-            Ok(util::async_result(
-                &command.args,
-                delete_result.deleted_count,
-            ))
+        let delete_result = if delete_one {
+            collection.delete_one(query, None).unwrap()
         } else {
-            Err(())
-        }
+            collection.delete_many(query, None).unwrap()
+        };
+        Ok(util::async_result(
+            &command.args,
+            delete_result.deleted_count,
+        ))
     };
     CoreOp::Async(fut.boxed())
 }

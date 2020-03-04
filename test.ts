@@ -55,10 +55,27 @@ test(async function testInsertOne() {
   });
 });
 
+test(async function testInsertMany() {
+  const db = getClient().database("test");
+  const users = db.collection("mongo_test_users");
+  const insertIds = await users.insertMany([
+    {
+      username: "many",
+      password: "pass1"
+    },
+    {
+      username: "many",
+      password: "pass1"
+    }
+  ]);
+
+  assertEquals(insertIds.length, 2);
+});
+
 test(async function testFindOne() {
   const db = getClient().database("test");
   const users = db.collection("mongo_test_users");
-  const user1 = await users.findOne({});
+  const user1 = await users.findOne();
   assert(user1 instanceof Object);
   assertEquals(Object.keys(user1), ["_id", "username", "password"]);
 
@@ -71,6 +88,15 @@ test(async function testDeleteOne() {
   const users = db.collection("mongo_test_users");
   const deleteCount = await users.deleteOne({});
   assertEquals(deleteCount, 1);
+});
+
+test(async function testDeleteMany() {
+  const db = getClient().database("test");
+  const users = db.collection("mongo_test_users");
+  const deleteCount = await users.deleteMany({
+    username: "many"
+  });
+  assertEquals(deleteCount, 2);
 });
 
 await cargoBuild();

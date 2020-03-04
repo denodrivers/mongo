@@ -5,5 +5,6 @@ export enum CommandType {
   ListCollectionNames = "ListCollectionNames",
   FindOne = "FindOne",
   InsertOne = "InsertOne",
+  InsertMany = "InsertMany",
   Delete = "Delete"
 }
