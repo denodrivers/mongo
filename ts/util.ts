@@ -17,9 +17,8 @@ interface Command {
   command_id?: number;
 }
 
-export async function init() {
-  let releaseUrl =
-    "https://github.com/manyuanrong/deno_mongo/releases/download/master";
+export async function init(binVer: string = "master") {
+  let releaseUrl = `https://github.com/manyuanrong/deno_mongo/releases/download/${binVer}`;
 
   const options = {
     name: PLUGIN_NAME,

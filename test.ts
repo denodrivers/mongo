@@ -74,5 +74,5 @@ test(async function testDeleteOne() {
 });
 
 await cargoBuild();
-await init();
+await init("master");
 await runTests();
