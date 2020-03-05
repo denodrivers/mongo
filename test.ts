@@ -55,23 +55,6 @@ test(async function testInsertOne() {
   });
 });
 
-test(async function testInsertMany() {
-  const db = getClient().database("test");
-  const users = db.collection("mongo_test_users");
-  const insertIds = await users.insertMany([
-    {
-      username: "many",
-      password: "pass1"
-    },
-    {
-      username: "many",
-      password: "pass1"
-    }
-  ]);
-
-  assertEquals(insertIds.length, 2);
-});
-
 test(async function testFindOne() {
   const db = getClient().database("test");
   const users = db.collection("mongo_test_users");
@@ -90,6 +73,34 @@ test(async function testDeleteOne() {
   assertEquals(deleteCount, 1);
 });
 
+test(async function testInsertMany() {
+  const db = getClient().database("test");
+  const users = db.collection("mongo_test_users");
+  const insertIds = await users.insertMany([
+    {
+      username: "many",
+      password: "pass1"
+    },
+    {
+      username: "many",
+      password: "pass1"
+    }
+  ]);
+
+  assertEquals(insertIds.length, 2);
+});
+
+test(async function testFind() {
+  const db = getClient().database("test");
+  const users = db.collection("mongo_test_users");
+  const findUsers = await users.find({ username: "many" });
+  assert(findUsers instanceof Array);
+  assertEquals(findUsers.length, 2);
+
+  const notFound = await users.find({ test: 1 });
+  assertEquals(notFound, []);
+});
+
 test(async function testDeleteMany() {
   const db = getClient().database("test");
   const users = db.collection("mongo_test_users");
@@ -100,5 +111,5 @@ test(async function testDeleteMany() {
 });
 
 await cargoBuild();
-await init("master");
+await init();
 await runTests();

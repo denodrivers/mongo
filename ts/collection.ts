@@ -9,21 +9,30 @@ export class Collection {
     private readonly collectionName: string
   ) {}
 
-  public async findOne(filter?: Object): Promise<any> {
+  private async _find(filter?: Object, findOne: boolean = false): Promise<any> {
     const doc = await dispatchAsync(
       {
-        command_type: CommandType.FindOne,
+        command_type: CommandType.Find,
         client_id: this.client.clientId
       },
       encode(
         JSON.stringify({
           dbName: this.dbName,
           collectionName: this.collectionName,
-          filter
+          filter,
+          findOne
         })
       )
     );
     return doc;
+  }
+
+  public async findOne(filter?: Object): Promise<any> {
+    return this._find(filter, true);
+  }
+
+  public async find(filter?: Object): Promise<any> {
+    return this._find(filter, false);
   }
 
   public async insertOne(doc: Object): Promise<any> {
