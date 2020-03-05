@@ -3,8 +3,9 @@ export enum CommandType {
   ConnectWithOptions = "ConnectWithOptions",
   ListDatabases = "ListDatabases",
   ListCollectionNames = "ListCollectionNames",
-  FindOne = "FindOne",
+  Find = "Find",
   InsertOne = "InsertOne",
   InsertMany = "InsertMany",
-  Delete = "Delete"
+  Delete = "Delete",
+  Update = "Update"
 }

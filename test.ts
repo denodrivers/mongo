@@ -55,6 +55,31 @@ test(async function testInsertOne() {
   });
 });
 
+test(async function testFindOne() {
+  const db = getClient().database("test");
+  const users = db.collection("mongo_test_users");
+  const user1 = await users.findOne();
+  assert(user1 instanceof Object);
+  assertEquals(Object.keys(user1), ["_id", "username", "password"]);
+
+  const findNull = await users.findOne({ test: 1 });
+  assertEquals(findNull, null);
+});
+
+test(async function testUpdateOne() {
+  const db = getClient().database("test");
+  const users = db.collection("mongo_test_users");
+  const result = await users.updateOne({}, { username: "USER1" });
+  assertEquals(result, { matchedCount: 1, modifiedCount: 1, upsertedId: null });
+});
+
+test(async function testDeleteOne() {
+  const db = getClient().database("test");
+  const users = db.collection("mongo_test_users");
+  const deleteCount = await users.deleteOne({});
+  assertEquals(deleteCount, 1);
+});
+
 test(async function testInsertMany() {
   const db = getClient().database("test");
   const users = db.collection("mongo_test_users");
@@ -72,33 +97,34 @@ test(async function testInsertMany() {
   assertEquals(insertIds.length, 2);
 });
 
-test(async function testFindOne() {
+test(async function testFind() {
   const db = getClient().database("test");
   const users = db.collection("mongo_test_users");
-  const user1 = await users.findOne();
-  assert(user1 instanceof Object);
-  assertEquals(Object.keys(user1), ["_id", "username", "password"]);
+  const findUsers = await users.find({ username: "many" });
+  assert(findUsers instanceof Array);
+  assertEquals(findUsers.length, 2);
 
-  const findNull = await users.findOne({ test: 1 });
-  assertEquals(findNull, null);
+  const notFound = await users.find({ test: 1 });
+  assertEquals(notFound, []);
 });
 
-test(async function testDeleteOne() {
+test(async function testUpdateMany() {
   const db = getClient().database("test");
   const users = db.collection("mongo_test_users");
-  const deleteCount = await users.deleteOne({});
-  assertEquals(deleteCount, 1);
+  const result = await users.updateMany(
+    { username: "many" },
+    { $set: { username: "MANY" } }
+  );
+  assertEquals(result, { matchedCount: 2, modifiedCount: 2, upsertedId: null });
 });
 
 test(async function testDeleteMany() {
   const db = getClient().database("test");
   const users = db.collection("mongo_test_users");
-  const deleteCount = await users.deleteMany({
-    username: "many"
-  });
+  const deleteCount = await users.deleteMany({ username: "MANY" });
   assertEquals(deleteCount, 2);
 });
 
 await cargoBuild();
-await init("master");
+await init();
 await runTests();

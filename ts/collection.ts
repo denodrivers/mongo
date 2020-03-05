@@ -1,4 +1,5 @@
 import { MongoClient } from "./client.ts";
+import { UpdateResult } from "./result.ts";
 import { CommandType } from "./types.ts";
 import { dispatchAsync, encode } from "./util.ts";
 
@@ -9,21 +10,30 @@ export class Collection {
     private readonly collectionName: string
   ) {}
 
-  public async findOne(filter?: Object): Promise<any> {
+  private async _find(filter?: Object, findOne: boolean = false): Promise<any> {
     const doc = await dispatchAsync(
       {
-        command_type: CommandType.FindOne,
+        command_type: CommandType.Find,
         client_id: this.client.clientId
       },
       encode(
         JSON.stringify({
           dbName: this.dbName,
           collectionName: this.collectionName,
-          filter
+          filter,
+          findOne
         })
       )
     );
     return doc;
+  }
+
+  public async findOne(filter?: Object): Promise<any> {
+    return this._find(filter, true);
+  }
+
+  public async find(filter?: Object): Promise<any> {
+    return this._find(filter, false);
   }
 
   public async insertOne(doc: Object): Promise<any> {
@@ -87,5 +97,36 @@ export class Collection {
 
   public deleteMany(query: Object): Promise<number> {
     return this._delete(query, false);
+  }
+
+  private async _update(
+    query: Object,
+    update: Object,
+    updateOne: boolean = false
+  ): Promise<UpdateResult> {
+    const result = await dispatchAsync(
+      {
+        command_type: CommandType.Update,
+        client_id: this.client.clientId
+      },
+      encode(
+        JSON.stringify({
+          dbName: this.dbName,
+          collectionName: this.collectionName,
+          query,
+          update,
+          updateOne
+        })
+      )
+    );
+    return result as UpdateResult;
+  }
+
+  public updateOne(query: Object, update: Object): Promise<UpdateResult> {
+    return this._update(query, update, true);
+  }
+
+  public updateMany(query: Object, update: Object): Promise<UpdateResult> {
+    return this._update(query, update, false);
   }
 }

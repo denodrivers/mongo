@@ -33,11 +33,12 @@ pub enum CommandType {
     ConnectWithOptions,
     ConnectWithUri,
     ListDatabases,
-    FindOne,
+    Find,
     ListCollectionNames,
     InsertMany,
     InsertOne,
     Delete,
+    Update,
 }
 
 #[derive(Deserialize)]
@@ -93,10 +94,11 @@ fn op_command(data: &[u8], zero_copy: Option<ZeroCopyBuf>) -> CoreOp {
         CommandType::ConnectWithUri => command::connect_with_uri,
         CommandType::ListDatabases => command::list_database_names,
         CommandType::ListCollectionNames => command::list_collection_names,
-        CommandType::FindOne => command::find_one,
+        CommandType::Find => command::find,
         CommandType::InsertOne => command::insert_one,
         CommandType::InsertMany => command::insert_many,
         CommandType::Delete => command::delete,
+        CommandType::Update => command::update,
     };
 
     executor(Command::new(args, zero_copy))
