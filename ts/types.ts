@@ -6,5 +6,6 @@ export enum CommandType {
   Find = "Find",
   InsertOne = "InsertOne",
   InsertMany = "InsertMany",
-  Delete = "Delete"
+  Delete = "Delete",
+  Update = "Update"
 }

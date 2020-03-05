@@ -51,6 +51,18 @@ const user1 = await users.findOne({ _id: insertId });
 // find
 const users = await users.find({ username: { $ne: null } });
 
+// updateOne
+const { matchedCount, modifiedCount, upsertedId } = await users.updateOne(
+  username: { $ne: null },
+  { $set: { username: "USERNAME" } }
+);
+
+// updateMany
+const { matchedCount, modifiedCount, upsertedId } = await users.updateMany(
+  username: { $ne: null },
+  { $set: { username: "USERNAME" } }
+);
+
 // deleteOne
 const deleteCount = await users.deleteOne({ _id: insertId });
 

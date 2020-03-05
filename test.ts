@@ -66,6 +66,13 @@ test(async function testFindOne() {
   assertEquals(findNull, null);
 });
 
+test(async function testUpdateOne() {
+  const db = getClient().database("test");
+  const users = db.collection("mongo_test_users");
+  const result = await users.updateOne({}, { username: "USER1" });
+  assertEquals(result, { matchedCount: 1, modifiedCount: 1, upsertedId: null });
+});
+
 test(async function testDeleteOne() {
   const db = getClient().database("test");
   const users = db.collection("mongo_test_users");
@@ -101,12 +108,20 @@ test(async function testFind() {
   assertEquals(notFound, []);
 });
 
+test(async function testUpdateMany() {
+  const db = getClient().database("test");
+  const users = db.collection("mongo_test_users");
+  const result = await users.updateMany(
+    { username: "many" },
+    { $set: { username: "MANY" } }
+  );
+  assertEquals(result, { matchedCount: 2, modifiedCount: 2, upsertedId: null });
+});
+
 test(async function testDeleteMany() {
   const db = getClient().database("test");
   const users = db.collection("mongo_test_users");
-  const deleteCount = await users.deleteMany({
-    username: "many"
-  });
+  const deleteCount = await users.deleteMany({ username: "MANY" });
   assertEquals(deleteCount, 2);
 });
 

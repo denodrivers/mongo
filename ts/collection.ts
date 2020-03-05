@@ -1,4 +1,5 @@
 import { MongoClient } from "./client.ts";
+import { UpdateResult } from "./result.ts";
 import { CommandType } from "./types.ts";
 import { dispatchAsync, encode } from "./util.ts";
 
@@ -96,5 +97,36 @@ export class Collection {
 
   public deleteMany(query: Object): Promise<number> {
     return this._delete(query, false);
+  }
+
+  private async _update(
+    query: Object,
+    update: Object,
+    updateOne: boolean = false
+  ): Promise<UpdateResult> {
+    const result = await dispatchAsync(
+      {
+        command_type: CommandType.Update,
+        client_id: this.client.clientId
+      },
+      encode(
+        JSON.stringify({
+          dbName: this.dbName,
+          collectionName: this.collectionName,
+          query,
+          update,
+          updateOne
+        })
+      )
+    );
+    return result as UpdateResult;
+  }
+
+  public updateOne(query: Object, update: Object): Promise<UpdateResult> {
+    return this._update(query, update, true);
+  }
+
+  public updateMany(query: Object, update: Object): Promise<UpdateResult> {
+    return this._update(query, update, false);
   }
 }
