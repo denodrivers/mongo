@@ -16,7 +16,7 @@
 ## Examples
 
 ```ts
-import { init, MongoClient } from "https://deno.land/x/mongo@v0.3.0/mod.ts";
+import { init, MongoClient } from "https://deno.land/x/mongo@v0.3.1/mod.ts";
 
 // Initialize the plugin
 await init();
