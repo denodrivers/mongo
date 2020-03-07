@@ -1,3 +1,5 @@
+import { assert } from "https://deno.land/std@v0.35.0/testing/asserts.ts";
+
 export enum CommandType {
   ConnectWithUri = "ConnectWithUri",
   ConnectWithOptions = "ConnectWithOptions",
@@ -8,4 +10,13 @@ export enum CommandType {
   InsertMany = "InsertMany",
   Delete = "Delete",
   Update = "Update"
+}
+
+export interface ObjectId {
+  $oid: string;
+}
+export function ObjectId($oid: string) {
+  const isLegal = /[0-9a-fA-F]{24}/.test($oid);
+  assert(isLegal, `ObjectId("${$oid}") is not legal.`);
+  return { $oid };
 }
