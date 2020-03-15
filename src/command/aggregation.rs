@@ -12,7 +12,7 @@ struct AggregationArgs {
     pipeline: Vec<Value>,
 }
 
-pub fn aggregation(command: Command) -> CoreOp {
+pub fn aggregate(command: Command) -> CoreOp {
     let fut = async move {
         let client = command.get_client();
         let data = command.data;

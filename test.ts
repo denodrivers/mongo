@@ -120,7 +120,7 @@ test(async function testFind() {
 test(async function testAggregation() {
   const db = getClient().database("test");
   const users = db.collection("mongo_test_users");
-  const docs = await users.aggregation([
+  const docs = await users.aggregate([
     { $match: { username: "many" } },
     { $group: { _id: "$username", total: { $sum: 1 } } }
   ]);

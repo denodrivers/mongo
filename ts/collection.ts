@@ -130,10 +130,10 @@ export class Collection {
     return this._update(query, update, false);
   }
 
-  public async aggregation<T = any>(pipeline: Object[]): Promise<T[]> {
+  public async aggregate<T = any>(pipeline: Object[]): Promise<T[]> {
     const docs = await dispatchAsync(
       {
-        command_type: CommandType.Aggregation,
+        command_type: CommandType.Aggregate,
         client_id: this.client.clientId
       },
       encode(
