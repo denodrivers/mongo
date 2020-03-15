@@ -117,6 +117,13 @@ test(async function testFind() {
   assertEquals(notFound, []);
 });
 
+test(async function testCount() {
+  const db = getClient().database("test");
+  const users = db.collection("mongo_test_users");
+  const count = await users.count({ username: "many" });
+  assertEquals(count, 2);
+});
+
 test(async function testAggregation() {
   const db = getClient().database("test");
   const users = db.collection("mongo_test_users");

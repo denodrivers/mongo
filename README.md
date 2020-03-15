@@ -52,6 +52,9 @@ const user1 = await users.findOne({ _id: insertId });
 // find
 const users = await users.find({ username: { $ne: null } });
 
+// count
+const count = await users.count({ username: { $ne: null } });
+
 // aggregation
 const docs = await users.aggregation([
   { $match: { username: "many" } },

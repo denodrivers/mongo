@@ -1,5 +1,6 @@
 mod aggregation;
 mod connect;
+mod count;
 mod delete;
 mod find;
 mod indexes;
@@ -10,6 +11,7 @@ mod update;
 
 pub use aggregation::aggregate;
 pub use connect::{connect_with_options, connect_with_uri};
+pub use count::count;
 pub use delete::delete;
 pub use find::find;
 pub use indexes::create_indexes;

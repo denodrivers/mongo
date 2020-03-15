@@ -40,6 +40,7 @@ pub enum CommandType {
     Delete,
     Aggregate,
     Update,
+    Count,
     CreateIndexes,
 }
 
@@ -103,6 +104,7 @@ fn op_command(data: &[u8], zero_copy: Option<ZeroCopyBuf>) -> CoreOp {
         CommandType::Update => command::update,
         CommandType::Aggregate => command::aggregate,
         CommandType::CreateIndexes => command::create_indexes,
+        CommandType::Count => command::count,
     };
 
     executor(Command::new(args, zero_copy))

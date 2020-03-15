@@ -11,6 +11,7 @@ export enum CommandType {
   Delete = "Delete",
   Update = "Update",
   Aggregate = "Aggregate",
+  Count = "Count",
   CreateIndexes = "CreateIndexes"
 }
 

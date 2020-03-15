@@ -28,6 +28,23 @@ export class Collection {
     return doc;
   }
 
+  public async count(filter?: Object): Promise<number> {
+    const count = await dispatchAsync(
+      {
+        command_type: CommandType.Count,
+        client_id: this.client.clientId
+      },
+      encode(
+        JSON.stringify({
+          dbName: this.dbName,
+          collectionName: this.collectionName,
+          filter
+        })
+      )
+    );
+    return count as number;
+  }
+
   public async findOne(filter?: Object): Promise<any> {
     return this._find(filter, { findOne: true });
   }
