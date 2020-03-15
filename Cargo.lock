@@ -213,9 +213,9 @@ dependencies = [
 
 [[package]]
 name = "deno_core"
-version = "0.35.0"
+version = "0.36.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9c2e5d1f0f0a48ecbe5a2fd404e4a6176c2a11b74466e16b2527cab07100acb1"
+checksum = "410f0cd767a2f27695e07d9164b26addef28e1fbab456edbd97f20137f7bbf54"
 dependencies = [
  "downcast-rs",
  "futures 0.3.4",

@@ -1,6 +1,6 @@
 import { MongoClient } from "./client.ts";
 import { UpdateResult } from "./result.ts";
-import { CommandType } from "./types.ts";
+import { CommandType, FindOptions } from "./types.ts";
 import { dispatchAsync, encode } from "./util.ts";
 
 export class Collection {
@@ -10,7 +10,7 @@ export class Collection {
     private readonly collectionName: string
   ) {}
 
-  private async _find(filter?: Object, findOne: boolean = false): Promise<any> {
+  private async _find(filter?: Object, options?: FindOptions): Promise<any> {
     const doc = await dispatchAsync(
       {
         command_type: CommandType.Find,
@@ -21,7 +21,7 @@ export class Collection {
           dbName: this.dbName,
           collectionName: this.collectionName,
           filter,
-          findOne
+          ...options
         })
       )
     );
@@ -29,11 +29,11 @@ export class Collection {
   }
 
   public async findOne(filter?: Object): Promise<any> {
-    return this._find(filter, true);
+    return this._find(filter, { findOne: true });
   }
 
-  public async find(filter?: Object): Promise<any> {
-    return this._find(filter, false);
+  public async find(filter?: Object, options?: FindOptions): Promise<any> {
+    return this._find(filter, { findOne: false, ...options });
   }
 
   public async insertOne(doc: Object): Promise<any> {

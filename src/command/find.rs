@@ -1,6 +1,7 @@
 use crate::*;
 use bson::Document;
 use mongodb::error::Result;
+use mongodb::options::FindOptions;
 use serde_json::Value;
 use util::maybe_json_to_document;
 
@@ -11,6 +12,8 @@ struct FindArgs {
     collection_name: String,
     filter: Option<Value>,
     find_one: bool,
+    skip: Option<i64>,
+    limit: Option<i64>,
 }
 
 pub fn find(command: Command) -> CoreOp {
@@ -21,6 +24,9 @@ pub fn find(command: Command) -> CoreOp {
         let db_name = args.db_name;
         let collection_name = args.collection_name;
         let filter = maybe_json_to_document(args.filter);
+        let skip = args.skip;
+        let limit = args.limit;
+
         let database = client.database(&db_name);
         let collection = database.collection(&collection_name);
 
@@ -28,7 +34,11 @@ pub fn find(command: Command) -> CoreOp {
             let doc = collection.find_one(filter, None).unwrap();
             Ok(util::async_result(&command.args, doc))
         } else {
-            let cursor = collection.find(filter, None).unwrap();
+            let mut options: FindOptions = FindOptions::default();
+            options.skip = skip;
+            options.limit = limit;
+
+            let cursor = collection.find(filter, Some(options)).unwrap();
             let docs: Vec<Document> = cursor
                 .filter_map(|doc: Result<Document>| match doc {
                     Ok(doc) => Some(doc),

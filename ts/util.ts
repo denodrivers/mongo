@@ -1,5 +1,5 @@
-import { prepare } from "https://raw.githubusercontent.com/manyuanrong/deno-plugin-prepare/master/mod.ts";
-import { VERSION } from "../mod.ts";
+import { prepare } from "https://deno.land/x/plugin_prepare@v0.3.0/mod.ts";
+import { RELEASE_URL } from "../mod.ts";
 import { CommandType } from "./types.ts";
 
 const PLUGIN_NAME = "deno_mongo";
@@ -18,9 +18,7 @@ interface Command {
   command_id?: number;
 }
 
-export async function init(binVer: string = VERSION) {
-  let releaseUrl = `https://github.com/manyuanrong/deno_mongo/releases/download/${binVer}`;
-
+export async function init(releaseUrl = RELEASE_URL) {
   const options = {
     name: PLUGIN_NAME,
     urls: {

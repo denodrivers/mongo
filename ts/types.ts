@@ -20,3 +20,9 @@ export function ObjectId($oid: string) {
   assert(isLegal, `ObjectId("${$oid}") is not legal.`);
   return { $oid };
 }
+
+export interface FindOptions {
+  findOne?: boolean;
+  skip?: number;
+  limit?: number;
+}

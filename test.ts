@@ -1,4 +1,8 @@
-import { assert, assertEquals } from "https://deno.land/std/testing/asserts.ts";
+import { exists } from "https://deno.land/std@v0.36.0/fs/mod.ts";
+import {
+  assert,
+  assertEquals
+} from "https://deno.land/std@v0.36.0/testing/asserts.ts";
 import { cargoBuild } from "./build.ts";
 import { init, MongoClient } from "./mod.ts";
 import "./ts/tests/types-check.test.ts";
@@ -92,7 +96,7 @@ test(async function testInsertMany() {
     },
     {
       username: "many",
-      password: "pass1"
+      password: "pass2"
     }
   ]);
 
@@ -102,9 +106,12 @@ test(async function testInsertMany() {
 test(async function testFind() {
   const db = getClient().database("test");
   const users = db.collection("mongo_test_users");
-  const findUsers = await users.find({ username: "many" });
+  const findUsers = await users.find(
+    { username: "many" },
+    { skip: 1, limit: 1 }
+  );
   assert(findUsers instanceof Array);
-  assertEquals(findUsers.length, 2);
+  assertEquals(findUsers.length, 1);
 
   const notFound = await users.find({ test: 1 });
   assertEquals(notFound, []);
@@ -127,6 +134,9 @@ test(async function testDeleteMany() {
   assertEquals(deleteCount, 2);
 });
 
+if (await exists(".deno_plugins")) {
+  await Deno.remove(".deno_plugins", { recursive: true });
+}
 await cargoBuild();
-await init();
+await init("file://./target/release");
 await runTests();
