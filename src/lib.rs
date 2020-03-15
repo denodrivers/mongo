@@ -40,6 +40,7 @@ pub enum CommandType {
     Delete,
     Aggregate,
     Update,
+    CreateIndexes,
 }
 
 #[derive(Deserialize)]
@@ -101,6 +102,7 @@ fn op_command(data: &[u8], zero_copy: Option<ZeroCopyBuf>) -> CoreOp {
         CommandType::Delete => command::delete,
         CommandType::Update => command::update,
         CommandType::Aggregate => command::aggregate,
+        CommandType::CreateIndexes => command::create_indexes,
     };
 
     executor(Command::new(args, zero_copy))

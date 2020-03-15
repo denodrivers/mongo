@@ -144,6 +144,16 @@ test(async function testDeleteMany() {
   assertEquals(deleteCount, 2);
 });
 
+// TODO mongdb_rust official library has not implemented this feature
+// test(async function testCreateIndexes() {
+//   const db = getClient().database("test");
+//   const collection = db.collection("mongo_indexes");
+//   const result = await collection.createIndexes([
+//     { keys: { created_at: 1 }, options: { expireAfterSeconds: 10000 } }
+//   ]);
+//   console.log(result);
+// });
+
 if (await exists(".deno_plugins")) {
   await Deno.remove(".deno_plugins", { recursive: true });
 }
