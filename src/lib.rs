@@ -38,6 +38,7 @@ pub enum CommandType {
     InsertMany,
     InsertOne,
     Delete,
+    Aggregate,
     Update,
 }
 
@@ -99,6 +100,7 @@ fn op_command(data: &[u8], zero_copy: Option<ZeroCopyBuf>) -> CoreOp {
         CommandType::InsertMany => command::insert_many,
         CommandType::Delete => command::delete,
         CommandType::Update => command::update,
+        CommandType::Aggregate => command::aggregate,
     };
 
     executor(Command::new(args, zero_copy))
