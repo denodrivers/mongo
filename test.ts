@@ -117,6 +117,16 @@ test(async function testFind() {
   assertEquals(notFound, []);
 });
 
+test(async function testAggregation() {
+  const db = getClient().database("test");
+  const users = db.collection("mongo_test_users");
+  const docs = await users.aggregation([
+    { $match: { username: "many" } },
+    { $group: { _id: "$username", total: { $sum: 1 } } }
+  ]);
+  assertEquals(docs, [{ _id: "many", total: 2 }]);
+});
+
 test(async function testUpdateMany() {
   const db = getClient().database("test");
   const users = db.collection("mongo_test_users");

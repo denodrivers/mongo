@@ -129,4 +129,21 @@ export class Collection {
   public updateMany(query: Object, update: Object): Promise<UpdateResult> {
     return this._update(query, update, false);
   }
+
+  public async aggregation<T = any>(pipeline: Object[]): Promise<T[]> {
+    const docs = await dispatchAsync(
+      {
+        command_type: CommandType.Aggregation,
+        client_id: this.client.clientId
+      },
+      encode(
+        JSON.stringify({
+          dbName: this.dbName,
+          collectionName: this.collectionName,
+          pipeline
+        })
+      )
+    );
+    return docs as T[];
+  }
 }

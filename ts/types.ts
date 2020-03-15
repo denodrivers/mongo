@@ -9,7 +9,8 @@ export enum CommandType {
   InsertOne = "InsertOne",
   InsertMany = "InsertMany",
   Delete = "Delete",
-  Update = "Update"
+  Update = "Update",
+  Aggregation = "Aggregation"
 }
 
 export interface ObjectId {
