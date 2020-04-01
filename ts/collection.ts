@@ -2,6 +2,7 @@ import { MongoClient } from "./client.ts";
 import { UpdateResult } from "./result.ts";
 import { CommandType, FindOptions } from "./types.ts";
 import { dispatchAsync, encode } from "./util.ts";
+import { parse, convert } from "./type_convert.ts";
 
 export class Collection {
   constructor(
@@ -46,11 +47,11 @@ export class Collection {
   }
 
   public async findOne(filter?: Object): Promise<any> {
-    return this._find(filter, { findOne: true });
+    return parse(await this._find(filter, { findOne: true }));
   }
 
   public async find(filter?: Object, options?: FindOptions): Promise<any> {
-    return this._find(filter, { findOne: false, ...options });
+    return parse(await this._find(filter, { findOne: false, ...options }));
   }
 
   public async insertOne(doc: Object): Promise<any> {
@@ -63,7 +64,7 @@ export class Collection {
         JSON.stringify({
           dbName: this.dbName,
           collectionName: this.collectionName,
-          doc
+          doc: convert(doc)
         })
       )
     );
@@ -80,7 +81,7 @@ export class Collection {
         JSON.stringify({
           dbName: this.dbName,
           collectionName: this.collectionName,
-          docs
+          docs: convert(docs)
         })
       )
     );
@@ -130,8 +131,8 @@ export class Collection {
         JSON.stringify({
           dbName: this.dbName,
           collectionName: this.collectionName,
-          query,
-          update,
+          query: convert(query),
+          update: convert(update),
           updateOne
         })
       )

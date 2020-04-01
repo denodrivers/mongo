@@ -1,14 +1,12 @@
-import { exists } from "https://deno.land/std@v0.36.0/fs/mod.ts";
-import {
-  assert,
-  assertEquals
-} from "https://deno.land/std@v0.36.0/testing/asserts.ts";
 import { cargoBuild } from "./build.ts";
 import { init, MongoClient } from "./mod.ts";
+import { assert, assertEquals, exists } from "./test.deps.ts";
+import "./ts/tests/type-convert.test.ts";
 import "./ts/tests/types-check.test.ts";
 import { ObjectId } from "./ts/types.ts";
 
 const { test, runTests } = Deno;
+const dateNow = Date.now();
 
 function getClient(): MongoClient {
   const client = new MongoClient();
@@ -45,7 +43,8 @@ test(async function testInsertOne() {
   const users = db.collection("mongo_test_users");
   const insertId: ObjectId = await users.insertOne({
     username: "user1",
-    password: "pass1"
+    password: "pass1",
+    date: new Date(dateNow)
   });
 
   assertEquals(Object.keys(insertId), ["$oid"]);
@@ -57,7 +56,8 @@ test(async function testInsertOne() {
   assertEquals(user1, {
     _id: insertId,
     username: "user1",
-    password: "pass1"
+    password: "pass1",
+    date: new Date(dateNow)
   });
 });
 
@@ -66,7 +66,7 @@ test(async function testFindOne() {
   const users = db.collection("mongo_test_users");
   const user1 = await users.findOne();
   assert(user1 instanceof Object);
-  assertEquals(Object.keys(user1), ["_id", "username", "password"]);
+  assertEquals(Object.keys(user1), ["_id", "username", "password", "date"]);
 
   const findNull = await users.findOne({ test: 1 });
   assertEquals(findNull, null);
@@ -166,4 +166,4 @@ if (await exists(".deno_plugins")) {
 }
 await cargoBuild();
 await init("file://./target/release");
-await runTests();
+await runTests({});
