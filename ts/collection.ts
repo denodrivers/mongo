@@ -1,8 +1,8 @@
 import { MongoClient } from "./client.ts";
 import { UpdateResult } from "./result.ts";
 import { CommandType, FindOptions } from "./types.ts";
+import { convert, parse } from "./type_convert.ts";
 import { dispatchAsync, encode } from "./util.ts";
-import { parse, convert } from "./type_convert.ts";
 
 export class Collection {
   constructor(
@@ -162,7 +162,7 @@ export class Collection {
         })
       )
     );
-    return docs as T[];
+    return parse(docs) as T[];
   }
 
   public async createIndexes(
