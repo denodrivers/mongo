@@ -1,4 +1,4 @@
-import { prepare } from "https://deno.land/x/plugin_prepare@v0.3.0/mod.ts";
+import { prepare } from "../deps.ts";
 import { RELEASE_URL } from "../mod.ts";
 import { CommandType } from "./types.ts";
 
@@ -24,12 +24,12 @@ export async function init(releaseUrl = RELEASE_URL) {
     urls: {
       mac: `${releaseUrl}/lib${PLUGIN_NAME}.dylib`,
       win: `${releaseUrl}/${PLUGIN_NAME}.dll`,
-      linux: `${releaseUrl}/lib${PLUGIN_NAME}.so`
-    }
+      linux: `${releaseUrl}/lib${PLUGIN_NAME}.so`,
+    },
   };
 
   const Mongo = await prepare(options);
-  dispatcher = Mongo.ops["mongo_command"];
+  dispatcher = Mongo.ops["mongo_command"] as Deno.PluginOp;
   dispatcher.setAsyncHandler((msg: Uint8Array) => {
     const { command_id, data } = JSON.parse(decoder.decode(msg));
     const resolver = pendingCommands.get(command_id);
@@ -57,13 +57,13 @@ export function dispatchAsync(
   command: Command,
   data?: ArrayBufferView
 ): Promise<unknown> {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     const commandId = nextCommandId++;
     pendingCommands.set(commandId, resolve);
     const control = encoder.encode(
       JSON.stringify({
         ...command,
-        command_id: commandId
+        command_id: commandId,
       })
     );
     if (!dispatcher) {
