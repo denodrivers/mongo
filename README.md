@@ -6,7 +6,7 @@
 [![Build Status](https://github.com/manyuanrong/deno_mongo/workflows/ci/badge.svg?branch=master)](https://github.com/manyuanrong/deno_mongo/actions)
 [![license](https://img.shields.io/github/license/manyuanrong/deno_mongo.svg)](https://github.com/manyuanrong/deno_mongo)
 [![downloads](https://img.shields.io/github/downloads/manyuanrong/deno_mongo/total)](https://github.com/manyuanrong/deno_mongo)
-[![tag](https://img.shields.io/badge/deno-v0.38.0-green.svg)](https://github.com/denoland/deno)
+[![tag](https://img.shields.io/badge/deno-v0.39.0-green.svg)](https://github.com/denoland/deno)
 
 ## Links
 
@@ -17,7 +17,7 @@
 ## Examples
 
 ```ts
-import { init, MongoClient } from "https://deno.land/x/mongo@v0.5.1/mod.ts";
+import { init, MongoClient } from "https://deno.land/x/mongo@v0.5.2/mod.ts";
 
 // Initialize the plugin
 await init();
