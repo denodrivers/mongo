@@ -3,7 +3,7 @@ export async function cargoBuild() {
     cmd: ["cargo", "build", "--release", "--locked"],
     stderr: "inherit",
     stdin: "inherit",
-    stdout: "inherit"
+    stdout: "inherit",
   });
   await cargoCommand.status();
 }
