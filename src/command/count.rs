@@ -10,7 +10,7 @@ struct CountArgs {
     filter: Option<Value>,
 }
 
-pub fn count(command: Command) -> CoreOp {
+pub fn count(command: Command) -> Op {
     let fut = async move {
         let client = command.get_client();
         let data = command.data;
@@ -23,7 +23,7 @@ pub fn count(command: Command) -> CoreOp {
         let collection = database.collection(&collection_name);
 
         let count = collection.count_documents(filter, None).unwrap();
-        Ok(util::async_result(&command.args, count))
+        util::async_result(&command.args, count)
     };
-    CoreOp::Async(fut.boxed())
+    Op::Async(fut.boxed())
 }

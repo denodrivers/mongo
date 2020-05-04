@@ -12,7 +12,7 @@ struct AggregationArgs {
     pipeline: Vec<Value>,
 }
 
-pub fn aggregate(command: Command) -> CoreOp {
+pub fn aggregate(command: Command) -> Op {
     let fut = async move {
         let client = command.get_client();
         let data = command.data;
@@ -31,7 +31,7 @@ pub fn aggregate(command: Command) -> CoreOp {
                 _ => None,
             })
             .collect();
-        Ok(util::async_result(&command.args, docs))
+        util::async_result(&command.args, docs)
     };
-    CoreOp::Async(fut.boxed())
+    Op::Async(fut.boxed())
 }

@@ -1,6 +1,6 @@
-export { exists } from "https://deno.land/std@v0.39.0/fs/mod.ts";
+export { exists } from "https://deno.land/std@v0.42.0/fs/mod.ts";
 export {
   assert,
   assertEquals,
-  assertThrows
-} from "https://deno.land/std@v0.39.0/testing/asserts.ts";
+  assertThrows,
+} from "https://deno.land/std@v0.42.0/testing/asserts.ts";

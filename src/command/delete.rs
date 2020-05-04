@@ -10,7 +10,7 @@ struct DeleteArgs {
     delete_one: bool,
 }
 
-pub fn delete(command: Command) -> CoreOp {
+pub fn delete(command: Command) -> Op {
     let fut = async move {
         let client = command.get_client();
         let data = command.data;
@@ -27,10 +27,10 @@ pub fn delete(command: Command) -> CoreOp {
         } else {
             collection.delete_many(query, None).unwrap()
         };
-        Ok(util::async_result(
+        util::async_result(
             &command.args,
             delete_result.deleted_count,
-        ))
+        )
     };
-    CoreOp::Async(fut.boxed())
+    Op::Async(fut.boxed())
 }

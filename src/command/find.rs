@@ -16,7 +16,7 @@ struct FindArgs {
     limit: Option<i64>,
 }
 
-pub fn find(command: Command) -> CoreOp {
+pub fn find(command: Command) -> Op {
     let fut = async move {
         let client = command.get_client();
         let data = command.data;
@@ -32,7 +32,7 @@ pub fn find(command: Command) -> CoreOp {
 
         if args.find_one {
             let doc = collection.find_one(filter, None).unwrap();
-            Ok(util::async_result(&command.args, doc))
+            util::async_result(&command.args, doc)
         } else {
             let mut options: FindOptions = FindOptions::default();
             options.skip = skip;
@@ -45,8 +45,8 @@ pub fn find(command: Command) -> CoreOp {
                     _ => None,
                 })
                 .collect();
-            Ok(util::async_result(&command.args, docs))
+            util::async_result(&command.args, docs)
         }
     };
-    CoreOp::Async(fut.boxed())
+    Op::Async(fut.boxed())
 }

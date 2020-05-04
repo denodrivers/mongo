@@ -19,7 +19,7 @@ struct UpdateResultArgs {
     pub upserted_id: Option<Value>,
 }
 
-pub fn update(command: Command) -> CoreOp {
+pub fn update(command: Command) -> Op {
     let fut = async move {
         let client = command.get_client();
         let data = command.data;
@@ -37,14 +37,14 @@ pub fn update(command: Command) -> CoreOp {
             collection.update_many(query_doc, update_doc, None).unwrap()
         };
 
-        Ok(util::async_result(
+        util::async_result(
             &command.args,
             UpdateResultArgs {
                 matched_count: result.matched_count,
                 modified_count: result.modified_count,
                 upserted_id: result.upserted_id.map(|id| id.into()),
             },
-        ))
+        )
     };
-    CoreOp::Async(fut.boxed())
+    Op::Async(fut.boxed())
 }
