@@ -1,4 +1,4 @@
-import { prepare } from "../deps.ts";
+import { prepare, PerpareOptions } from "../deps.ts";
 import { RELEASE_URL } from "../mod.ts";
 import { CommandType } from "./types.ts";
 
@@ -19,11 +19,11 @@ interface Command {
 }
 
 export async function init(releaseUrl = RELEASE_URL) {
-  const options = {
+  const options: PerpareOptions = {
     name: PLUGIN_NAME,
     urls: {
       darwin: `${releaseUrl}/lib${PLUGIN_NAME}.dylib`,
-      win: `${releaseUrl}/${PLUGIN_NAME}.dll`,
+      windows: `${releaseUrl}/${PLUGIN_NAME}.dll`,
       linux: `${releaseUrl}/lib${PLUGIN_NAME}.so`,
     },
   };
