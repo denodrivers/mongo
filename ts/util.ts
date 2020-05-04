@@ -9,7 +9,7 @@ const DenoCore = Deno.core as {
   dispatch(
     rid: number,
     msg: any,
-    buf?: ArrayBufferView
+    buf?: ArrayBufferView,
   ): Uint8Array | undefined;
 };
 
@@ -68,7 +68,7 @@ export function dispatch(command: Command, data?: ArrayBufferView): Uint8Array {
 
 export function dispatchAsync(
   command: Command,
-  data?: ArrayBufferView
+  data?: ArrayBufferView,
 ): Promise<unknown> {
   return new Promise((resolve) => {
     const commandId = nextCommandId++;
@@ -77,7 +77,7 @@ export function dispatchAsync(
       JSON.stringify({
         ...command,
         command_id: commandId,
-      })
+      }),
     );
     if (!mongoPluginId) {
       throw new Error("The plugin must be initialized before use");
