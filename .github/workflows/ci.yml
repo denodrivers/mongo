@@ -62,14 +62,10 @@ jobs:
           rustc --version
           cargo --version
 
-      - name: Configure cargo data directory
-        run: echo "::set-env name=CARGO_HOME::$(pwd)/.cargo_home"
-
       - name: Cache
         uses: denoland/github-actions-cache@stable-prerelease
         with:
           path: |-
-            .cargo_home
             target/*/.*
             target/*/build
             target/*/deps
