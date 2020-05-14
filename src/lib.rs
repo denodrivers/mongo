@@ -1,4 +1,3 @@
-#[macro_use]
 extern crate deno_core;
 #[macro_use]
 extern crate lazy_static;
@@ -8,9 +7,7 @@ extern crate bson;
 extern crate mongodb;
 extern crate serde;
 
-use deno_core::CoreOp;
-use deno_core::PluginInitContext;
-use deno_core::{Buf, ZeroCopyBuf};
+use deno_core::plugin_api::{Buf, Interface, Op, ZeroCopyBuf};
 use futures::FutureExt;
 use mongodb::Client;
 use serde::{Deserialize, Serialize};
@@ -25,8 +22,6 @@ lazy_static! {
     static ref CLIENTS: Mutex<HashMap<usize, Client>> = Mutex::new(HashMap::new());
     static ref NEXT_CLIENT_ID: AtomicUsize = AtomicUsize::new(0);
 }
-
-init_fn!(init);
 
 #[derive(Serialize, Deserialize)]
 pub enum CommandType {
@@ -81,8 +76,9 @@ impl CommandArgs {
     }
 }
 
-fn init(context: &mut dyn PluginInitContext) {
-    context.register_op("mongo_command", Box::new(op_command));
+#[no_mangle]
+pub fn deno_plugin_init(interface: &mut dyn Interface) {
+    interface.register_op("mongo_command", op_command);
 }
 
 pub(crate) fn get_client(client_id: usize) -> Client {
@@ -90,7 +86,7 @@ pub(crate) fn get_client(client_id: usize) -> Client {
     map.get(&client_id).unwrap().clone()
 }
 
-fn op_command(data: &[u8], zero_copy: Option<ZeroCopyBuf>) -> CoreOp {
+fn op_command(_interface: &mut dyn Interface, data: &[u8], zero_copy: Option<ZeroCopyBuf>) -> Op {
     let args = CommandArgs::new(data);
     let executor = match args.command_type {
         CommandType::ConnectWithOptions => command::connect_with_options,

@@ -23,7 +23,7 @@ impl IndexModelArgs {
     }
 }
 
-pub fn create_indexes(command: Command) -> CoreOp {
+pub fn create_indexes(command: Command) -> Op {
     let fut = async move {
         let client = command.get_client();
         let data = command.data;
@@ -48,7 +48,7 @@ pub fn create_indexes(command: Command) -> CoreOp {
         let collection = database.collection(&collection_name);
 
         let result = collection.create_indexes(models).unwrap();
-        Ok(util::async_result(&command.args, result))
+        util::async_result(&command.args, result)
     };
-    CoreOp::Async(fut.boxed())
+    Op::Async(fut.boxed())
 }

@@ -1,12 +1,12 @@
 use crate::*;
 
-pub fn list_database_names(command: Command) -> CoreOp {
+pub fn list_database_names(command: Command) -> Op {
     let fut = async move {
         let names = command
             .get_client()
             .list_database_names(None::<bson::Document>);
         let data = names.unwrap();
-        Ok(util::async_result(&command.args, data))
+        util::async_result(&command.args, data)
     };
-    CoreOp::Async(fut.boxed())
+    Op::Async(fut.boxed())
 }

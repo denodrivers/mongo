@@ -20,7 +20,7 @@ struct ConnectArgs {
     password: Option<String>,
 }
 
-pub fn connect_with_options(command: Command) -> CoreOp {
+pub fn connect_with_options(command: Command) -> Op {
     let args: ConnectArgs = serde_json::from_slice(command.data.unwrap().as_ref()).unwrap();
     let hosts = args
         .hosts
@@ -56,14 +56,14 @@ pub fn connect_with_options(command: Command) -> CoreOp {
     let client = mongodb::Client::with_options(options).unwrap();
     let client_id: usize = NEXT_CLIENT_ID.fetch_add(1, Ordering::SeqCst);
     CLIENTS.lock().unwrap().insert(client_id, client);
-    CoreOp::Sync(Buf::from(client_id.to_string().as_bytes()))
+    Op::Sync(Buf::from(client_id.to_string().as_bytes()))
 }
 
-pub fn connect_with_uri(command: Command) -> CoreOp {
+pub fn connect_with_uri(command: Command) -> Op {
     let uri: Vec<u8> = command.data.unwrap().as_ref().to_vec();
     let uri = String::from_utf8(uri).unwrap();
     let client = mongodb::Client::with_uri_str(&uri).unwrap();
     let client_id: usize = NEXT_CLIENT_ID.fetch_add(1, Ordering::SeqCst);
     CLIENTS.lock().unwrap().insert(client_id, client);
-    CoreOp::Sync(Buf::from(client_id.to_string().as_bytes()))
+    Op::Sync(Buf::from(client_id.to_string().as_bytes()))
 }

@@ -18,7 +18,7 @@ struct InsertOneArgs {
     doc: Value,
 }
 
-pub fn insert_one(command: Command) -> CoreOp {
+pub fn insert_one(command: Command) -> Op {
     let fut = async move {
         let client = command.get_client();
         let data = command.data;
@@ -30,12 +30,12 @@ pub fn insert_one(command: Command) -> CoreOp {
         let collection = database.collection(&collection_name);
 
         let insert_result = collection.insert_one(doc, None).unwrap();
-        Ok(util::async_result(&command.args, insert_result.inserted_id))
+        util::async_result(&command.args, insert_result.inserted_id)
     };
-    CoreOp::Async(fut.boxed())
+    Op::Async(fut.boxed())
 }
 
-pub fn insert_many(command: Command) -> CoreOp {
+pub fn insert_many(command: Command) -> Op {
     let fut = async move {
         let client = command.get_client();
         let data = command.data;
@@ -54,7 +54,7 @@ pub fn insert_many(command: Command) -> CoreOp {
             .map(|(_, id)| id.to_owned())
             .collect();
 
-        Ok(util::async_result(&command.args, ids))
+        util::async_result(&command.args, ids)
     };
-    CoreOp::Async(fut.boxed())
+    Op::Async(fut.boxed())
 }

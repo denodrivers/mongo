@@ -1,6 +1,6 @@
 use crate::*;
 
-pub fn list_collection_names(command: Command) -> CoreOp {
+pub fn list_collection_names(command: Command) -> Op {
     let fut = async move {
         let client = command.get_client();
         let data = command.data;
@@ -9,7 +9,7 @@ pub fn list_collection_names(command: Command) -> CoreOp {
         let database = client.database(&db_name);
         let collection_names = database.list_collection_names(None::<bson::Document>);
 
-        Ok(util::async_result(&command.args, collection_names.unwrap()))
+        util::async_result(&command.args, collection_names.unwrap())
     };
-    CoreOp::Async(fut.boxed())
+    Op::Async(fut.boxed())
 }

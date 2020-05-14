@@ -2,9 +2,20 @@ import { prepare } from "../deps.ts";
 import { RELEASE_URL } from "../mod.ts";
 import { CommandType } from "./types.ts";
 
+// @ts-ignore
+const DenoCore = Deno.core as {
+  ops: () => { [key: string]: number };
+  setAsyncHandler(rid: number, handler: Function): void;
+  dispatch(
+    rid: number,
+    msg: any,
+    buf?: ArrayBufferView
+  ): Uint8Array | undefined;
+};
+
 const PLUGIN_NAME = "deno_mongo";
 
-let dispatcher: Deno.PluginOp | null = null;
+let mongoPluginId: number;
 
 const decoder = new TextDecoder();
 const encoder = new TextEncoder();
@@ -22,15 +33,17 @@ export async function init(releaseUrl = RELEASE_URL) {
   const options = {
     name: PLUGIN_NAME,
     urls: {
-      mac: `${releaseUrl}/lib${PLUGIN_NAME}.dylib`,
-      win: `${releaseUrl}/${PLUGIN_NAME}.dll`,
+      darwin: `${releaseUrl}/lib${PLUGIN_NAME}.dylib`,
+      windows: `${releaseUrl}/${PLUGIN_NAME}.dll`,
       linux: `${releaseUrl}/lib${PLUGIN_NAME}.so`,
     },
   };
 
-  const Mongo = await prepare(options);
-  dispatcher = Mongo.ops["mongo_command"] as Deno.PluginOp;
-  dispatcher.setAsyncHandler((msg: Uint8Array) => {
+  await prepare(options);
+
+  mongoPluginId = DenoCore.ops()["mongo_command"];
+
+  DenoCore.setAsyncHandler(mongoPluginId, (msg: Uint8Array) => {
     const { command_id, data } = JSON.parse(decoder.decode(msg));
     const resolver = pendingCommands.get(command_id);
     resolver && resolver(data);
@@ -47,10 +60,10 @@ export function decode(data: Uint8Array): string {
 
 export function dispatch(command: Command, data?: ArrayBufferView): Uint8Array {
   const control = encoder.encode(JSON.stringify(command));
-  if (!dispatcher) {
+  if (!mongoPluginId) {
     throw new Error("The plugin must be initialized before use");
   }
-  return dispatcher.dispatch(control, data)!;
+  return DenoCore.dispatch(mongoPluginId, control, data)!;
 }
 
 export function dispatchAsync(
@@ -66,11 +79,9 @@ export function dispatchAsync(
         command_id: commandId,
       })
     );
-    if (!dispatcher) {
-      if (!dispatcher) {
-        throw new Error("The plugin must be initialized before use");
-      }
+    if (!mongoPluginId) {
+      throw new Error("The plugin must be initialized before use");
     }
-    dispatcher.dispatch(control, data);
+    DenoCore.dispatch(mongoPluginId, control, data);
   });
 }

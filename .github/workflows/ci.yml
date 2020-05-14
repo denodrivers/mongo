@@ -19,7 +19,7 @@ jobs:
       - name: Install rust
         uses: hecrj/setup-rust-action@v1
         with:
-          rust-version: "1.42.0"
+          rust-version: "1.43.0"
 
       - name: Install clippy and rustfmt
         if: matrix.kind == 'lint'
@@ -30,7 +30,7 @@ jobs:
       - name: Install Deno
         uses: denolib/setup-deno@master
         with:
-          deno-version: 0.39.0
+          deno-version: 1.0.0
 
       - name: Start MongoDB (MacOs)
         if: matrix.kind == 'test' && startsWith(matrix.os, 'mac')
@@ -62,28 +62,21 @@ jobs:
           rustc --version
           cargo --version
 
-      - name: Cache cargo registry
-        uses: actions/cache@v1
-        with:
-          path: ~/.cargo/registry
-          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
-      - name: Cache cargo index
-        uses: actions/cache@v1
-        with:
-          path: ~/.cargo/git
-          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
-      - name: Cache cargo build
-        uses: actions/cache@v1
-        with:
-          path: target
-          key: ${{ matrix.kind }}-${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
+      - name: Configure cargo data directory
+        run: echo "::set-env name=CARGO_HOME::$(pwd)/.cargo_home"
 
-      # Fix the problem that the second build of windows will fail
-      - name: Remove Some Cache
-        if: matrix.os == 'windows-2019'
-        run: |
-          rm target/release/gn_root -Recurse -ErrorAction Ignore
-          rm target/debug/gn_root -Recurse -ErrorAction Ignore
+      - name: Cache
+        uses: denoland/github-actions-cache@stable-prerelease
+        with:
+          path: |-
+            .cargo_home
+            target/*/.*
+            target/*/build
+            target/*/deps
+          key:
+            ${{ matrix.os }}-${{ matrix.kind }}-${{ hashFiles('Cargo.lock') }}
+          restore-keys: |
+            ${{ matrix.os }}-${{ matrix.kind }}-
 
       - name: Install python
         uses: actions/setup-python@v1
@@ -102,7 +95,7 @@ jobs:
         run: cargo test --release --locked --all-targets
       - name: Test TS
         if: matrix.kind == 'test'
-        run: deno run -A ./test.ts
+        run: deno test -A --unstable ./test.ts
 
       - name: Release
         uses: softprops/action-gh-release@v1
