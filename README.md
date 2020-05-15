@@ -25,7 +25,7 @@ await init();
 const client = new MongoClient();
 client.connectWithUri("mongodb://localhost:27017");
 
-const db = getClient().database("test");
+const db = client.database("test");
 const users = db.collection("users");
 
 // insert
