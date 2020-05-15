@@ -4,102 +4,95 @@ on: [push, pull_request]
 
 jobs:
   build:
-    name: ${{ matrix.kind }} ${{ matrix.os }}
+    name: ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     strategy:
       matrix:
         os: [macOS-latest, windows-2019, ubuntu-16.04]
-        kind: ["test", "lint"]
 
     steps:
+      - name: Setup Environment
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+          echo ::set-env name=GH_ACTIONS::1
+          echo ::set-env name=RUST_BACKTRACE::full
+
       - name: Clone repository
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
 
       - name: Install rust
         uses: hecrj/setup-rust-action@v1
         with:
-          rust-version: "1.43.0"
-
+          rust-version: 1.43.1
       - name: Install clippy and rustfmt
-        if: matrix.kind == 'lint'
         run: |
           rustup component add clippy
           rustup component add rustfmt
-
       - name: Install Deno
         uses: denolib/setup-deno@master
         with:
           deno-version: 1.0.0
-
-      - name: Start MongoDB (MacOs)
-        if: matrix.kind == 'test' && startsWith(matrix.os, 'mac')
-        run: |
-          brew tap mongodb/brew
-          brew install mongodb-community@4.2
-          brew services start mongodb-community@4.2
-
-      - name: Start MongoDB (Linux)
-        if: matrix.kind == 'test' && startsWith(matrix.os, 'ubuntu')
-        uses: wbari/start-mongoDB@v0.2
-        with:
-          mongoDBVersion: 4.2
-
-      - name: Start MongoDB (Windows)
-        if: matrix.kind == 'test' && startsWith(matrix.os, 'windows')
-        run: |
-          choco install mongodb --version=4.2.0 --no-progress
-          "C:\Program Files\MongoDB\Server\4.2.0\bin\mongo.exe"
-
-      - name: Environment (common)
-        run: |
-          echo ::set-env name=GH_ACTIONS::1
-          echo ::set-env name=DENO_BUILD_MODE::release
-          echo ::set-env name=RUST_BACKTRACE::full
       - name: Log versions
         run: |
-          node -v
+          deno --version
           rustc --version
           cargo --version
-
-      - name: Configure cargo data directory
-        run: echo "::set-env name=CARGO_HOME::$(pwd)/.cargo_home"
 
       - name: Cache
         uses: denoland/github-actions-cache@stable-prerelease
         with:
           path: |-
-            .cargo_home
+            ~/.cargo/registry
+            ~/.cargo/git
             target/*/.*
             target/*/build
             target/*/deps
           key:
-            ${{ matrix.os }}-${{ matrix.kind }}-${{ hashFiles('Cargo.lock') }}
+            ${{ matrix.os }}-${{ hashFiles('Cargo.lock') }}
           restore-keys: |
-            ${{ matrix.os }}-${{ matrix.kind }}-
+            ${{ matrix.os }}-
 
-      - name: Install python
-        uses: actions/setup-python@v1
-        with:
-          python-version: "2.7.x"
-          architecture: x64
-
+      # Lint
       - name: Clippy
-        if: matrix.kind == 'lint'
         run: cargo clippy --all-targets --release --locked -- -D clippy::all
+      - name: Format Rust
+        run: cargo fmt -- --check
+      - name: Format TS
+        run: deno fmt --check
+
+      # Build
       - name: Build
-        if: matrix.kind == 'test'
         run: cargo build --release --locked --all-targets
+
+      # Start MongoDB
+      - name: Start MongoDB (MacOs)
+        if: startsWith(matrix.os, 'mac')
+        run: |
+          brew tap mongodb/brew
+          brew install mongodb-community@4.2
+          brew services start mongodb-community@4.2
+      - name: Start MongoDB (Linux)
+        if: startsWith(matrix.os, 'ubuntu')
+        uses: wbari/start-mongoDB@v0.2
+        with:
+          mongoDBVersion: 4.2
+      - name: Start MongoDB (Windows)
+        if: startsWith(matrix.os, 'windows')
+        run: |
+          choco install mongodb --version=4.2.0 --no-progress
+          "C:\Program Files\MongoDB\Server\4.2.0\bin\mongo.exe"
+
+      # Tests
       - name: Test Rust
-        if: matrix.kind == 'test'
         run: cargo test --release --locked --all-targets
       - name: Test TS
-        if: matrix.kind == 'test'
-        run: deno test -A --unstable ./test.ts
+        run: deno test -A --unstable
 
       - name: Release
         uses: softprops/action-gh-release@v1
-        if: matrix.kind == 'test' && startsWith(github.ref, 'refs/tags/')
+        if: startsWith(github.ref, 'refs/tags/')
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:

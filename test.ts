@@ -1,8 +1,6 @@
 import { cargoBuild } from "./build.ts";
 import { init, MongoClient } from "./mod.ts";
 import { assert, assertEquals, exists } from "./test.deps.ts";
-import "./ts/tests/type-convert.test.ts";
-import "./ts/tests/types-check.test.ts";
 import { ObjectId } from "./ts/types.ts";
 
 const { test } = Deno;
@@ -108,7 +106,7 @@ test("testFind", async () => {
   const users = db.collection("mongo_test_users");
   const findUsers = await users.find(
     { username: "many" },
-    { skip: 1, limit: 1 }
+    { skip: 1, limit: 1 },
   );
   assert(findUsers instanceof Array);
   assertEquals(findUsers.length, 1);
@@ -139,7 +137,7 @@ test("testUpdateMany", async () => {
   const users = db.collection("mongo_test_users");
   const result = await users.updateMany(
     { username: "many" },
-    { $set: { username: "MANY" } }
+    { $set: { username: "MANY" } },
   );
   assertEquals(result, { matchedCount: 2, modifiedCount: 2, upsertedId: null });
 });
@@ -152,7 +150,7 @@ test("testDeleteMany", async () => {
 });
 
 // TODO mongdb_rust official library has not implemented this feature
-// test(async function testCreateIndexes() {
+// test("testCreateIndexes", async () => {
 //   const db = getClient().database("test");
 //   const collection = db.collection("mongo_indexes");
 //   const result = await collection.createIndexes([

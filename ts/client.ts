@@ -96,7 +96,7 @@ export class MongoClient {
   connectWithUri(uri: string) {
     const data = dispatch(
       { command_type: CommandType.ConnectWithUri },
-      encode(uri)
+      encode(uri),
     );
     this._clientId = parseInt(decode(data));
   }
@@ -104,7 +104,7 @@ export class MongoClient {
   connectWithOptions(options: ClientOptions) {
     const data = dispatch(
       { command_type: CommandType.ConnectWithOptions },
-      encode(JSON.stringify(options))
+      encode(JSON.stringify(options)),
     );
     this._clientId = parseInt(decode(data));
   }
@@ -112,7 +112,7 @@ export class MongoClient {
   async listDatabases(): Promise<string[]> {
     return (await dispatchAsync({
       command_type: CommandType.ListDatabases,
-      client_id: this._clientId
+      client_id: this._clientId,
     })) as string[];
   }
 
