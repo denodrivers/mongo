@@ -14,6 +14,14 @@
 - [Examples]() TODO
 - [Benchmarks]() TODO
 
+## Important
+
+Because the plug-in API of Deno is still in an unstable state, the `--unstable` flag needs to be used. The minimum permissions required to run deno_mongo should be
+
+```sh
+deno run --allow-net --allow-write --allow-read --allow-plugin --unstable xxx.ts
+```
+
 ## Examples
 
 ```ts
