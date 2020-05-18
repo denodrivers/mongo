@@ -1,5 +1,4 @@
 import { prepare } from "../deps.ts";
-import { RELEASE_URL } from "../mod.ts";
 import { CommandType } from "./types.ts";
 
 // @ts-ignore
@@ -29,7 +28,7 @@ interface Command {
   command_id?: number;
 }
 
-export async function init(releaseUrl = RELEASE_URL) {
+export async function init(releaseUrl: string) {
   const options = {
     name: PLUGIN_NAME,
     urls: {
