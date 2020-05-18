@@ -25,10 +25,7 @@ deno run --allow-net --allow-write --allow-read --allow-plugin --unstable xxx.ts
 ## Examples
 
 ```ts
-import { init, MongoClient } from "https://deno.land/x/mongo@v0.6.0/mod.ts";
-
-// Initialize the plugin
-await init();
+import { MongoClient } from "https://deno.land/x/mongo@v0.6.0/mod.ts";
 
 const client = new MongoClient();
 client.connectWithUri("mongodb://localhost:27017");
