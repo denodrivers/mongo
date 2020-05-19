@@ -1,5 +1,6 @@
 import { cargoBuild } from "./build.ts";
-import { init, MongoClient } from "./mod.ts";
+import { init } from "./ts/util.ts";
+import { MongoClient } from "./ts/client.ts";
 import { assert, assertEquals, exists } from "./test.deps.ts";
 import { ObjectId } from "./ts/types.ts";
 
