@@ -88,7 +88,7 @@ jobs:
       - name: Test Rust
         run: cargo test --release --locked --all-targets
       - name: Test TS
-        run: deno test -A --unstable
+        run: deno test -A --unstable ./test.ts
 
       - name: Release
         uses: softprops/action-gh-release@v1
