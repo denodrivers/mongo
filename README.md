@@ -82,5 +82,5 @@ const { matchedCount, modifiedCount, upsertedId } = await users.updateMany(
 const deleteCount = await users.deleteOne({ _id: insertId });
 
 // deleteMany
-const deleteCount2 = await users.deleteMany({ usename: "test" });
+const deleteCount2 = await users.deleteMany({ username: "test" });
 ```
