@@ -16,7 +16,7 @@ pub fn aggregate(command: Command) -> Op {
     let fut = async move {
         let client = command.get_client();
         let data = command.data;
-        let args: AggregationArgs = serde_json::from_slice(data.unwrap().as_ref()).unwrap();
+        let args: AggregationArgs = serde_json::from_slice(data[0].as_ref()).unwrap();
         let db_name = args.db_name;
         let collection_name = args.collection_name;
         let pipeline = jsons_to_documents(args.pipeline);

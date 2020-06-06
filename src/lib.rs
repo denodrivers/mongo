@@ -48,7 +48,7 @@ pub struct CommandArgs {
 
 pub struct Command {
     args: CommandArgs,
-    data: Option<ZeroCopyBuf>,
+    data: Vec<ZeroCopyBuf>,
 }
 
 #[derive(Serialize)]
@@ -61,7 +61,7 @@ where
 }
 
 impl Command {
-    fn new(args: CommandArgs, data: Option<ZeroCopyBuf>) -> Command {
+    fn new(args: CommandArgs, data: Vec<ZeroCopyBuf>) -> Command {
         Command { args, data }
     }
 
@@ -86,7 +86,7 @@ pub(crate) fn get_client(client_id: usize) -> Client {
     map.get(&client_id).unwrap().clone()
 }
 
-fn op_command(_interface: &mut dyn Interface, data: &[u8], zero_copy: Option<ZeroCopyBuf>) -> Op {
+fn op_command(_interface: &mut dyn Interface, data: &[u8], zero_copy: &mut [ZeroCopyBuf]) -> Op {
     let args = CommandArgs::new(data);
     let executor = match args.command_type {
         CommandType::ConnectWithOptions => command::connect_with_options,
@@ -102,6 +102,5 @@ fn op_command(_interface: &mut dyn Interface, data: &[u8], zero_copy: Option<Zer
         CommandType::CreateIndexes => command::create_indexes,
         CommandType::Count => command::count,
     };
-
-    executor(Command::new(args, zero_copy))
+    executor(Command::new(args, zero_copy.to_vec()))
 }

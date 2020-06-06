@@ -19,7 +19,7 @@ struct FindArgs {
 pub fn find(command: Command) -> Op {
     let fut = async move {
         let client = command.get_client();
-        let data = command.data;
+        let data = command.data.first();
         let args: FindArgs = serde_json::from_slice(data.unwrap().as_ref()).unwrap();
         let db_name = args.db_name;
         let collection_name = args.collection_name;

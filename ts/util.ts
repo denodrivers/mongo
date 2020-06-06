@@ -8,7 +8,7 @@ const DenoCore = Deno.core as {
   dispatch(
     rid: number,
     msg: any,
-    buf?: ArrayBufferView,
+    ...buf: ArrayBufferView[]
   ): Uint8Array | undefined;
 };
 
@@ -57,17 +57,20 @@ export function decode(data: Uint8Array): string {
   return decoder.decode(data);
 }
 
-export function dispatch(command: Command, data?: ArrayBufferView): Uint8Array {
+export function dispatch(
+  command: Command,
+  ...data: ArrayBufferView[]
+): Uint8Array {
   const control = encoder.encode(JSON.stringify(command));
   if (!mongoPluginId) {
     throw new Error("The plugin must be initialized before use");
   }
-  return DenoCore.dispatch(mongoPluginId, control, data)!;
+  return DenoCore.dispatch(mongoPluginId, control, ...data)!;
 }
 
 export function dispatchAsync(
   command: Command,
-  data?: ArrayBufferView,
+  ...data: ArrayBufferView[]
 ): Promise<unknown> {
   return new Promise((resolve) => {
     const commandId = nextCommandId++;
@@ -81,6 +84,6 @@ export function dispatchAsync(
     if (!mongoPluginId) {
       throw new Error("The plugin must be initialized before use");
     }
-    DenoCore.dispatch(mongoPluginId, control, data);
+    DenoCore.dispatch(mongoPluginId, control, ...data);
   });
 }
