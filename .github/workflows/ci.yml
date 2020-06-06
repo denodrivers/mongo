@@ -41,7 +41,7 @@ jobs:
           cargo --version
 
       - name: Cache
-        uses: denoland/github-actions-cache@stable-prerelease
+        uses: actions/cache@v2
         with:
           path: |-
             ~/.cargo/registry
