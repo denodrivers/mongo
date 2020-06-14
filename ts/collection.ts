@@ -1,14 +1,14 @@
-import { MongoClient } from "./client.ts";
-import { UpdateResult } from "./result.ts";
-import { CommandType, FindOptions } from "./types.ts";
-import { convert, parse } from "./type_convert.ts";
-import { dispatchAsync, encode } from "./util.ts";
+import { MongoClient } from './client.ts'
+import { UpdateResult } from './result.ts'
+import { CommandType, FindOptions } from './types.ts'
+import { convert, parse } from './type_convert.ts'
+import { dispatchAsync, encode } from './util.ts'
 
-export class Collection {
+export class Collection<T = any> {
   constructor(
     private readonly client: MongoClient,
     private readonly dbName: string,
-    private readonly collectionName: string,
+    private readonly collectionName: string
   ) {}
 
   private async _find(filter?: Object, options?: FindOptions): Promise<any> {
@@ -23,10 +23,10 @@ export class Collection {
           collectionName: this.collectionName,
           filter,
           ...options,
-        }),
-      ),
-    );
-    return doc;
+        })
+      )
+    )
+    return doc
   }
 
   public async count(filter?: Object): Promise<number> {
@@ -40,21 +40,21 @@ export class Collection {
           dbName: this.dbName,
           collectionName: this.collectionName,
           filter,
-        }),
-      ),
-    );
-    return count as number;
+        })
+      )
+    )
+    return count as number
   }
 
-  public async findOne(filter?: Object): Promise<any> {
-    return parse(await this._find(filter, { findOne: true }));
+  public async findOne(filter?: Object): Promise<T> {
+    return parse(await this._find(filter, { findOne: true }))
   }
 
-  public async find(filter?: Object, options?: FindOptions): Promise<any> {
-    return parse(await this._find(filter, { findOne: false, ...options }));
+  public async find(filter?: Object, options?: FindOptions): Promise<T[]> {
+    return parse(await this._find(filter, { findOne: false, ...options }))
   }
 
-  public async insertOne(doc: Object): Promise<any> {
+  public async insertOne(doc: Partial<T>): Promise<any> {
     const _id = await dispatchAsync(
       {
         command_type: CommandType.InsertOne,
@@ -65,13 +65,13 @@ export class Collection {
           dbName: this.dbName,
           collectionName: this.collectionName,
           doc: convert(doc),
-        }),
-      ),
-    );
-    return _id;
+        })
+      )
+    )
+    return _id
   }
 
-  public async insertMany(docs: Object[]): Promise<any> {
+  public async insertMany(docs: Partial<T>[]): Promise<any> {
     const _ids = await dispatchAsync(
       {
         command_type: CommandType.InsertMany,
@@ -82,16 +82,13 @@ export class Collection {
           dbName: this.dbName,
           collectionName: this.collectionName,
           docs: convert(docs),
-        }),
-      ),
-    );
-    return _ids;
+        })
+      )
+    )
+    return _ids
   }
 
-  private async _delete(
-    query: Object,
-    deleteOne: boolean = false,
-  ): Promise<number> {
+  private async _delete(query: Object, deleteOne: boolean = false): Promise<number> {
     const deleteCount = await dispatchAsync(
       {
         command_type: CommandType.Delete,
@@ -103,25 +100,21 @@ export class Collection {
           collectionName: this.collectionName,
           query,
           deleteOne,
-        }),
-      ),
-    );
-    return deleteCount as number;
+        })
+      )
+    )
+    return deleteCount as number
   }
 
   public deleteOne(query: Object): Promise<number> {
-    return this._delete(query, true);
+    return this._delete(query, true)
   }
 
   public deleteMany(query: Object): Promise<number> {
-    return this._delete(query, false);
+    return this._delete(query, false)
   }
 
-  private async _update(
-    query: Object,
-    update: Object,
-    updateOne: boolean = false,
-  ): Promise<UpdateResult> {
+  private async _update(query: Object, update: Object, updateOne: boolean = false): Promise<UpdateResult> {
     const result = await dispatchAsync(
       {
         command_type: CommandType.Update,
@@ -134,21 +127,21 @@ export class Collection {
           query: convert(query),
           update: convert(update),
           updateOne,
-        }),
-      ),
-    );
-    return result as UpdateResult;
+        })
+      )
+    )
+    return result as UpdateResult
   }
 
   public updateOne(query: Object, update: Object): Promise<UpdateResult> {
-    return this._update(query, update, true);
+    return this._update(query, update, true)
   }
 
   public updateMany(query: Object, update: Object): Promise<UpdateResult> {
-    return this._update(query, update, false);
+    return this._update(query, update, false)
   }
 
-  public async aggregate<T = any>(pipeline: Object[]): Promise<T[]> {
+  public async aggregate(pipeline: Object[]): Promise<T[]> {
     const docs = await dispatchAsync(
       {
         command_type: CommandType.Aggregate,
@@ -159,25 +152,25 @@ export class Collection {
           dbName: this.dbName,
           collectionName: this.collectionName,
           pipeline,
-        }),
-      ),
-    );
-    return parse(docs) as T[];
+        })
+      )
+    )
+    return parse(docs)
   }
 
   public async createIndexes(
     models: {
-      keys: Object;
+      keys: Object
       options?: {
-        background?: boolean;
-        unique?: boolean;
-        name?: string;
-        partialFilterExpression?: Object;
-        sparse?: boolean;
-        expireAfterSeconds?: number;
-        storageEngine?: Object;
-      };
-    }[],
+        background?: boolean
+        unique?: boolean
+        name?: string
+        partialFilterExpression?: Object
+        sparse?: boolean
+        expireAfterSeconds?: number
+        storageEngine?: Object
+      }
+    }[]
   ): Promise<string[]> {
     const docs = await dispatchAsync(
       {
@@ -189,9 +182,9 @@ export class Collection {
           dbName: this.dbName,
           collectionName: this.collectionName,
           models,
-        }),
-      ),
-    );
-    return docs as string[];
+        })
+      )
+    )
+    return docs as string[]
   }
 }
