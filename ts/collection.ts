@@ -15,14 +15,14 @@ export class Collection<T = any> {
     const doc = await dispatchAsync(
       {
         command_type: CommandType.Find,
-        client_id: this.client.clientId,
+        client_id: this.client.clientId
       },
       encode(
         JSON.stringify({
           dbName: this.dbName,
           collectionName: this.collectionName,
           filter,
-          ...options,
+          ...options
         })
       )
     );
@@ -33,13 +33,13 @@ export class Collection<T = any> {
     const count = await dispatchAsync(
       {
         command_type: CommandType.Count,
-        client_id: this.client.clientId,
+        client_id: this.client.clientId
       },
       encode(
         JSON.stringify({
           dbName: this.dbName,
           collectionName: this.collectionName,
-          filter,
+          filter
         })
       )
     );
@@ -58,13 +58,13 @@ export class Collection<T = any> {
     const _id = await dispatchAsync(
       {
         command_type: CommandType.InsertOne,
-        client_id: this.client.clientId,
+        client_id: this.client.clientId
       },
       encode(
         JSON.stringify({
           dbName: this.dbName,
           collectionName: this.collectionName,
-          doc: convert(doc),
+          doc: convert(doc)
         })
       )
     );
@@ -75,31 +75,34 @@ export class Collection<T = any> {
     const _ids = await dispatchAsync(
       {
         command_type: CommandType.InsertMany,
-        client_id: this.client.clientId,
+        client_id: this.client.clientId
       },
       encode(
         JSON.stringify({
           dbName: this.dbName,
           collectionName: this.collectionName,
-          docs: convert(docs),
+          docs: convert(docs)
         })
       )
     );
     return _ids;
   }
 
-  private async _delete(query: Object, deleteOne: boolean = false): Promise<number> {
+  private async _delete(
+    query: Object,
+    deleteOne: boolean = false
+  ): Promise<number> {
     const deleteCount = await dispatchAsync(
       {
         command_type: CommandType.Delete,
-        client_id: this.client.clientId,
+        client_id: this.client.clientId
       },
       encode(
         JSON.stringify({
           dbName: this.dbName,
           collectionName: this.collectionName,
           query,
-          deleteOne,
+          deleteOne
         })
       )
     );
@@ -114,11 +117,15 @@ export class Collection<T = any> {
     return this._delete(query, false);
   }
 
-  private async _update(query: Object, update: Object, updateOne: boolean = false): Promise<UpdateResult> {
+  private async _update(
+    query: Object,
+    update: Object,
+    updateOne: boolean = false
+  ): Promise<UpdateResult> {
     const result = await dispatchAsync(
       {
         command_type: CommandType.Update,
-        client_id: this.client.clientId,
+        client_id: this.client.clientId
       },
       encode(
         JSON.stringify({
@@ -126,7 +133,7 @@ export class Collection<T = any> {
           collectionName: this.collectionName,
           query: convert(query),
           update: convert(update),
-          updateOne,
+          updateOne
         })
       )
     );
@@ -145,13 +152,13 @@ export class Collection<T = any> {
     const docs = await dispatchAsync(
       {
         command_type: CommandType.Aggregate,
-        client_id: this.client.clientId,
+        client_id: this.client.clientId
       },
       encode(
         JSON.stringify({
           dbName: this.dbName,
           collectionName: this.collectionName,
-          pipeline,
+          pipeline
         })
       )
     );
@@ -175,13 +182,13 @@ export class Collection<T = any> {
     const docs = await dispatchAsync(
       {
         command_type: CommandType.CreateIndexes,
-        client_id: this.client.clientId,
+        client_id: this.client.clientId
       },
       encode(
         JSON.stringify({
           dbName: this.dbName,
           collectionName: this.collectionName,
-          models,
+          models
         })
       )
     );

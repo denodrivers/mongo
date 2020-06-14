@@ -10,7 +10,7 @@ export class Database {
     const names = await dispatchAsync(
       {
         command_type: CommandType.ListCollectionNames,
-        client_id: this.client.clientId,
+        client_id: this.client.clientId
       },
       encode(this.name)
     );
