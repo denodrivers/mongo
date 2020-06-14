@@ -1,7 +1,7 @@
-import { MongoClient } from './client.ts'
-import { Collection } from './collection.ts'
-import { CommandType } from './types.ts'
-import { dispatchAsync, encode } from './util.ts'
+import { MongoClient } from "./client.ts";
+import { Collection } from "./collection.ts";
+import { CommandType } from "./types.ts";
+import { dispatchAsync, encode } from "./util.ts";
 
 export class Database {
   constructor(private client: MongoClient, private name: string) {}
@@ -13,11 +13,11 @@ export class Database {
         client_id: this.client.clientId,
       },
       encode(this.name)
-    )
-    return names as string[]
+    );
+    return names as string[];
   }
 
   collection<T>(name: string): Collection<T> {
-    return new Collection<T>(this.client, this.name, name)
+    return new Collection<T>(this.client, this.name, name);
   }
 }

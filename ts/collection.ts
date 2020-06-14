@@ -1,8 +1,8 @@
-import { MongoClient } from './client.ts'
-import { UpdateResult } from './result.ts'
-import { CommandType, FindOptions } from './types.ts'
-import { convert, parse } from './type_convert.ts'
-import { dispatchAsync, encode } from './util.ts'
+import { MongoClient } from "./client.ts";
+import { UpdateResult } from "./result.ts";
+import { CommandType, FindOptions } from "./types.ts";
+import { convert, parse } from "./type_convert.ts";
+import { dispatchAsync, encode } from "./util.ts";
 
 export class Collection<T = any> {
   constructor(
@@ -25,8 +25,8 @@ export class Collection<T = any> {
           ...options,
         })
       )
-    )
-    return doc
+    );
+    return doc;
   }
 
   public async count(filter?: Object): Promise<number> {
@@ -42,16 +42,16 @@ export class Collection<T = any> {
           filter,
         })
       )
-    )
-    return count as number
+    );
+    return count as number;
   }
 
   public async findOne(filter?: Object): Promise<T> {
-    return parse(await this._find(filter, { findOne: true }))
+    return parse(await this._find(filter, { findOne: true }));
   }
 
   public async find(filter?: Object, options?: FindOptions): Promise<T[]> {
-    return parse(await this._find(filter, { findOne: false, ...options }))
+    return parse(await this._find(filter, { findOne: false, ...options }));
   }
 
   public async insertOne(doc: Partial<T>): Promise<any> {
@@ -67,8 +67,8 @@ export class Collection<T = any> {
           doc: convert(doc),
         })
       )
-    )
-    return _id
+    );
+    return _id;
   }
 
   public async insertMany(docs: Partial<T>[]): Promise<any> {
@@ -84,8 +84,8 @@ export class Collection<T = any> {
           docs: convert(docs),
         })
       )
-    )
-    return _ids
+    );
+    return _ids;
   }
 
   private async _delete(query: Object, deleteOne: boolean = false): Promise<number> {
@@ -102,16 +102,16 @@ export class Collection<T = any> {
           deleteOne,
         })
       )
-    )
-    return deleteCount as number
+    );
+    return deleteCount as number;
   }
 
   public deleteOne(query: Object): Promise<number> {
-    return this._delete(query, true)
+    return this._delete(query, true);
   }
 
   public deleteMany(query: Object): Promise<number> {
-    return this._delete(query, false)
+    return this._delete(query, false);
   }
 
   private async _update(query: Object, update: Object, updateOne: boolean = false): Promise<UpdateResult> {
@@ -129,16 +129,16 @@ export class Collection<T = any> {
           updateOne,
         })
       )
-    )
-    return result as UpdateResult
+    );
+    return result as UpdateResult;
   }
 
   public updateOne(query: Object, update: Object): Promise<UpdateResult> {
-    return this._update(query, update, true)
+    return this._update(query, update, true);
   }
 
   public updateMany(query: Object, update: Object): Promise<UpdateResult> {
-    return this._update(query, update, false)
+    return this._update(query, update, false);
   }
 
   public async aggregate(pipeline: Object[]): Promise<T[]> {
@@ -154,22 +154,22 @@ export class Collection<T = any> {
           pipeline,
         })
       )
-    )
-    return parse(docs)
+    );
+    return parse(docs);
   }
 
   public async createIndexes(
     models: {
-      keys: Object
+      keys: Object;
       options?: {
-        background?: boolean
-        unique?: boolean
-        name?: string
-        partialFilterExpression?: Object
-        sparse?: boolean
-        expireAfterSeconds?: number
-        storageEngine?: Object
-      }
+        background?: boolean;
+        unique?: boolean;
+        name?: string;
+        partialFilterExpression?: Object;
+        sparse?: boolean;
+        expireAfterSeconds?: number;
+        storageEngine?: Object;
+      };
     }[]
   ): Promise<string[]> {
     const docs = await dispatchAsync(
@@ -184,7 +184,7 @@ export class Collection<T = any> {
           models,
         })
       )
-    )
-    return docs as string[]
+    );
+    return docs as string[];
   }
 }
