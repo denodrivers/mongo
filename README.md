@@ -30,8 +30,15 @@ import { MongoClient } from "https://deno.land/x/mongo@v0.8.0/mod.ts";
 const client = new MongoClient();
 client.connectWithUri("mongodb://localhost:27017");
 
+// Defining schema interface
+interface UserSchema {
+  _id: { $oid: string };
+  username: string;
+  password: string;
+};
+
 const db = client.database("test");
-const users = db.collection("users");
+const users = db.collection<UserSchema>("users");
 
 // insert
 const insertId = await users.insertOne({
