@@ -29,7 +29,7 @@ test("testConnectWithUri", async () => {
 test("testConnectWithOptions", async () => {
   const client = new MongoClient();
   client.connectWithOptions({
-    hosts: ["localhost:27017"]
+    hosts: ["localhost:27017"],
   });
   const names = await client.listDatabases();
   assert(names instanceof Array);
@@ -48,20 +48,20 @@ test("testInsertOne", async () => {
   const insertId: ObjectId = await users.insertOne({
     username: "user1",
     password: "pass1",
-    date: new Date(dateNow)
+    date: new Date(dateNow),
   });
 
   assertEquals(Object.keys(insertId), ["$oid"]);
 
   const user1 = await users.findOne({
-    _id: ObjectId(insertId.$oid)
+    _id: ObjectId(insertId.$oid),
   });
 
   assertEquals(user1, {
     _id: insertId,
     username: "user1",
     password: "pass1",
-    date: new Date(dateNow)
+    date: new Date(dateNow),
   });
 });
 
@@ -96,12 +96,12 @@ test("testInsertMany", async () => {
   const insertIds = await users.insertMany([
     {
       username: "many",
-      password: "pass1"
+      password: "pass1",
     },
     {
       username: "many",
-      password: "pass2"
-    }
+      password: "pass2",
+    },
   ]);
 
   assertEquals(insertIds.length, 2);
@@ -112,7 +112,7 @@ test("testFind", async () => {
   const users = db.collection("mongo_test_users");
   const findUsers = await users.find(
     { username: "many" },
-    { skip: 1, limit: 1 }
+    { skip: 1, limit: 1 },
   );
   assert(findUsers instanceof Array);
   assertEquals(findUsers.length, 1);
@@ -133,7 +133,7 @@ test("testAggregation", async () => {
   const users = db.collection("mongo_test_users");
   const docs = await users.aggregate([
     { $match: { username: "many" } },
-    { $group: { _id: "$username", total: { $sum: 1 } } }
+    { $group: { _id: "$username", total: { $sum: 1 } } },
   ]);
   assertEquals(docs, [{ _id: "many", total: 2 }]);
 });
@@ -143,7 +143,7 @@ test("testUpdateMany", async () => {
   const users = db.collection("mongo_test_users");
   const result = await users.updateMany(
     { username: "many" },
-    { $set: { username: "MANY" } }
+    { $set: { username: "MANY" } },
   );
   assertEquals(result, { matchedCount: 2, modifiedCount: 2, upsertedId: null });
 });
