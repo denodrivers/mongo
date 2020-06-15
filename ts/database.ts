@@ -17,7 +17,7 @@ export class Database {
     return names as string[];
   }
 
-  collection(name: string): Collection {
-    return new Collection(this.client, this.name, name);
+  collection<T>(name: string): Collection<T> {
+    return new Collection<T>(this.client, this.name, name);
   }
 }

@@ -3,7 +3,12 @@ import { init } from "./ts/util.ts";
 import { MongoClient } from "./ts/client.ts";
 import { assert, assertEquals, exists } from "./test.deps.ts";
 import { ObjectId } from "./ts/types.ts";
-
+interface IUser {
+  username: string;
+  password: string;
+  _id: { $oid: string };
+  date?: Date;
+}
 const { test } = Deno;
 const dateNow = Date.now();
 
@@ -39,7 +44,7 @@ test("testListCollectionNames", async () => {
 
 test("testInsertOne", async () => {
   const db = getClient().database("test");
-  const users = db.collection("mongo_test_users");
+  const users = db.collection<IUser>("mongo_test_users");
   const insertId: ObjectId = await users.insertOne({
     username: "user1",
     password: "pass1",
@@ -62,7 +67,7 @@ test("testInsertOne", async () => {
 
 test("testFindOne", async () => {
   const db = getClient().database("test");
-  const users = db.collection("mongo_test_users");
+  const users = db.collection<IUser>("mongo_test_users");
   const user1 = await users.findOne();
   assert(user1 instanceof Object);
   assertEquals(Object.keys(user1), ["_id", "username", "password", "date"]);

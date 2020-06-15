@@ -4,7 +4,7 @@ import { CommandType, FindOptions } from "./types.ts";
 import { convert, parse } from "./type_convert.ts";
 import { dispatchAsync, encode } from "./util.ts";
 
-export class Collection {
+export class Collection<T = any> {
   constructor(
     private readonly client: MongoClient,
     private readonly dbName: string,
@@ -46,15 +46,15 @@ export class Collection {
     return count as number;
   }
 
-  public async findOne(filter?: Object): Promise<any> {
+  public async findOne(filter?: Object): Promise<T> {
     return parse(await this._find(filter, { findOne: true }));
   }
 
-  public async find(filter?: Object, options?: FindOptions): Promise<any> {
+  public async find(filter?: Object, options?: FindOptions): Promise<T[]> {
     return parse(await this._find(filter, { findOne: false, ...options }));
   }
 
-  public async insertOne(doc: Object): Promise<any> {
+  public async insertOne(doc: Partial<T>): Promise<any> {
     const _id = await dispatchAsync(
       {
         command_type: CommandType.InsertOne,
@@ -71,7 +71,7 @@ export class Collection {
     return _id;
   }
 
-  public async insertMany(docs: Object[]): Promise<any> {
+  public async insertMany(docs: Partial<T>[]): Promise<any> {
     const _ids = await dispatchAsync(
       {
         command_type: CommandType.InsertMany,
@@ -148,7 +148,7 @@ export class Collection {
     return this._update(query, update, false);
   }
 
-  public async aggregate<T = any>(pipeline: Object[]): Promise<T[]> {
+  public async aggregate(pipeline: Object[]): Promise<T[]> {
     const docs = await dispatchAsync(
       {
         command_type: CommandType.Aggregate,
@@ -162,7 +162,7 @@ export class Collection {
         }),
       ),
     );
-    return parse(docs) as T[];
+    return parse(docs);
   }
 
   public async createIndexes(
