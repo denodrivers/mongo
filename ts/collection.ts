@@ -4,7 +4,7 @@ import { CommandType, FindOptions } from "./types.ts";
 import { convert, parse } from "./type_convert.ts";
 import { dispatchAsync, encode } from "./util.ts";
 
-export class Collection<T = any> {
+export class Collection<T> {
   constructor(
     private readonly client: MongoClient,
     private readonly dbName: string,
