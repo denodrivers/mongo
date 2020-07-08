@@ -9,7 +9,7 @@ jobs:
     timeout-minutes: 60
     strategy:
       matrix:
-        os: [macOS-latest, windows-2019, ubuntu-16.04]
+        os: [macOS-latest, windows-2019, ubuntu-18.04]
 
     steps:
       - name: Setup Environment
@@ -80,16 +80,7 @@ jobs:
           brew tap mongodb/brew
           brew install mongodb-community@4.2
           brew services start mongodb-community@4.2
-      - name: Start MongoDB (Linux)
-        if: startsWith(matrix.os, 'ubuntu')
-        uses: wbari/start-mongoDB@v0.2
-        with:
-          mongoDBVersion: 4.2
-      - name: Start MongoDB (Windows)
-        if: startsWith(matrix.os, 'windows')
-        run: |
-          choco install mongodb --version=4.2.0 --no-progress
-          "C:\Program Files\MongoDB\Server\4.2.0\bin\mongo.exe"
+      # Mongo is installed & started on Windows & Linux be default
 
       # Tests
       - name: Test Rust
