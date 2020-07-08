@@ -55,6 +55,7 @@ jobs:
 
       # Lint
       - name: Clippy
+        if: "!startsWith(matrix.os, 'ubuntu')"
         run: cargo clippy --all-targets --release --locked -- -D clippy::all
       - name: Format Rust
         run: cargo fmt -- --check
@@ -63,8 +64,10 @@ jobs:
 
       # Build
       - name: Build (macOS & Windows)
+        if: startsWith(matrix.os, 'mac') || startsWith(matrix.os, 'windows')
         run: cargo build --release --locked --all-targets
       - name: Build (Linux)
+        if: startsWith(matrix.os, 'ubuntu')
         run: |
           docker build -t test-runner -f ./.github/Dockerfile .
           docker create --name extract test-runner
