@@ -49,8 +49,7 @@ jobs:
             target/*/.*
             target/*/build
             target/*/deps
-          key:
-            ${{ matrix.os }}-${{ hashFiles('Cargo.lock') }}
+          key: ${{ matrix.os }}-${{ hashFiles('Cargo.lock') }}
           restore-keys: |
             ${{ matrix.os }}-
 
@@ -63,8 +62,13 @@ jobs:
         run: deno fmt --check
 
       # Build
-      - name: Build
+      - name: Build (macOS & Windows)
         run: cargo build --release --locked --all-targets
+      - name: Build (Linux)
+        run: |
+          docker build -t test-runner -f ./.github/Dockerfile .
+          docker create --name extract test-runner
+          docker cp extract:/deno_mongo/target/ ./target
 
       # Start MongoDB
       - name: Start MongoDB (MacOs)
