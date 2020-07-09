@@ -4,19 +4,132 @@ import { CommandType, FindOptions, ObjectId } from "./types.ts";
 import { convert, parse } from "./type_convert.ts";
 import { dispatchAsync, encode } from "./util.ts";
 
+export interface WithID {
+  _id: ObjectId;
+}
+export enum BSONType {
+  Double = 1,
+  String,
+  Object,
+  Array,
+  BinData,
+  Undefined,
+  ObjectId,
+  Boolean,
+  Date,
+  Null,
+  Regex,
+  DBPointer,
+  JavaScript,
+  Symbol,
+  JavaScriptWithScope,
+  Int,
+  Timestamp,
+  Long,
+  Decimal,
+  MinKey = -1,
+  MaxKey = 127,
+}
+
+type BSONTypeAlias =
+  | "number"
+  | "double"
+  | "string"
+  | "object"
+  | "array"
+  | "binData"
+  | "undefined"
+  | "objectId"
+  | "bool"
+  | "date"
+  | "null"
+  | "regex"
+  | "dbPointer"
+  | "javascript"
+  | "symbol"
+  | "javascriptWithScope"
+  | "int"
+  | "timestamp"
+  | "long"
+  | "decimal"
+  | "minKey"
+  | "maxKey";
+
+export type QuerySelector<T> = {
+  $set?: T;
+  // Comparison
+  $eq?: T;
+  $gt?: T;
+  $gte?: T;
+  $in?: T[];
+  $lt?: T;
+  $lte?: T;
+  $ne?: T;
+  $nin?: T[];
+  // Logical
+  $not?: T extends string ? (QuerySelector<T> | RegExp) : QuerySelector<T>;
+  /** https://docs.mongodb.com/manual/reference/operator/query/and/#op._S_and */
+  $and?: T extends string ? (QuerySelector<T> | RegExp) : QuerySelector<T>;
+  /** https://docs.mongodb.com/manual/reference/operator/query/nor/#op._S_nor */
+  $nor?: T extends string ? (QuerySelector<T> | RegExp) : QuerySelector<T>;
+  /** https://docs.mongodb.com/manual/reference/operator/query/or/#op._S_or */
+  $or?: T extends string ? (QuerySelector<T> | RegExp) : QuerySelector<T>;
+
+  /** https://docs.mongodb.com/manual/reference/operator/query/comment/#op._S_comment */
+  $comment?: string;
+
+  // Element
+  /**
+   * When `true`, `$exists` matches the documents that contain the field,
+   * including documents where the field value is null.
+   */
+  $exists?: boolean;
+  $type?: BSONType | BSONTypeAlias;
+  // Evaluation
+  $expr?: any;
+  $jsonSchema?: any;
+  $mod?: T extends number ? [number, number] : never;
+  $regex?: T extends string ? (RegExp | string) : never;
+  /** https://docs.mongodb.com/manual/reference/operator/query/text */
+  $text?: {
+    $search: string;
+    $language?: string;
+    $caseSensitive?: boolean;
+    $diacraticSensitive?: boolean;
+  };
+  /** https://docs.mongodb.com/manual/reference/operator/query/where/#op._S_where */
+  $where?: string | Function;
+
+  // Geospatial
+  // TODO: define better types for geo queries
+  $geoIntersects?: { $geometry: object };
+  $geoWithin?: object;
+  $near?: object;
+  $nearSphere?: object;
+  // $maxDistance?: number;
+  // Array
+  // TODO: define better types for $all and $elemMatch
+  $all?: T extends Array<infer U> ? any[] : never;
+  $elemMatch?: T extends Array<infer U> ? object : never;
+  $size?: T extends Array<infer U> ? number : never;
+  // Bitwise
+  $bitsAllClear?: any;
+  $bitsAllSet?: any;
+  $bitsAnyClear?: any;
+  $bitsAnySet?: any;
+};
+
+export type FilterType<T extends any> =
+  | Partial<T & WithID>
+  | { [P in keyof T]?: QuerySelector<T[P] | null> }
+  | QuerySelector<Partial<T & WithID>>;
+
+export type DocumentType<T extends any> = T extends {} ? Partial<T & WithID>
+  : any;
+
 /**
  * 
  * @example
- * import { MongoClient } from "https://deno.land/x/mongo/mod.ts";
- * import { DATABASE_NAME, MONGO_URL } from "./constants.ts";
- * const client = new MongoClient();
- * 
- * client.connectWithUri(
- *   `${MONGO_URL}/${DATABASE_NAME}`,
- * );
- * 
- * const db = client.database(DATABASE_NAME);
- * 
  * export interface Answer {
  *   surveyId: string;
  *   date: Date;
@@ -24,21 +137,25 @@ import { dispatchAsync, encode } from "./util.ts";
  *   answers: { [key: string]: string | string[] | null };
  * }
  * 
- * //Using Generics to get better typescript completition.
+ * //Modified mongo library in order to be able to use Generics and get completition.
  * export const answersCollection = db.collection<Answer>("answers");
  * 
  * //Typecript will infer type: const answers: Answer[]
  * const answers = await answersCollection.find();
  * 
  */
-export class Collection<T extends {}> {
+
+export class Collection<T extends any> {
   constructor(
     private readonly client: MongoClient,
     private readonly dbName: string,
     private readonly collectionName: string,
   ) {}
 
-  private async _find(filter?: Partial<T>, options?: FindOptions): Promise<T> {
+  private async _find(
+    filter?: FilterType<T>,
+    options?: FindOptions,
+  ): Promise<T & WithID> {
     const doc = await dispatchAsync(
       {
         command_type: CommandType.Find,
@@ -53,10 +170,10 @@ export class Collection<T extends {}> {
         }),
       ),
     );
-    return doc as T;
+    return doc as T & WithID;
   }
 
-  public async count(filter?: Partial<T>): Promise<number> {
+  public async count(filter?: FilterType<T>): Promise<number> {
     const count = await dispatchAsync(
       {
         command_type: CommandType.Count,
@@ -73,15 +190,20 @@ export class Collection<T extends {}> {
     return count as number;
   }
 
-  public async findOne(filter?: Partial<T>): Promise<T> {
+  public async findOne(
+    filter?: FilterType<T>,
+  ): Promise<T & WithID> {
     return parse(await this._find(filter, { findOne: true }));
   }
 
-  public async find(filter?: Partial<T>, options?: FindOptions): Promise<T[]> {
+  public async find(
+    filter?: FilterType<T>,
+    options?: FindOptions,
+  ): Promise<Array<T & WithID>> {
     return parse(await this._find(filter, { findOne: false, ...options }));
   }
 
-  public async insertOne(doc: T): Promise<ObjectId> {
+  public async insertOne(doc: DocumentType<T>): Promise<ObjectId> {
     const _id = await dispatchAsync(
       {
         command_type: CommandType.InsertOne,
@@ -98,7 +220,9 @@ export class Collection<T extends {}> {
     return _id as ObjectId;
   }
 
-  public async insertMany(docs: T[]): Promise<ObjectId[]> {
+  public async insertMany(
+    docs: Array<DocumentType<T>>,
+  ): Promise<ObjectId[]> {
     const _ids = await dispatchAsync(
       {
         command_type: CommandType.InsertMany,
@@ -116,7 +240,7 @@ export class Collection<T extends {}> {
   }
 
   private async _delete(
-    query: Partial<T>,
+    query: FilterType<T>,
     deleteOne: boolean = false,
   ): Promise<number> {
     const deleteCount = await dispatchAsync(
@@ -136,19 +260,19 @@ export class Collection<T extends {}> {
     return deleteCount as number;
   }
 
-  public deleteOne(query: Partial<T>): Promise<number> {
+  public deleteOne(query: FilterType<T>): Promise<number> {
     return this._delete(query, true);
   }
 
-  public deleteMany(query: Partial<T>): Promise<number> {
+  public deleteMany(query: FilterType<T>): Promise<number> {
     return this._delete(query, false);
   }
 
   private async _update(
-    query: Partial<T>,
-    update: Partial<T>,
+    query: FilterType<T>,
+    update: FilterType<T>,
     updateOne: boolean = false,
-  ): Promise<UpdateResult & T> {
+  ): Promise<UpdateResult & T & WithID> {
     const result = await dispatchAsync(
       {
         command_type: CommandType.Update,
@@ -164,24 +288,26 @@ export class Collection<T extends {}> {
         }),
       ),
     );
-    return result as UpdateResult & T;
+    return result as UpdateResult & T & WithID;
   }
 
   public updateOne(
-    query: Partial<T>,
-    update: Partial<T>,
-  ): Promise<UpdateResult & T> {
+    query: FilterType<T>,
+    update: FilterType<T>,
+  ): Promise<UpdateResult & T & WithID> {
     return this._update(query, update, true);
   }
 
   public updateMany(
-    query: Partial<T>,
-    update: Partial<T>,
-  ): Promise<UpdateResult & T> {
+    query: FilterType<T>,
+    update: FilterType<T>,
+  ) {
     return this._update(query, update, false);
   }
 
-  public async aggregate<T = any>(pipeline: Object[]): Promise<T[]> {
+  public async aggregate<T extends {}>(
+    pipeline: Object[],
+  ): Promise<Array<T & WithID>> {
     const docs = await dispatchAsync(
       {
         command_type: CommandType.Aggregate,
@@ -195,7 +321,7 @@ export class Collection<T extends {}> {
         }),
       ),
     );
-    return parse(docs) as T[];
+    return parse(docs) as Array<T & WithID>;
   }
 
   public async createIndexes(
