@@ -23,18 +23,24 @@ pub fn update(command: Command) -> util::AsyncJsonOp<UpdateResultArgs> {
     let fut = async move {
         let client = command.get_client();
         let data = command.data.first();
-        let args: UpdateArgs = serde_json::from_slice(data.unwrap().as_ref()).unwrap();
+        let args: UpdateArgs =
+            serde_json::from_slice(data.ok_or("Missing arguments for update")?.as_ref())
+                .map_err(|e| e.to_string())?;
         let db_name = args.db_name;
         let collection_name = args.collection_name;
-        let query_doc = util::json_to_document(args.query).expect("query canot be null");
-        let update_doc = util::json_to_document(args.update).expect("update_doc canot be null");
+        let query_doc = util::json_to_document(args.query).ok_or("query can not be null")?;
+        let update_doc = util::json_to_document(args.update).ok_or("update_doc can not be null")?;
         let database = client.database(&db_name);
         let collection = database.collection(&collection_name);
 
         let result = if args.update_one {
-            collection.update_one(query_doc, update_doc, None).unwrap()
+            collection
+                .update_one(query_doc, update_doc, None)
+                .map_err(|e| e.to_string())?
         } else {
-            collection.update_many(query_doc, update_doc, None).unwrap()
+            collection
+                .update_many(query_doc, update_doc, None)
+                .map_err(|e| e.to_string())?
         };
 
         Ok(UpdateResultArgs {

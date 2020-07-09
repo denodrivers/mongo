@@ -88,7 +88,7 @@ export function dispatchAsync(
       JSON.stringify({
         ...command,
         command_id: commandId,
-      })
+      }),
     );
     if (!mongoPluginId) {
       throw new Error("The plugin must be initialized before use");
