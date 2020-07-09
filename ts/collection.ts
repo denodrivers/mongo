@@ -164,34 +164,4 @@ export class Collection<T = any> {
     );
     return parse(docs);
   }
-
-  public async createIndexes(
-    models: {
-      keys: Object;
-      options?: {
-        background?: boolean;
-        unique?: boolean;
-        name?: string;
-        partialFilterExpression?: Object;
-        sparse?: boolean;
-        expireAfterSeconds?: number;
-        storageEngine?: Object;
-      };
-    }[],
-  ): Promise<string[]> {
-    const docs = await dispatchAsync(
-      {
-        command_type: CommandType.CreateIndexes,
-        client_id: this.client.clientId,
-      },
-      encode(
-        JSON.stringify({
-          dbName: this.dbName,
-          collectionName: this.collectionName,
-          models,
-        }),
-      ),
-    );
-    return docs as string[];
-  }
 }

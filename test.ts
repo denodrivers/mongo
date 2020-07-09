@@ -156,6 +156,7 @@ test("testDeleteMany", async () => {
 });
 
 // TODO mongdb_rust official library has not implemented this feature
+// Ref https://github.com/manyuanrong/deno_mongo/pull/69#issuecomment-655831962
 // test("testCreateIndexes", async () => {
 //   const db = getClient().database("test");
 //   const collection = db.collection("mongo_indexes");

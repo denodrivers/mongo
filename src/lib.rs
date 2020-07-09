@@ -9,7 +9,7 @@ extern crate serde;
 
 use deno_core::plugin_api::{Buf, Interface, Op, ZeroCopyBuf};
 use futures::FutureExt;
-use mongodb::Client;
+use mongodb::sync::Client;
 use serde::{Deserialize, Serialize};
 use std::sync::atomic::{AtomicUsize, Ordering};
 
@@ -36,7 +36,6 @@ pub enum CommandType {
     Aggregate,
     Update,
     Count,
-    CreateIndexes,
 }
 
 #[derive(Deserialize)]
@@ -99,7 +98,6 @@ fn op_command(_interface: &mut dyn Interface, data: &[u8], zero_copy: &mut [Zero
         CommandType::Delete => command::delete,
         CommandType::Update => command::update,
         CommandType::Aggregate => command::aggregate,
-        CommandType::CreateIndexes => command::create_indexes,
         CommandType::Count => command::count,
     };
     executor(Command::new(args, zero_copy.to_vec()))

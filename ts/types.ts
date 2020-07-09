@@ -10,7 +10,6 @@ export enum CommandType {
   Update = "Update",
   Aggregate = "Aggregate",
   Count = "Count",
-  CreateIndexes = "CreateIndexes",
 }
 
 export interface ObjectId {
