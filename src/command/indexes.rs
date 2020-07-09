@@ -49,7 +49,9 @@ pub fn create_indexes(command: Command) -> util::AsyncJsonOp<Vec<String>> {
         let database = client.database(&db_name);
         let collection = database.collection(&collection_name);
 
-        let result = collection.create_indexes(models).map_err(|e| e.to_string())?;
+        let result = collection
+            .create_indexes(models)
+            .map_err(|e| e.to_string())?;
         Ok(result)
     };
     fut.boxed()
