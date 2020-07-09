@@ -14,11 +14,9 @@ pub fn delete(command: Command) -> util::AsyncJsonOp<i64> {
     let fut = async move {
         let client = command.get_client();
         let data = command.data.first();
-        let args: DeleteArgs = serde_json::from_slice(
-            data.ok_or("Missing arguments for delete".to_string())?
-                .as_ref(),
-        )
-        .map_err(|e| e.to_string())?;
+        let args: DeleteArgs =
+            serde_json::from_slice(data.ok_or("Missing arguments for delete")?.as_ref())
+                .map_err(|e| e.to_string())?;
         let db_name = args.db_name;
         let collection_name = args.collection_name;
         let delete_one = args.delete_one;

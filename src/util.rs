@@ -2,17 +2,14 @@ use crate::*;
 use bson::{Bson, Document};
 use serde_json::Value;
 
-pub type JsonResult<T>
-where
-    T: Serialize + 'static,
-= Result<T, String>;
+pub type JsonResult<T> = Result<T, String>;
 
 pub fn sync_op<D, T>(d: D, command: Command) -> Op
 where
     D: Fn(Command) -> JsonResult<T>,
     T: Serialize,
 {
-    let res = d(command.clone());
+    let res = d(command);
     Op::Sync(match res {
         Ok(data) => sync_result(data),
         Err(error) => sync_error(error),
@@ -42,10 +39,7 @@ pub fn sync_error(error: String) -> Buf {
     Buf::from(data)
 }
 
-pub type AsyncJsonOp<T>
-where
-    T: Serialize + 'static,
-= Pin<Box<dyn Future<Output = JsonResult<T>>>>;
+pub type AsyncJsonOp<T> = Pin<Box<dyn Future<Output = JsonResult<T>>>>;
 
 pub fn async_op<D, T>(d: D, command: Command) -> Op
 where

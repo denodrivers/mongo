@@ -53,7 +53,7 @@ pub fn connect_with_options(command: Command) -> util::JsonResult<ConnectResult>
     options.connect_timeout = args.connect_timeout.map(Duration::from_millis);
     options.direct_connection = args.direct_connection;
     let password = args.password.clone();
-    options.credential = args.username.clone().map(|username| {
+    options.credential = args.username.map(|username| {
         let mut credential = Credential::default();
         credential.username = Some(username);
         credential.password = password;
@@ -70,12 +70,7 @@ pub fn connect_with_options(command: Command) -> util::JsonResult<ConnectResult>
 }
 
 pub fn connect_with_uri(command: Command) -> util::JsonResult<ConnectResult> {
-    let uri: Vec<u8> = command
-        .data
-        .first()
-        .ok_or("Missing URI".to_string())?
-        .as_ref()
-        .to_vec();
+    let uri: Vec<u8> = command.data.first().ok_or("Missing URI")?.as_ref().to_vec();
     let uri = String::from_utf8(uri).map_err(|e| e.to_string())?;
     let client = mongodb::Client::with_uri_str(&uri).map_err(|e| e.to_string())?;
     let client_id: usize = NEXT_CLIENT_ID.fetch_add(1, Ordering::SeqCst);

@@ -20,11 +20,9 @@ pub fn find(command: Command) -> util::AsyncJsonOp<Vec<Document>> {
     let fut = async move {
         let client = command.get_client();
         let data = command.data.first();
-        let args: FindArgs = serde_json::from_slice(
-            data.ok_or("Arguments missing for find".to_string())?
-                .as_ref(),
-        )
-        .map_err(|e| e.to_string())?;
+        let args: FindArgs =
+            serde_json::from_slice(data.ok_or("Missing arguments for find")?.as_ref())
+                .map_err(|e| e.to_string())?;
         let db_name = args.db_name;
         let collection_name = args.collection_name;
         let filter = maybe_json_to_document(args.filter);
