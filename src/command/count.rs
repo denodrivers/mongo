@@ -10,7 +10,7 @@ struct CountArgs {
     filter: Option<Value>,
 }
 
-pub fn count(command: Command) -> Op {
+pub fn count(command: Command) -> util::AsyncJsonOp<i64> {
     let fut = async move {
         let client = command.get_client();
         let data = command.data.first();
@@ -23,7 +23,7 @@ pub fn count(command: Command) -> Op {
         let collection = database.collection(&collection_name);
 
         let count = collection.count_documents(filter, None).unwrap();
-        util::async_result(&command.args, count)
+        Ok(count)
     };
-    Op::Async(fut.boxed())
+    fut.boxed()
 }

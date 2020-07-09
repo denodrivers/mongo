@@ -16,7 +16,7 @@ struct FindArgs {
     limit: Option<i64>,
 }
 
-pub fn find(command: Command) -> Op {
+pub fn find(command: Command) -> util::AsyncJsonOp<Vec<Document>> {
     let fut = async move {
         let client = command.get_client();
         let data = command.data.first();
@@ -32,7 +32,11 @@ pub fn find(command: Command) -> Op {
 
         if args.find_one {
             let doc = collection.find_one(filter, None).unwrap();
-            util::async_result(&command.args, doc)
+            if let Some(doc) = doc {
+                Ok(vec![doc])
+            } else {
+                Ok(vec![])
+            }
         } else {
             let mut options: FindOptions = FindOptions::default();
             options.skip = skip;
@@ -45,8 +49,8 @@ pub fn find(command: Command) -> Op {
                     _ => None,
                 })
                 .collect();
-            util::async_result(&command.args, docs)
+            Ok(docs)
         }
     };
-    Op::Async(fut.boxed())
+    fut.boxed()
 }

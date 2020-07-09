@@ -10,7 +10,7 @@ struct DeleteArgs {
     delete_one: bool,
 }
 
-pub fn delete(command: Command) -> Op {
+pub fn delete(command: Command) -> util::AsyncJsonOp<i64> {
     let fut = async move {
         let client = command.get_client();
         let data = command.data.first();
@@ -27,7 +27,7 @@ pub fn delete(command: Command) -> Op {
         } else {
             collection.delete_many(query, None).unwrap()
         };
-        util::async_result(&command.args, delete_result.deleted_count)
+        Ok(delete_result.deleted_count)
     };
-    Op::Async(fut.boxed())
+    fut.boxed()
 }

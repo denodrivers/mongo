@@ -1,6 +1,6 @@
 use crate::*;
 
-pub fn list_collection_names(command: Command) -> Op {
+pub fn list_collection_names(command: Command) -> util::AsyncJsonOp<Vec<String>> {
     let fut = async move {
         let client = command.get_client();
         let data = command.data.first();
@@ -9,7 +9,7 @@ pub fn list_collection_names(command: Command) -> Op {
         let database = client.database(&db_name);
         let collection_names = database.list_collection_names(None::<bson::Document>);
 
-        util::async_result(&command.args, collection_names.unwrap())
+        Ok(collection_names.unwrap())
     };
-    Op::Async(fut.boxed())
+    fut.boxed()
 }

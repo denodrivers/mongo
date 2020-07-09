@@ -13,13 +13,13 @@ struct UpdateArgs {
 
 #[derive(Serialize, Debug)]
 #[serde(rename_all = "camelCase")]
-struct UpdateResultArgs {
+pub struct UpdateResultArgs {
     pub matched_count: i64,
     pub modified_count: i64,
     pub upserted_id: Option<Value>,
 }
 
-pub fn update(command: Command) -> Op {
+pub fn update(command: Command) -> util::AsyncJsonOp<UpdateResultArgs> {
     let fut = async move {
         let client = command.get_client();
         let data = command.data.first();
@@ -37,14 +37,11 @@ pub fn update(command: Command) -> Op {
             collection.update_many(query_doc, update_doc, None).unwrap()
         };
 
-        util::async_result(
-            &command.args,
-            UpdateResultArgs {
-                matched_count: result.matched_count,
-                modified_count: result.modified_count,
-                upserted_id: result.upserted_id.map(|id| id.into()),
-            },
-        )
+        Ok(UpdateResultArgs {
+            matched_count: result.matched_count,
+            modified_count: result.modified_count,
+            upserted_id: result.upserted_id.map(|id| id.into()),
+        })
     };
-    Op::Async(fut.boxed())
+    fut.boxed()
 }

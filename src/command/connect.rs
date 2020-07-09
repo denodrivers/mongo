@@ -20,8 +20,15 @@ struct ConnectArgs {
     password: Option<String>,
 }
 
-pub fn connect_with_options(command: Command) -> Op {
-    let args: ConnectArgs = serde_json::from_slice(command.data[0].as_ref()).unwrap();
+#[derive(Serialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct ConnectResult {
+    client_id: usize,
+}
+
+pub fn connect_with_options(command: Command) -> util::JsonResult<ConnectResult> {
+    let args: ConnectArgs =
+        serde_json::from_slice(command.data[0].as_ref()).map_err(|e| e.to_string())?;
     let hosts = args
         .hosts
         .into_iter()
@@ -53,17 +60,28 @@ pub fn connect_with_options(command: Command) -> Op {
         credential
     });
 
-    let client = mongodb::Client::with_options(options).unwrap();
+    let client = mongodb::Client::with_options(options).map_err(|e| e.to_string())?;
     let client_id: usize = NEXT_CLIENT_ID.fetch_add(1, Ordering::SeqCst);
-    CLIENTS.lock().unwrap().insert(client_id, client);
-    Op::Sync(Buf::from(client_id.to_string().as_bytes()))
+    CLIENTS
+        .lock()
+        .map_err(|e| e.to_string())?
+        .insert(client_id, client);
+    Ok(ConnectResult { client_id })
 }
 
-pub fn connect_with_uri(command: Command) -> Op {
-    let uri: Vec<u8> = command.data.first().unwrap().as_ref().to_vec();
-    let uri = String::from_utf8(uri).unwrap();
-    let client = mongodb::Client::with_uri_str(&uri).unwrap();
+pub fn connect_with_uri(command: Command) -> util::JsonResult<ConnectResult> {
+    let uri: Vec<u8> = command
+        .data
+        .first()
+        .ok_or("Missing URI".to_string())?
+        .as_ref()
+        .to_vec();
+    let uri = String::from_utf8(uri).map_err(|e| e.to_string())?;
+    let client = mongodb::Client::with_uri_str(&uri).map_err(|e| e.to_string())?;
     let client_id: usize = NEXT_CLIENT_ID.fetch_add(1, Ordering::SeqCst);
-    CLIENTS.lock().unwrap().insert(client_id, client);
-    Op::Sync(Buf::from(client_id.to_string().as_bytes()))
+    CLIENTS
+        .lock()
+        .map_err(|e| e.to_string())?
+        .insert(client_id, client);
+    Ok(ConnectResult { client_id })
 }

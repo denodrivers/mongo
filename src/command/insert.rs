@@ -18,7 +18,7 @@ struct InsertOneArgs {
     doc: Value,
 }
 
-pub fn insert_one(command: Command) -> Op {
+pub fn insert_one(command: Command) -> util::AsyncJsonOp<bson::Bson> {
     let fut = async move {
         let client = command.get_client();
         let data = command.data.first();
@@ -30,12 +30,12 @@ pub fn insert_one(command: Command) -> Op {
         let collection = database.collection(&collection_name);
 
         let insert_result = collection.insert_one(doc, None).unwrap();
-        util::async_result(&command.args, insert_result.inserted_id)
+        Ok(insert_result.inserted_id)
     };
-    Op::Async(fut.boxed())
+    fut.boxed()
 }
 
-pub fn insert_many(command: Command) -> Op {
+pub fn insert_many(command: Command) -> util::AsyncJsonOp<Vec<bson::Bson>> {
     let fut = async move {
         let client = command.get_client();
         let data = command.data.first();
@@ -54,7 +54,7 @@ pub fn insert_many(command: Command) -> Op {
             .map(|(_, id)| id.to_owned())
             .collect();
 
-        util::async_result(&command.args, ids)
+        Ok(ids)
     };
-    Op::Async(fut.boxed())
+    fut.boxed()
 }

@@ -23,7 +23,7 @@ impl IndexModelArgs {
     }
 }
 
-pub fn create_indexes(command: Command) -> Op {
+pub fn create_indexes(command: Command) -> util::AsyncJsonOp<Vec<String>> {
     let fut = async move {
         let client = command.get_client();
         let data = command.data.first();
@@ -48,7 +48,7 @@ pub fn create_indexes(command: Command) -> Op {
         let collection = database.collection(&collection_name);
 
         let result = collection.create_indexes(models).unwrap();
-        util::async_result(&command.args, result)
+        Ok(result)
     };
-    Op::Async(fut.boxed())
+    fut.boxed()
 }

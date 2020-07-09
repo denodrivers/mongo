@@ -2,13 +2,85 @@ use crate::*;
 use bson::{Bson, Document};
 use serde_json::Value;
 
+pub type JsonResult<T>
+where
+    T: Serialize + 'static,
+= Result<T, String>;
+
+pub fn sync_op<D, T>(d: D, command: Command) -> Op
+where
+    D: Fn(Command) -> JsonResult<T>,
+    T: Serialize,
+{
+    let res = d(command.clone());
+    Op::Sync(match res {
+        Ok(data) => sync_result(data),
+        Err(error) => sync_error(error),
+    })
+}
+
+pub fn sync_result<T>(data: T) -> Buf
+where
+    T: Serialize,
+{
+    let result = SyncResult {
+        data: Some(data),
+        error: None,
+    };
+    let json = json!(result);
+    let data = serde_json::to_vec(&json).unwrap();
+    Buf::from(data)
+}
+
+pub fn sync_error(error: String) -> Buf {
+    let result = SyncResult::<usize> {
+        data: None,
+        error: Some(error),
+    };
+    let json = json!(result);
+    let data = serde_json::to_vec(&json).unwrap();
+    Buf::from(data)
+}
+
+pub type AsyncJsonOp<T>
+where
+    T: Serialize + 'static,
+= Pin<Box<dyn Future<Output = JsonResult<T>>>>;
+
+pub fn async_op<D, T>(d: D, command: Command) -> Op
+where
+    D: Fn(Command) -> AsyncJsonOp<T>,
+    T: Serialize + 'static,
+{
+    let res = d(command.clone());
+    let fut = res.then(move |res| {
+        futures::future::ready(match res {
+            Ok(data) => async_result(&command.args, data),
+            Err(error) => async_error(&command.args, error),
+        })
+    });
+    Op::Async(fut.boxed_local())
+}
+
 pub fn async_result<T>(args: &CommandArgs, data: T) -> Buf
 where
     T: Serialize,
 {
     let result = AsyncResult {
         command_id: args.command_id.unwrap(),
-        data,
+        data: Some(data),
+        error: None,
+    };
+    let json = json!(result);
+    let data = serde_json::to_vec(&json).unwrap();
+    Buf::from(data)
+}
+
+pub fn async_error(args: &CommandArgs, error: String) -> Buf {
+    let result = AsyncResult::<usize> {
+        command_id: args.command_id.unwrap(),
+        data: None,
+        error: Some(error),
     };
     let json = json!(result);
     let data = serde_json::to_vec(&json).unwrap();

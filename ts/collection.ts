@@ -8,7 +8,7 @@ export class Collection<T = any> {
   constructor(
     private readonly client: MongoClient,
     private readonly dbName: string,
-    private readonly collectionName: string,
+    private readonly collectionName: string
   ) {}
 
   private async _find(filter?: Object, options?: FindOptions): Promise<any> {
@@ -23,8 +23,8 @@ export class Collection<T = any> {
           collectionName: this.collectionName,
           filter,
           ...options,
-        }),
-      ),
+        })
+      )
     );
     return doc;
   }
@@ -40,14 +40,14 @@ export class Collection<T = any> {
           dbName: this.dbName,
           collectionName: this.collectionName,
           filter,
-        }),
-      ),
+        })
+      )
     );
     return count as number;
   }
 
   public async findOne(filter?: Object): Promise<T> {
-    return parse(await this._find(filter, { findOne: true }));
+    return parse(await this._find(filter, { findOne: true }))[0] ?? null;
   }
 
   public async find(filter?: Object, options?: FindOptions): Promise<T[]> {
@@ -65,8 +65,8 @@ export class Collection<T = any> {
           dbName: this.dbName,
           collectionName: this.collectionName,
           doc: convert(doc),
-        }),
-      ),
+        })
+      )
     );
     return _id;
   }
@@ -82,15 +82,15 @@ export class Collection<T = any> {
           dbName: this.dbName,
           collectionName: this.collectionName,
           docs: convert(docs),
-        }),
-      ),
+        })
+      )
     );
     return _ids;
   }
 
   private async _delete(
     query: Object,
-    deleteOne: boolean = false,
+    deleteOne: boolean = false
   ): Promise<number> {
     const deleteCount = await dispatchAsync(
       {
@@ -103,8 +103,8 @@ export class Collection<T = any> {
           collectionName: this.collectionName,
           query,
           deleteOne,
-        }),
-      ),
+        })
+      )
     );
     return deleteCount as number;
   }
@@ -120,7 +120,7 @@ export class Collection<T = any> {
   private async _update(
     query: Object,
     update: Object,
-    updateOne: boolean = false,
+    updateOne: boolean = false
   ): Promise<UpdateResult> {
     const result = await dispatchAsync(
       {
@@ -134,8 +134,8 @@ export class Collection<T = any> {
           query: convert(query),
           update: convert(update),
           updateOne,
-        }),
-      ),
+        })
+      )
     );
     return result as UpdateResult;
   }
@@ -159,8 +159,8 @@ export class Collection<T = any> {
           dbName: this.dbName,
           collectionName: this.collectionName,
           pipeline,
-        }),
-      ),
+        })
+      )
     );
     return parse(docs);
   }
@@ -177,7 +177,7 @@ export class Collection<T = any> {
         expireAfterSeconds?: number;
         storageEngine?: Object;
       };
-    }[],
+    }[]
   ): Promise<string[]> {
     const docs = await dispatchAsync(
       {
@@ -189,8 +189,8 @@ export class Collection<T = any> {
           dbName: this.dbName,
           collectionName: this.collectionName,
           models,
-        }),
-      ),
+        })
+      )
     );
     return docs as string[];
   }
