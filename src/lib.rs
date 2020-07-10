@@ -7,13 +7,17 @@ extern crate bson;
 extern crate mongodb;
 extern crate serde;
 
+use bson::Document;
 use deno_core::plugin_api::{Buf, Interface, Op, ZeroCopyBuf};
 use futures::FutureExt;
-use mongodb::Client;
+use mongodb::{options::*, Client};
 use serde::{Deserialize, Serialize};
-use std::sync::atomic::{AtomicUsize, Ordering};
-
-use std::{collections::HashMap, sync::Mutex, sync::MutexGuard};
+use std::{
+    collections::HashMap,
+    sync::atomic::{AtomicUsize, Ordering},
+    sync::Mutex,
+    sync::MutexGuard,
+};
 
 mod command;
 mod util;
