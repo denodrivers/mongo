@@ -70,6 +70,31 @@ test("testInsertOne", async () => {
   });
 });
 
+test("testUpsertOne", async () => {
+  const db = getClient().database("test");
+  const users = db.collection<IUser>("mongo_test_users");
+  const { _id: upsertedId } = await users.updateOne({
+    _id: ObjectId("aaaaaaaaaaaaaaaaaaaaaaaa"),
+  }, {
+    username: "user1",
+    password: "pass1",
+    date: new Date(dateNow),
+  }, { upsert: true });
+
+  assertEquals(Object.keys(upsertedId), ["$oid"]);
+
+  const user1 = await users.findOne({
+    _id: ObjectId(upsertedId.$oid),
+  });
+
+  assertEquals(user1, {
+    _id: upsertedId,
+    username: "user1",
+    password: "pass1",
+    date: new Date(dateNow),
+  });
+});
+
 test("testInsertOneTwice", async () => {
   const db = getClient().database("test");
   const users = db.collection<IUser>("mongo_test_users_2");
