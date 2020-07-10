@@ -83,7 +83,7 @@ test("testInsertOneTwice", async () => {
       users.insertOne({
         _id: ObjectId("aaaaaaaaaaaaaaaaaaaaaaaa"),
         username: "user1",
-      }),
+      }) as any,
     undefined,
     "E11000",
   );
