@@ -73,7 +73,7 @@ test("testInsertOne", async () => {
 test("testUpsertOne", async () => {
   const db = getClient().database("test");
   const users = db.collection<IUser>("mongo_test_users");
-  const { _id: upsertedId } = await users.updateOne({
+  const { upsertedId } = await users.updateOne({
     _id: ObjectId("aaaaaaaaaaaaaaaaaaaaaaaa"),
   }, {
     username: "user1",
@@ -81,6 +81,7 @@ test("testUpsertOne", async () => {
     date: new Date(dateNow),
   }, { upsert: true });
 
+  assert(upsertedId);
   assertEquals(Object.keys(upsertedId), ["$oid"]);
 
   const user1 = await users.findOne({
