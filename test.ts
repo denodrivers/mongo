@@ -83,7 +83,7 @@ test("testInsertOneTwice", async () => {
       users.insertOne({
         _id: ObjectId("aaaaaaaaaaaaaaaaaaaaaaaa"),
         username: "user1",
-      }),
+      }) as any,
     undefined,
     "E11000",
   );
@@ -96,7 +96,8 @@ test("testFindOne", async () => {
   assert(user1 instanceof Object);
   assertEquals(Object.keys(user1), ["_id", "username", "password", "date"]);
 
-  const findNull = await users.findOne({ test: 1 });
+  const query = { test: 1 } as any;
+  const findNull = await users.findOne(query);
   assertEquals(findNull, null);
 });
 

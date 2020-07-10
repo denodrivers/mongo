@@ -79,7 +79,6 @@ jobs:
         with:
           mongoDBVersion: 4.2
       # MongoDB is auto started on Windows by default
-
       # Tests
       - name: Test Rust
         run: cargo test --release --locked --all-targets
