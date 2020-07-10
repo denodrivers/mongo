@@ -47,7 +47,7 @@ export class Collection<T = any> {
   }
 
   public async findOne(filter?: Object): Promise<T> {
-    return parse(await this._find(filter, { findOne: true }));
+    return parse(await this._find(filter, { findOne: true }))[0] ?? null;
   }
 
   public async find(filter?: Object, options?: FindOptions): Promise<T[]> {
