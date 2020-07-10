@@ -1,12 +1,12 @@
 use crate::*;
 
-pub fn list_database_names(command: Command) -> Op {
+pub fn list_database_names(command: Command) -> util::AsyncJsonOp<Vec<String>> {
     let fut = async move {
         let names = command
             .get_client()
             .list_database_names(None::<bson::Document>);
-        let data = names.unwrap();
-        util::async_result(&command.args, data)
+        let data = names.map_err(|e| e.to_string())?;
+        Ok(data)
     };
-    Op::Async(fut.boxed())
+    fut.boxed()
 }

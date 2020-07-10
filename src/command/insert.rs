@@ -18,28 +18,34 @@ struct InsertOneArgs {
     doc: Value,
 }
 
-pub fn insert_one(command: Command) -> Op {
+pub fn insert_one(command: Command) -> util::AsyncJsonOp<bson::Bson> {
     let fut = async move {
         let client = command.get_client();
         let data = command.data.first();
-        let args: InsertOneArgs = serde_json::from_slice(data.unwrap().as_ref()).unwrap();
+        let args: InsertOneArgs =
+            serde_json::from_slice(data.ok_or("Missing arguments for insertOne")?.as_ref())
+                .map_err(|e| e.to_string())?;
         let db_name = args.db_name;
         let collection_name = args.collection_name;
-        let doc = util::json_to_document(args.doc).expect("doc canot be null");
+        let doc = util::json_to_document(args.doc).ok_or("doc can not be null")?;
         let database = client.database(&db_name);
         let collection = database.collection(&collection_name);
 
-        let insert_result = collection.insert_one(doc, None).unwrap();
-        util::async_result(&command.args, insert_result.inserted_id)
+        let insert_result = collection
+            .insert_one(doc, None)
+            .map_err(|e| e.to_string())?;
+        Ok(insert_result.inserted_id)
     };
-    Op::Async(fut.boxed())
+    fut.boxed()
 }
 
-pub fn insert_many(command: Command) -> Op {
+pub fn insert_many(command: Command) -> util::AsyncJsonOp<Vec<bson::Bson>> {
     let fut = async move {
         let client = command.get_client();
         let data = command.data.first();
-        let args: InsertManyArgs = serde_json::from_slice(data.unwrap().as_ref()).unwrap();
+        let args: InsertManyArgs =
+            serde_json::from_slice(data.ok_or("Missing arguments for insertMany")?.as_ref())
+                .map_err(|e| e.to_string())?;
         let db_name = args.db_name;
         let collection_name = args.collection_name;
         let docs: Vec<Document> = util::jsons_to_documents(args.docs);
@@ -47,14 +53,16 @@ pub fn insert_many(command: Command) -> Op {
         let database = client.database(&db_name);
         let collection = database.collection(&collection_name);
 
-        let insert_result = collection.insert_many(docs, None).unwrap();
+        let insert_result = collection
+            .insert_many(docs, None)
+            .map_err(|e| e.to_string())?;
         let ids: Vec<bson::Bson> = insert_result
             .inserted_ids
             .iter()
             .map(|(_, id)| id.to_owned())
             .collect();
 
-        util::async_result(&command.args, ids)
+        Ok(ids)
     };
-    Op::Async(fut.boxed())
+    fut.boxed()
 }

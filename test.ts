@@ -1,7 +1,12 @@
 import { cargoBuild } from "./build.ts";
 import { init } from "./ts/util.ts";
 import { MongoClient } from "./ts/client.ts";
-import { assert, assertEquals, exists } from "./test.deps.ts";
+import {
+  assert,
+  assertEquals,
+  exists,
+  assertThrowsAsync,
+} from "./test.deps.ts";
 import { ObjectId } from "./ts/types.ts";
 interface IUser {
   username: string;
@@ -65,6 +70,25 @@ test("testInsertOne", async () => {
   });
 });
 
+test("testInsertOneTwice", async () => {
+  const db = getClient().database("test");
+  const users = db.collection<IUser>("mongo_test_users_2");
+  const insertId: ObjectId = await users.insertOne({
+    _id: ObjectId("aaaaaaaaaaaaaaaaaaaaaaaa"),
+    username: "user1",
+  });
+
+  await assertThrowsAsync(
+    () =>
+      users.insertOne({
+        _id: ObjectId("aaaaaaaaaaaaaaaaaaaaaaaa"),
+        username: "user1",
+      }) as any,
+    undefined,
+    "E11000",
+  );
+});
+
 test("testFindOne", async () => {
   const db = getClient().database("test");
   const users = db.collection<IUser>("mongo_test_users");
@@ -72,7 +96,8 @@ test("testFindOne", async () => {
   assert(user1 instanceof Object);
   assertEquals(Object.keys(user1), ["_id", "username", "password", "date"]);
 
-  const findNull = await users.findOne({ test: 1 });
+  const query = { test: 1 } as any;
+  const findNull = await users.findOne(query);
   assertEquals(findNull, null);
 });
 

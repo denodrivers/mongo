@@ -86,6 +86,10 @@ export interface ClientOptions {
   waitQueueTimeout?: number;
 }
 
+interface ConnectResult {
+  clientId: number;
+}
+
 export class MongoClient {
   private _clientId: number = 0;
 
@@ -97,16 +101,16 @@ export class MongoClient {
     const data = dispatch(
       { command_type: CommandType.ConnectWithUri },
       encode(uri),
-    );
-    this._clientId = parseInt(decode(data));
+    ) as ConnectResult;
+    this._clientId = data.clientId;
   }
 
   connectWithOptions(options: ClientOptions) {
     const data = dispatch(
       { command_type: CommandType.ConnectWithOptions },
       encode(JSON.stringify(options)),
-    );
-    this._clientId = parseInt(decode(data));
+    ) as ConnectResult;
+    this._clientId = data.clientId;
   }
 
   async listDatabases(): Promise<string[]> {

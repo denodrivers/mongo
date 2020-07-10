@@ -78,12 +78,7 @@ jobs:
         uses: wbari/start-mongoDB@v0.2
         with:
           mongoDBVersion: 4.2
-      - name: Start MongoDB (Windows)
-        if: startsWith(matrix.os, 'windows')
-        run: |
-          choco install mongodb --version=4.2.0 --no-progress
-          "C:\Program Files\MongoDB\Server\4.2.0\bin\mongo.exe"
-
+      # MongoDB is auto started on Windows by default
       # Tests
       - name: Test Rust
         run: cargo test --release --locked --all-targets
