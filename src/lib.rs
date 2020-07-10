@@ -10,7 +10,7 @@ extern crate serde;
 use bson::Document;
 use deno_core::plugin_api::{Buf, Interface, Op, ZeroCopyBuf};
 use futures::{Future, FutureExt};
-use mongodb::Client;
+use mongodb::{options, Client};
 use serde::{Deserialize, Serialize};
 use std::{
     clone::Clone,

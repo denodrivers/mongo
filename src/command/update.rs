@@ -18,8 +18,8 @@ struct UpdateOptions {
     array_filters: Option<Vec<Document>>,
     bypass_document_validation: Option<bool>,
     upsert: Option<bool>,
-    collation: Option<Collation>,
-    hint: Option<Hint>,
+    // TODO: add collation
+    // TODO: add hint
     // TODO: add write_concern
 }
 
@@ -46,12 +46,12 @@ pub fn update(command: Command) -> util::AsyncJsonOp<UpdateResultArgs> {
         let collection = database.collection(&collection_name);
 
         let options = if let Some(option) = args.options {
-            Some(mongodb::options::UpdateOptions {
+            Some(options::UpdateOptions {
                 array_filters: option.array_filters,
                 bypass_document_validation: option.bypass_document_validation,
                 upsert: option.upsert,
-                collation: option.collation,
-                hint: option.hint,
+                collation: None,
+                hint: None,
                 write_concern: None,
             })
         } else {
