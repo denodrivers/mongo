@@ -1,7 +1,12 @@
 import { cargoBuild } from "./build.ts";
 import { init } from "./ts/util.ts";
 import { MongoClient } from "./ts/client.ts";
-import { assert, assertEquals, exists } from "./test.deps.ts";
+import {
+  assert,
+  assertEquals,
+  exists,
+  assertThrowsAsync,
+} from "./test.deps.ts";
 import { ObjectId } from "./ts/types.ts";
 interface IUser {
   username: string;
@@ -63,6 +68,25 @@ test("testInsertOne", async () => {
     password: "pass1",
     date: new Date(dateNow),
   });
+});
+
+test("testInsertOneTwice", async () => {
+  const db = getClient().database("test");
+  const users = db.collection<IUser>("mongo_test_users_2");
+  const insertId: ObjectId = await users.insertOne({
+    _id: ObjectId("aaaaaaaaaaaaaaaaaaaaaaaa"),
+    username: "user1",
+  });
+
+  await assertThrowsAsync(
+    () =>
+      users.insertOne({
+        _id: ObjectId("aaaaaaaaaaaaaaaaaaaaaaaa"),
+        username: "user1",
+      }),
+    undefined,
+    "E11000",
+  );
 });
 
 test("testFindOne", async () => {

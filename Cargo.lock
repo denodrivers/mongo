@@ -198,9 +198,9 @@ dependencies = [
 
 [[package]]
 name = "deno_core"
-version = "0.47.1"
+version = "0.48.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "88bb710ac3916a30de1d3f03f0763c9c0ed5100473687f95ddb37df7de661d0c"
+checksum = "4963ddfdb287602928b8847242884840381bb896fba2dda83f7408952451a3eb"
 dependencies = [
  "downcast-rs",
  "futures 0.3.5",
@@ -1051,9 +1051,9 @@ dependencies = [
 
 [[package]]
 name = "rusty_v8"
-version = "0.5.1"
+version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "acb51793f34f267b197a6688c986ddcd7a60c94894d77702f1b4a3febf6e1eda"
+checksum = "da4dd2d680bf9812b3156b44f89fdd7b508c1369fbc69a14150972c6919c84d1"
 dependencies = [
  "bitflags",
  "cargo_gn",
@@ -1106,9 +1106,9 @@ dependencies = [
 
 [[package]]
 name = "serde_json"
-version = "1.0.53"
+version = "1.0.56"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "993948e75b189211a9b31a7528f950c6adc21f9720b6438ff80a7fa2f864cea2"
+checksum = "3433e879a558dde8b5e8feb2a04899cf34fdde1fafb894687e52105fc1162ac3"
 dependencies = [
  "indexmap",
  "itoa",
@@ -1512,9 +1512,9 @@ dependencies = [
 
 [[package]]
 name = "which"
-version = "4.0.0"
+version = "4.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bd3edc3cf5458851a4d6a2329232bd5f42c7f9bbe4c4782c4ef9ce37e5d101b2"
+checksum = "b5fe1a9cb33fe7cf77d431070d0223e544b1e4e7f7764bad0a3e691a6678a131"
 dependencies = [
  "libc",
  "thiserror",

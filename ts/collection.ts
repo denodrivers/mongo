@@ -192,8 +192,8 @@ export class Collection<T extends any> {
 
   public async findOne(
     filter?: FilterType<T>,
-  ): Promise<T & WithID> {
-    return parse(await this._find(filter, { findOne: true }));
+  ): Promise<(T & WithID) | null> {
+    return parse(await this._find(filter, { findOne: true }))[0] ?? null;
   }
 
   public async find(

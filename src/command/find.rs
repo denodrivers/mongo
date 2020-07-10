@@ -16,11 +16,13 @@ struct FindArgs {
     limit: Option<i64>,
 }
 
-pub fn find(command: Command) -> Op {
+pub fn find(command: Command) -> util::AsyncJsonOp<Vec<Document>> {
     let fut = async move {
         let client = command.get_client();
         let data = command.data.first();
-        let args: FindArgs = serde_json::from_slice(data.unwrap().as_ref()).unwrap();
+        let args: FindArgs =
+            serde_json::from_slice(data.ok_or("Missing arguments for find")?.as_ref())
+                .map_err(|e| e.to_string())?;
         let db_name = args.db_name;
         let collection_name = args.collection_name;
         let filter = maybe_json_to_document(args.filter);
@@ -31,22 +33,30 @@ pub fn find(command: Command) -> Op {
         let collection = database.collection(&collection_name);
 
         if args.find_one {
-            let doc = collection.find_one(filter, None).unwrap();
-            util::async_result(&command.args, doc)
+            let doc = collection
+                .find_one(filter, None)
+                .map_err(|e| e.to_string())?;
+            if let Some(doc) = doc {
+                Ok(vec![doc])
+            } else {
+                Ok(vec![])
+            }
         } else {
             let mut options: FindOptions = FindOptions::default();
             options.skip = skip;
             options.limit = limit;
 
-            let cursor = collection.find(filter, Some(options)).unwrap();
+            let cursor = collection
+                .find(filter, Some(options))
+                .map_err(|e| e.to_string())?;
             let docs: Vec<Document> = cursor
                 .filter_map(|doc: Result<Document>| match doc {
                     Ok(doc) => Some(doc),
                     _ => None,
                 })
                 .collect();
-            util::async_result(&command.args, docs)
+            Ok(docs)
         }
     };
-    Op::Async(fut.boxed())
+    fut.boxed()
 }
