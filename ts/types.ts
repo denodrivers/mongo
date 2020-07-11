@@ -29,3 +29,9 @@ export interface FindOptions {
   skip?: number;
   limit?: number;
 }
+
+export interface UpdateOptions {
+  arrayFilters?: object[];
+  bypassDocumentValidation?: boolean;
+  upsert?: boolean;
+}

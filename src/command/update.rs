@@ -9,6 +9,18 @@ struct UpdateArgs {
     query: Value,
     update: Value,
     update_one: bool,
+    options: Option<UpdateOptions>,
+}
+
+#[derive(Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+struct UpdateOptions {
+    array_filters: Option<Vec<Document>>,
+    bypass_document_validation: Option<bool>,
+    upsert: Option<bool>,
+    // TODO: add collation
+    // TODO: add hint
+    // TODO: add write_concern
 }
 
 #[derive(Serialize, Debug)]
@@ -33,13 +45,26 @@ pub fn update(command: Command) -> util::AsyncJsonOp<UpdateResultArgs> {
         let database = client.database(&db_name);
         let collection = database.collection(&collection_name);
 
+        let options = if let Some(option) = args.options {
+            Some(options::UpdateOptions {
+                array_filters: option.array_filters,
+                bypass_document_validation: option.bypass_document_validation,
+                upsert: option.upsert,
+                collation: None,
+                hint: None,
+                write_concern: None,
+            })
+        } else {
+            None
+        };
+
         let result = if args.update_one {
             collection
-                .update_one(query_doc, update_doc, None)
+                .update_one(query_doc, update_doc, options)
                 .map_err(|e| e.to_string())?
         } else {
             collection
-                .update_many(query_doc, update_doc, None)
+                .update_many(query_doc, update_doc, options)
                 .map_err(|e| e.to_string())?
         };
 

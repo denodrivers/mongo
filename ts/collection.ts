@@ -1,6 +1,6 @@
 import { MongoClient } from "./client.ts";
 import { UpdateResult } from "./result.ts";
-import { CommandType, FindOptions, ObjectId } from "./types.ts";
+import { CommandType, FindOptions, ObjectId, UpdateOptions } from "./types.ts";
 import { convert, parse } from "./type_convert.ts";
 import { dispatchAsync, encode } from "./util.ts";
 
@@ -272,6 +272,7 @@ export class Collection<T extends any> {
     query: FilterType<T>,
     update: FilterType<T>,
     updateOne: boolean = false,
+    options?: UpdateOptions,
   ): Promise<UpdateResult & T & WithID> {
     const result = await dispatchAsync(
       {
@@ -285,6 +286,7 @@ export class Collection<T extends any> {
           query: convert(query),
           update: convert(update),
           updateOne,
+          options: options ?? null,
         }),
       ),
     );
@@ -294,15 +296,17 @@ export class Collection<T extends any> {
   public updateOne(
     query: FilterType<T>,
     update: FilterType<T>,
+    options?: UpdateOptions,
   ): Promise<UpdateResult & T & WithID> {
-    return this._update(query, update, true);
+    return this._update(query, update, true, options);
   }
 
   public updateMany(
     query: FilterType<T>,
     update: FilterType<T>,
+    options?: UpdateOptions,
   ) {
-    return this._update(query, update, false);
+    return this._update(query, update, false, options);
   }
 
   public async aggregate<T extends {}>(
