@@ -25,7 +25,7 @@ deno run --allow-net --allow-write --allow-read --allow-plugin --unstable xxx.ts
 ## Examples
 
 ```ts
-import { MongoClient } from "https://deno.land/x/mongo@v0.10.0/mod.ts";
+import { MongoClient } from "https://deno.land/x/mongo@v0.9.1/mod.ts";
 
 const client = new MongoClient();
 client.connectWithUri("mongodb://localhost:27017");
@@ -35,7 +35,7 @@ interface UserSchema {
   _id: { $oid: string };
   username: string;
   password: string;
-};
+}
 
 const db = client.database("test");
 const users = db.collection<UserSchema>("users");
@@ -67,9 +67,7 @@ const user1 = await users.findOne({ _id: insertId });
 const all_users = await users.find({ username: { $ne: null } });
 
 // find by ObjectId
-const user1_id = await users.findOne(
-  { _id: { "$oid": "<oid>" } },
-);
+const user1_id = await users.findOne({ _id: { $oid: "<oid>" } });
 
 // count
 const count = await users.count({ username: { $ne: null } });
@@ -83,13 +81,13 @@ const docs = await users.aggregate([
 // updateOne
 const { matchedCount, modifiedCount, upsertedId } = await users.updateOne(
   { username: { $ne: null } },
-  { $set: { username: "USERNAME" } },
+  { $set: { username: "USERNAME" } }
 );
 
 // updateMany
 const { matchedCount, modifiedCount, upsertedId } = await users.updateMany(
   { username: { $ne: null } },
-  { $set: { username: "USERNAME" } },
+  { $set: { username: "USERNAME" } }
 );
 
 // deleteOne
