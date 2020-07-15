@@ -105,10 +105,11 @@ pub(crate) fn get_client(client_id: usize) -> Client {
     map.get(&client_id).unwrap().clone()
 }
 
-fn op_command(_interface: &mut dyn Interface, data: &[u8], zero_copy: &mut [ZeroCopyBuf]) -> Op {
-    let args = CommandArgs::new(data);
+fn op_command(_interface: &mut dyn Interface, zero_copy: &mut [ZeroCopyBuf]) -> Op {
+    let (first, rest) = zero_copy.split_first().unwrap();
+    let args = CommandArgs::new(first);
     let args2 = args.clone();
-    let command = Command::new(args, zero_copy.to_vec());
+    let command = Command::new(args, rest.to_vec());
     match args2.command_type {
         CommandType::ConnectWithOptions => util::sync_op(command::connect_with_options, command),
         CommandType::ConnectWithUri => util::sync_op(command::connect_with_uri, command),
