@@ -10,6 +10,7 @@ mod list_database_names;
 mod update;
 mod distinct;
 
+pub use distinct::distinct;
 pub use aggregation::aggregate;
 pub use connect::{connect_with_options, connect_with_uri};
 pub use count::count;
