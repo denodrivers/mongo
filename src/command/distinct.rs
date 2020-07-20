@@ -1,6 +1,5 @@
 use crate::*;
-use bson::Document;
-use mongodb::error::Result;
+use bson::Bson;
 use mongodb::options::DistinctOptions;
 use serde_json::Value;
 use util::maybe_json_to_document;
@@ -29,12 +28,12 @@ pub fn distinct(command: Command) -> util::AsyncJsonOp<Vec<Bson>> {
         let database = client.database(&db_name);
         let collection = database.collection(&collection_name);
 
-        let mut options: DistinctOptions = DistinctOptions::default();
+        let options: DistinctOptions = DistinctOptions::default();
 
         let bson = collection
             .distinct(&field_name, filter, Some(options))
             .map_err(|e| e.to_string())?;
-        
+
         Ok(bson)
     };
     fut.boxed()
