@@ -358,10 +358,9 @@ export class Collection<T extends any> {
     return docs as string[];
   }
 
-  public async distinct<>(
+  public async distinct(
     fieldName: string,
     filter?: FilterType<T>,
-    options?: FindOptions,
   ): Promise<Array<T & WithID>> {
     const docs = await dispatchAsync(
       {

@@ -206,6 +206,14 @@ test("testDeleteMany", async () => {
   assertEquals(deleteCount, 2);
 });
 
+test("testDistinct", async () => {
+  const db = getClient().database("test");
+  const users = db.collection<IUser>("mongo_test_users");
+  const user1 = await users.distinct("username", {});
+  assertEquals(user1, ["user1"]);
+});
+
+
 // TODO mongdb_rust official library has not implemented this feature
 // test("testCreateIndexes", async () => {
 //   const db = getClient().database("test");
