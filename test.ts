@@ -213,7 +213,6 @@ test("testDistinct", async () => {
   assertEquals(user1, ["user1"]);
 });
 
-
 // TODO mongdb_rust official library has not implemented this feature
 // test("testCreateIndexes", async () => {
 //   const db = getClient().database("test");
