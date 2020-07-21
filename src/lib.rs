@@ -45,6 +45,7 @@ pub enum CommandType {
     Update,
     Count,
     CreateIndexes,
+    Distinct,
 }
 
 #[derive(Deserialize, Clone)]
@@ -123,5 +124,6 @@ fn op_command(_interface: &mut dyn Interface, zero_copy: &mut [ZeroCopyBuf]) -> 
         CommandType::Aggregate => util::async_op(command::aggregate, command),
         CommandType::CreateIndexes => util::async_op(command::create_indexes, command),
         CommandType::Count => util::async_op(command::count, command),
+        CommandType::Distinct => util::async_op(command::distinct, command),
     }
 }

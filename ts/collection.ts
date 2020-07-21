@@ -128,7 +128,7 @@ export type DocumentType<T extends any> = T extends {} ? Partial<T & WithID>
   : any;
 
 /**
- * 
+ *
  * @example
  * export interface Answer {
  *   surveyId: string;
@@ -136,13 +136,13 @@ export type DocumentType<T extends any> = T extends {} ? Partial<T & WithID>
  *   userAgent: string;
  *   answers: { [key: string]: string | string[] | null };
  * }
- * 
+ *
  * //Modified mongo library in order to be able to use Generics and get completition.
  * export const answersCollection = db.collection<Answer>("answers");
- * 
+ *
  * //Typecript will infer type: const answers: Answer[]
  * const answers = await answersCollection.find();
- * 
+ *
  */
 
 export class Collection<T extends any> {
@@ -356,5 +356,25 @@ export class Collection<T extends any> {
       ),
     );
     return docs as string[];
+  }
+
+  public async distinct(
+    fieldName: string,
+    filter?: FilterType<T>,
+  ): Promise<Array<T & WithID>> {
+    const docs = await dispatchAsync(
+      {
+        command_type: CommandType.Distinct,
+        client_id: this.client.clientId,
+      },
+      encode(
+        JSON.stringify({
+          dbName: this.dbName,
+          collectionName: this.collectionName,
+          fieldName,
+        }),
+      ),
+    );
+    return parse(docs) as Array<T & WithID>;
   }
 }

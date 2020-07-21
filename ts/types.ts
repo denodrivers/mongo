@@ -11,6 +11,7 @@ export enum CommandType {
   Aggregate = "Aggregate",
   Count = "Count",
   CreateIndexes = "CreateIndexes",
+  Distinct = "Distinct",
 }
 
 export interface ObjectId {
