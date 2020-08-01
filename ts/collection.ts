@@ -67,7 +67,7 @@ export type QuerySelector<T> = {
   $ne?: T;
   $nin?: T[];
   // Logical
-  $not?: T extends string ? (QuerySelector<T> | RegExp) : QuerySelector<T>;
+  $not?: T extends string ? (QuerySelector<T> | RegExp) : FilterType<T>;
   /** https://docs.mongodb.com/manual/reference/operator/query/and/#op._S_and */
   $and?: T extends string ? (QuerySelector<T> | RegExp) : FilterType<T>[];
   /** https://docs.mongodb.com/manual/reference/operator/query/nor/#op._S_nor */
