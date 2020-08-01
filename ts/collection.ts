@@ -69,11 +69,11 @@ export type QuerySelector<T> = {
   // Logical
   $not?: T extends string ? (QuerySelector<T> | RegExp) : QuerySelector<T>;
   /** https://docs.mongodb.com/manual/reference/operator/query/and/#op._S_and */
-  $and?: T extends string ? (QuerySelector<T> | RegExp) : QuerySelector<T>;
+  $and?: T extends string ? (QuerySelector<T> | RegExp) : FilterType<T>[];
   /** https://docs.mongodb.com/manual/reference/operator/query/nor/#op._S_nor */
-  $nor?: T extends string ? (QuerySelector<T> | RegExp) : QuerySelector<T>;
+  $nor?: T extends string ? (QuerySelector<T> | RegExp) : FilterType<T>[];
   /** https://docs.mongodb.com/manual/reference/operator/query/or/#op._S_or */
-  $or?: T extends string ? (QuerySelector<T> | RegExp) : QuerySelector<T>;
+  $or?: T extends string ? (QuerySelector<T> | RegExp) : FilterType<T>[];
 
   /** https://docs.mongodb.com/manual/reference/operator/query/comment/#op._S_comment */
   $comment?: string;
