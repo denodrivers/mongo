@@ -161,11 +161,13 @@ test("testInsertMany", async () => {
 test("testFindOr", async () => {
   const db = getClient().database("test");
   const users = db.collection<IUser>("mongo_test_users");
-  const user1 = await users.find({ $or: [{
-    password: 'pass1'
-  }, {
-    password: 'pass2'
-  }] });
+  const user1 = await users.find({
+    $or: [{
+      password: "pass1",
+    }, {
+      password: "pass2",
+    }],
+  });
 
   assert(user1 instanceof Array);
   assertEquals(user1.length, 3);
