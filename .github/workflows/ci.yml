@@ -33,7 +33,7 @@ jobs:
       - name: Install Deno
         uses: denolib/setup-deno@master
         with:
-          deno-version: 1.2.0
+          deno-version: 1.2.2
       - name: Log versions
         run: |
           deno --version
