@@ -35,6 +35,7 @@ lazy_static! {
 pub enum CommandType {
     ConnectWithOptions,
     ConnectWithUri,
+    Close,
     ListDatabases,
     Find,
     ListCollectionNames,
@@ -114,6 +115,7 @@ fn op_command(_interface: &mut dyn Interface, zero_copy: &mut [ZeroCopyBuf]) -> 
     match args2.command_type {
         CommandType::ConnectWithOptions => util::sync_op(command::connect_with_options, command),
         CommandType::ConnectWithUri => util::sync_op(command::connect_with_uri, command),
+        CommandType::Close => util::sync_op(command::close, command),
         CommandType::ListDatabases => util::async_op(command::list_database_names, command),
         CommandType::ListCollectionNames => util::async_op(command::list_collection_names, command),
         CommandType::Find => util::async_op(command::find, command),

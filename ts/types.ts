@@ -1,6 +1,7 @@
 export enum CommandType {
   ConnectWithUri = "ConnectWithUri",
   ConnectWithOptions = "ConnectWithOptions",
+  Close = "Close",
   ListDatabases = "ListDatabases",
   ListCollectionNames = "ListCollectionNames",
   Find = "Find",

@@ -1,6 +1,6 @@
 import { Database } from "./database.ts";
 import { CommandType } from "./types.ts";
-import { decode, dispatch, dispatchAsync, encode } from "./util.ts";
+import { dispatch, dispatchAsync, encode } from "./util.ts";
 
 export interface ClientOptions {
   /**
@@ -100,7 +100,7 @@ export class MongoClient {
   connectWithUri(uri: string) {
     const data = dispatch(
       { command_type: CommandType.ConnectWithUri },
-      encode(uri),
+      encode(uri)
     ) as ConnectResult;
     this._clientId = data.clientId;
   }
@@ -108,7 +108,7 @@ export class MongoClient {
   connectWithOptions(options: ClientOptions) {
     const data = dispatch(
       { command_type: CommandType.ConnectWithOptions },
-      encode(JSON.stringify(options)),
+      encode(JSON.stringify(options))
     ) as ConnectResult;
     this._clientId = data.clientId;
   }
@@ -118,6 +118,15 @@ export class MongoClient {
       command_type: CommandType.ListDatabases,
       client_id: this._clientId,
     })) as string[];
+  }
+
+  close() {
+    return dispatch({
+      command_type: CommandType.Close,
+      client_id: this._clientId,
+    }) as {
+      success: boolean;
+    };
   }
 
   database(name: string): Database {
