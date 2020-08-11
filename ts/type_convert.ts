@@ -5,6 +5,9 @@ export function convert(data: any): any {
   if (data instanceof Date) {
     return { $date: { $numberLong: data.getTime() } };
   }
+  if (data instanceof Map) {
+    return convert(Object.fromEntries(data));
+  }
   if (data instanceof Object) {
     Object.keys(data).forEach((key) => {
       data[key] = convert(data[key]);
