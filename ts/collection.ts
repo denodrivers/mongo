@@ -150,7 +150,10 @@ export class Collection<T extends any> {
     private readonly client: MongoClient,
     private readonly dbName: string,
     private readonly collectionName: string,
-  ) {}
+  ) { }
+
+  private maxQueryLimit: number = -1;
+  private skipDocCount: number = -1;
 
   private async _find(
     filter?: FilterType<T>,
@@ -200,7 +203,12 @@ export class Collection<T extends any> {
     filter?: FilterType<T>,
     options?: FindOptions,
   ): Promise<Array<T & WithID>> {
-    return parse(await this._find(filter, { findOne: false, ...options }));
+    return parse(await this._find(filter, {
+      findOne: false,
+      limit: this.maxQueryLimit < 0 ? undefined : this.maxQueryLimit,
+      skip: this.skipDocCount < 0 ? undefined : this.skipDocCount,
+      ...options
+    }));
   }
 
   public async insertOne(doc: DocumentType<T>): Promise<ObjectId> {
@@ -376,5 +384,17 @@ export class Collection<T extends any> {
       ),
     );
     return parse(docs) as Array<T & WithID>;
+  }
+
+  // Limit
+  public limit(maxLimit: number) {
+    this.maxQueryLimit = maxLimit;
+    return this;
+  }
+
+  // Skip
+  public skip(skipCount: number) {
+    this.skipDocCount = skipCount;
+    return this;
   }
 }
