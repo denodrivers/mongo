@@ -156,7 +156,7 @@ export class Collection<T extends any> {
     private readonly client: MongoClient,
     private readonly dbName: string,
     private readonly collectionName: string,
-  ) {}
+  ) { }
 
   private async _find(
     filter?: FilterType<T>,
@@ -202,11 +202,12 @@ export class Collection<T extends any> {
     return parse(await this._find(filter, { findOne: true }))[0] ?? null;
   }
 
-  public find(filter?: FilterType<T>, options?: FindOptions): Cursor {
+  public find(filter?: FilterType<T>, options?: FindOptions): Cursor | any {
     return new class extends Cursor {
       private maxQueryLimit: number = -1;
       private skipDocCount: number = -1;
       private superClass: any;
+      private instance: any;
 
       constructor(superClass: any) {
         super();
@@ -214,7 +215,10 @@ export class Collection<T extends any> {
       }
 
       private async _get(): Promise<(T & WithID) | null> {
-        return parse(
+        if (this.instance) {
+          return this.instance;
+        }
+        const currentInstance = parse(
           await this.superClass._find(filter, {
             findOne: false,
             limit: this.maxQueryLimit < 0 ? undefined : this.maxQueryLimit,
@@ -222,6 +226,7 @@ export class Collection<T extends any> {
             ...options,
           }),
         );
+        return this.instance = currentInstance;
       }
 
       public then(callback: any): Promise<(T & WithID) | null> {
