@@ -156,7 +156,7 @@ export class Collection<T extends any> {
     private readonly client: MongoClient,
     private readonly dbName: string,
     private readonly collectionName: string,
-  ) { }
+  ) {}
 
   private async _find(
     filter?: FilterType<T>,
