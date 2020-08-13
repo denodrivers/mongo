@@ -37,3 +37,11 @@ export interface UpdateOptions {
   bypassDocumentValidation?: boolean;
   upsert?: boolean;
 }
+export abstract class Cursor {
+  public limit(n: number): this | any {
+    return this;
+  }
+  public skip(n: number): this | any {
+    return this;
+  }
+}
