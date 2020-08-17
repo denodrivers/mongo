@@ -37,11 +37,32 @@ export interface UpdateOptions {
   bypassDocumentValidation?: boolean;
   upsert?: boolean;
 }
-export abstract class Cursor {
-  public limit(n: number): this | any {
-    return this;
+
+export abstract class ChainBuilderPromise<T> {
+  #promise?: Promise<T>;
+
+  abstract _excutor(): Promise<T>;
+
+  private getPromise(): Promise<T> {
+    if (!this.#promise) {
+      this.#promise = this._excutor();
+    }
+    return this.#promise;
   }
-  public skip(n: number): this | any {
-    return this;
+
+  public async then(
+    callback?: ((value: T) => any | PromiseLike<T>) | undefined | null,
+  ): Promise<T> {
+    return this.getPromise().then(callback);
+  }
+
+  public async catch(
+    callback?: ((value: T) => any | PromiseLike<T>) | undefined | null,
+  ): Promise<T> {
+    return this.getPromise().catch(callback);
+  }
+
+  public async finally(callback?: () => void): Promise<T> {
+    return this.getPromise().finally(callback);
   }
 }
