@@ -1,11 +1,11 @@
 import { MongoClient } from "./client.ts";
 import { UpdateResult } from "./result.ts";
 import {
+  ChainBuilderPromise,
   CommandType,
   FindOptions,
   ObjectId,
   UpdateOptions,
-  Cursor,
 } from "./types.ts";
 import { convert, parse } from "./type_convert.ts";
 import { dispatchAsync, encode } from "./util.ts";
@@ -73,13 +73,13 @@ export type QuerySelector<T> = {
   $ne?: T;
   $nin?: T[];
   // Logical
-  $not?: T extends string ? (QuerySelector<T> | RegExp) : FilterType<T>;
+  $not?: T extends string ? QuerySelector<T> | RegExp : FilterType<T>;
   /** https://docs.mongodb.com/manual/reference/operator/query/and/#op._S_and */
-  $and?: T extends string ? (QuerySelector<T> | RegExp) : FilterType<T>[];
+  $and?: T extends string ? QuerySelector<T> | RegExp : FilterType<T>[];
   /** https://docs.mongodb.com/manual/reference/operator/query/nor/#op._S_nor */
-  $nor?: T extends string ? (QuerySelector<T> | RegExp) : FilterType<T>[];
+  $nor?: T extends string ? QuerySelector<T> | RegExp : FilterType<T>[];
   /** https://docs.mongodb.com/manual/reference/operator/query/or/#op._S_or */
-  $or?: T extends string ? (QuerySelector<T> | RegExp) : FilterType<T>[];
+  $or?: T extends string ? QuerySelector<T> | RegExp : FilterType<T>[];
 
   /** https://docs.mongodb.com/manual/reference/operator/query/comment/#op._S_comment */
   $comment?: string;
@@ -95,7 +95,7 @@ export type QuerySelector<T> = {
   $expr?: any;
   $jsonSchema?: any;
   $mod?: T extends number ? [number, number] : never;
-  $regex?: T extends string ? (RegExp | string) : never;
+  $regex?: T extends string ? RegExp | string : never;
   /** https://docs.mongodb.com/manual/reference/operator/query/text */
   $text?: {
     $search: string;
@@ -196,61 +196,37 @@ export class Collection<T extends any> {
     return count as number;
   }
 
-  public async findOne(
-    filter?: FilterType<T>,
-  ): Promise<(T & WithID) | null> {
+  public async findOne(filter?: FilterType<T>): Promise<(T & WithID) | null> {
     return parse(await this._find(filter, { findOne: true }))[0] ?? null;
   }
 
-  public find(filter?: FilterType<T>, options?: FindOptions): Cursor | any {
-    return new class extends Cursor {
-      private maxQueryLimit: number = -1;
-      private skipDocCount: number = -1;
-      private superClass: any;
-      private instance: any;
+  public find(filter?: FilterType<T>, options?: FindOptions) {
+    const self = this;
+    return new (class extends ChainBuilderPromise<T> {
+      private maxQueryLimit?: number;
+      private skipDocCount?: number;
 
-      constructor(superClass: any) {
-        super();
-        this.superClass = superClass;
-      }
-
-      private async _get(): Promise<(T & WithID) | null> {
-        if (this.instance) {
-          return this.instance;
-        }
-        const currentInstance = parse(
-          await this.superClass._find(filter, {
+      async _excutor(): Promise<T> {
+        return parse(
+          await self._find(filter, {
             findOne: false,
-            limit: this.maxQueryLimit < 0 ? undefined : this.maxQueryLimit,
-            skip: this.skipDocCount < 0 ? undefined : this.skipDocCount,
+            limit: this.maxQueryLimit,
+            skip: this.skipDocCount,
             ...options,
           }),
         );
-        return this.instance = currentInstance;
       }
 
-      public then(callback: any): Promise<(T & WithID) | null> {
-        return this._get().then(callback);
-      }
-
-      public catch(callback: any): Promise<(T & WithID) | null> {
-        return this._get().catch(callback);
-      }
-
-      public finally(callback: any): Promise<(T & WithID) | null> {
-        return this._get().finally(callback);
-      }
-
-      public skip(skipCount: number): this | Promise<(T & WithID) | null> {
+      public skip(skipCount: number): Omit<this, "_excutor"> {
         this.skipDocCount = skipCount;
         return this;
       }
 
-      public limit(limitCount: number): this | Promise<(T & WithID) | null> {
+      public limit(limitCount: number): Omit<this, "_excutor"> {
         this.maxQueryLimit = limitCount;
         return this;
       }
-    }(this);
+    })();
   }
 
   public async insertOne(doc: DocumentType<T>): Promise<ObjectId> {
@@ -270,9 +246,7 @@ export class Collection<T extends any> {
     return _id as ObjectId;
   }
 
-  public async insertMany(
-    docs: Array<DocumentType<T>>,
-  ): Promise<ObjectId[]> {
+  public async insertMany(docs: Array<DocumentType<T>>): Promise<ObjectId[]> {
     const _ids = await dispatchAsync(
       {
         command_type: CommandType.InsertMany,
