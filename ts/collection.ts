@@ -1,6 +1,12 @@
 import { MongoClient } from "./client.ts";
 import { UpdateResult } from "./result.ts";
-import { CommandType, FindOptions, ObjectId, UpdateOptions } from "./types.ts";
+import {
+  CommandType,
+  FindOptions,
+  ObjectId,
+  UpdateOptions,
+  Cursor,
+} from "./types.ts";
 import { convert, parse } from "./type_convert.ts";
 import { dispatchAsync, encode } from "./util.ts";
 
@@ -196,11 +202,55 @@ export class Collection<T extends any> {
     return parse(await this._find(filter, { findOne: true }))[0] ?? null;
   }
 
-  public async find(
-    filter?: FilterType<T>,
-    options?: FindOptions,
-  ): Promise<Array<T & WithID>> {
-    return parse(await this._find(filter, { findOne: false, ...options }));
+  public find(filter?: FilterType<T>, options?: FindOptions): Cursor | any {
+    return new class extends Cursor {
+      private maxQueryLimit: number = -1;
+      private skipDocCount: number = -1;
+      private superClass: any;
+      private instance: any;
+
+      constructor(superClass: any) {
+        super();
+        this.superClass = superClass;
+      }
+
+      private async _get(): Promise<(T & WithID) | null> {
+        if (this.instance) {
+          return this.instance;
+        }
+        const currentInstance = parse(
+          await this.superClass._find(filter, {
+            findOne: false,
+            limit: this.maxQueryLimit < 0 ? undefined : this.maxQueryLimit,
+            skip: this.skipDocCount < 0 ? undefined : this.skipDocCount,
+            ...options,
+          }),
+        );
+        return this.instance = currentInstance;
+      }
+
+      public then(callback: any): Promise<(T & WithID) | null> {
+        return this._get().then(callback);
+      }
+
+      public catch(callback: any): Promise<(T & WithID) | null> {
+        return this._get().catch(callback);
+      }
+
+      public finally(callback: any): Promise<(T & WithID) | null> {
+        return this._get().finally(callback);
+      }
+
+      public skip(skipCount: number): this | Promise<(T & WithID) | null> {
+        this.skipDocCount = skipCount;
+        return this;
+      }
+
+      public limit(limitCount: number): this | Promise<(T & WithID) | null> {
+        this.maxQueryLimit = limitCount;
+        return this;
+      }
+    }(this);
   }
 
   public async insertOne(doc: DocumentType<T>): Promise<ObjectId> {

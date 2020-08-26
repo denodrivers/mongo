@@ -95,4 +95,10 @@ const deleteCount = await users.deleteOne({ _id: insertId });
 
 // deleteMany
 const deleteCount2 = await users.deleteMany({ username: "test" });
+
+// Skip
+const skipTwo = await users.skip(2).find();
+
+// Limit
+const featuredUser = await users.limit(5).find();
 ```
