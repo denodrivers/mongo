@@ -202,11 +202,11 @@ export class Collection<T extends any> {
 
   public find(filter?: FilterType<T>, options?: FindOptions) {
     const self = this;
-    return new (class extends ChainBuilderPromise<T> {
+    return new (class extends ChainBuilderPromise<T[]> {
       private maxQueryLimit?: number;
       private skipDocCount?: number;
 
-      async _excutor(): Promise<T> {
+      async _excutor(): Promise<T[]> {
         return parse(
           await self._find(filter, {
             findOne: false,
