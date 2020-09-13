@@ -25,7 +25,7 @@ jobs:
       - name: Install rust
         uses: hecrj/setup-rust-action@v1
         with:
-          rust-version: 1.44.0
+          rust-version: 1.46.0
       - name: Install clippy and rustfmt
         run: |
           rustup component add clippy
@@ -33,7 +33,7 @@ jobs:
       - name: Install Deno
         uses: denolib/setup-deno@master
         with:
-          deno-version: 1.2.2
+          deno-version: 1.4.0
       - name: Log versions
         run: |
           deno --version
