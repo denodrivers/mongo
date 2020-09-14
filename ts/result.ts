@@ -1,4 +1,4 @@
-import { ObjectId } from "./types.ts";
+import type { ObjectId } from "./types.ts";
 
 export interface UpdateResult {
   matchedCount: number;

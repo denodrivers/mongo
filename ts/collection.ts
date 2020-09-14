@@ -1,5 +1,5 @@
-import { MongoClient } from "./client.ts";
-import { UpdateResult } from "./result.ts";
+import type { MongoClient } from "./client.ts";
+import type { UpdateResult } from "./result.ts";
 import {
   ChainBuilderPromise,
   CommandType,

@@ -1,6 +1,6 @@
 [package]
 name = "deno_mongo"
-version = "0.11.0"
+version = "0.11.2"
 authors = ["Enok <416828041@qq.com>"]
 edition = "2018"
 

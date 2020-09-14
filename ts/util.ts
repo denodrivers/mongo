@@ -1,5 +1,5 @@
 import { prepare } from "../deps.ts";
-import { CommandType } from "./types.ts";
+import type { CommandType } from "./types.ts";
 
 // @ts-ignore
 const DenoCore = Deno.core as {

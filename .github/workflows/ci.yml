@@ -9,7 +9,7 @@ jobs:
     timeout-minutes: 60
     strategy:
       matrix:
-        os: [macOS-latest, windows-2019, ubuntu-16.04]
+        os: [macOS-latest, windows-2019, ubuntu-latest]
 
     steps:
       - name: Setup Environment
@@ -25,7 +25,7 @@ jobs:
       - name: Install rust
         uses: hecrj/setup-rust-action@v1
         with:
-          rust-version: 1.44.0
+          rust-version: 1.46.0
       - name: Install clippy and rustfmt
         run: |
           rustup component add clippy
@@ -33,7 +33,7 @@ jobs:
       - name: Install Deno
         uses: denolib/setup-deno@master
         with:
-          deno-version: 1.2.2
+          deno-version: 1.4.0
       - name: Log versions
         run: |
           deno --version
@@ -43,16 +43,12 @@ jobs:
       - name: Cache
         uses: actions/cache@v2
         with:
-          path: |-
+          path: |
             ~/.cargo/registry
             ~/.cargo/git
-            target/*/.*
-            target/*/build
-            target/*/deps
-          key:
-            ${{ matrix.os }}-${{ hashFiles('Cargo.lock') }}
-          restore-keys: |
-            ${{ matrix.os }}-
+            target/
+          key: ${{ runner.os }}-${{ github.sha }}
+          restore-keys: ${{ runner.os }}-
 
       # Lint
       - name: Clippy
@@ -67,7 +63,7 @@ jobs:
         run: cargo build --release --locked --all-targets
 
       # Start MongoDB
-      - name: Start MongoDB (MacOs)
+      - name: Start MongoDB (macOS)
         if: startsWith(matrix.os, 'mac')
         run: |
           brew tap mongodb/brew
@@ -79,6 +75,7 @@ jobs:
         with:
           mongoDBVersion: 4.2
       # MongoDB is auto started on Windows by default
+      
       # Tests
       - name: Test Rust
         run: cargo test --release --locked --all-targets
