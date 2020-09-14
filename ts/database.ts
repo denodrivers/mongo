@@ -1,4 +1,4 @@
-import { MongoClient } from "./client.ts";
+import type { MongoClient } from "./client.ts";
 import { Collection } from "./collection.ts";
 import { CommandType } from "./types.ts";
 import { dispatchAsync, encode } from "./util.ts";
