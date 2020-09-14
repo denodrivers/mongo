@@ -7,7 +7,7 @@ export * from "./ts/result.ts";
 export { ObjectId } from "./ts/types.ts";
 export type { UpdateOptions } from "./ts/types.ts";
 export * from "./ts/util.ts";
-export const VERSION = "v0.11.2";
+export const VERSION = "v0.12.1";
 export const RELEASE_URL =
   `https://github.com/manyuanrong/deno_mongo/releases/download/${VERSION}`;
 
