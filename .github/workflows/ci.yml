@@ -9,7 +9,7 @@ jobs:
     timeout-minutes: 60
     strategy:
       matrix:
-        os: [macOS-latest, windows-2019, ubuntu-16.04]
+        os: [macOS-latest, windows-2019, ubuntu-latest]
 
     steps:
       - name: Setup Environment
@@ -63,7 +63,7 @@ jobs:
         run: cargo build --release --locked --all-targets
 
       # Start MongoDB
-      - name: Start MongoDB (MacOs)
+      - name: Start MongoDB (macOS)
         if: startsWith(matrix.os, 'mac')
         run: |
           brew tap mongodb/brew
@@ -75,6 +75,7 @@ jobs:
         with:
           mongoDBVersion: 4.2
       # MongoDB is auto started on Windows by default
+      
       # Tests
       - name: Test Rust
         run: cargo test --release --locked --all-targets
