@@ -188,7 +188,7 @@ try {
 }
 ```
 
-## Find 
+## find 
 
 `find` returns an array of all occurrences matching the criteria, if none found it returns an empty array.
 
