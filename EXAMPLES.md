@@ -4,7 +4,7 @@
 
 Selects the database, if it does not exist, it creates it.
 
-```
+```ts
 import {
   MongoClient,
 } from "https://deno.land/x/mongo@v0.12.1/mod.ts";
@@ -24,7 +24,7 @@ try {
 Selects the collection, if it does not exist, it creates it.
 When working with TypeScript the Schema of the collection documents must be defined.
 
-``` 
+```ts 
 import {
   MongoClient,
   ObjectId,
@@ -53,7 +53,7 @@ try {
 
 You can insert one document in a collection using the `insertOne` function. You can explicitily set the `_id` or else let Mongo do it for you.
 
-```
+```ts
 import {
   MongoClient,
   ObjectId,
@@ -103,7 +103,7 @@ try {
 
 You can insert an array of documents in a collection using the `insertMany` function. As for `insertOne` you can explicitily set the `_id` or else let Mongo do it for you.
 
-```import {
+```tsimport {
   MongoClient,
   ObjectId,
 } from "https://deno.land/x/mongo@v0.12.1/mod.ts";
@@ -146,7 +146,7 @@ try {
 
 This functions returns first document maching the criteria. If non, it returns `null`
 
-``` 
+```ts 
 import {
   MongoClient,
 } from "https://deno.land/x/mongo@v0.12.1/mod.ts";
@@ -191,7 +191,7 @@ try {
 
 `find` returns an array of all occurrences matching the criteria, if none found it returns an empty array.
 
-```
+```ts
 import {
   MongoClient,
   ObjectId,
@@ -241,7 +241,7 @@ try {
         }
     ]
     */
-    
+
   } else {
     console.log("No result matching your criteria");
   }
