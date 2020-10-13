@@ -49,7 +49,7 @@ try {
 }
 ``` 
 
-## InsertOne
+## insertOne
 
 You can insert one document in a collection using the `insertOne` function. You can explicitily set the `_id` or else let Mongo do it for you.
 
@@ -99,11 +99,12 @@ try {
 
 `insertOne` returns the ObjectId of the inserted document.
 
-## InsertMany
+## insertMany
 
 You can insert an array of documents in a collection using the `insertMany` function. As for `insertOne` you can explicitily set the `_id` or else let Mongo do it for you.
 
-```tsimport {
+```ts
+import {
   MongoClient,
   ObjectId,
 } from "https://deno.land/x/mongo@v0.12.1/mod.ts";
