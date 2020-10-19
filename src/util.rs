@@ -3,6 +3,17 @@ use bson::{Bson, Document};
 use serde_json::Value;
 
 pub type JsonResult<T> = Result<T, String>;
+#[derive(Serialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct SuccessResult {
+    success: bool,
+}
+
+impl SuccessResult {
+    pub fn new() -> SuccessResult {
+        SuccessResult { success: true }
+    }
+}
 
 pub fn sync_op<D, T>(d: D, command: Command) -> Op
 where

@@ -235,7 +235,7 @@ test("testDeleteMany", async () => {
 test("testDistinct", async () => {
   const db = getClient().database("test");
   const users = db.collection<IUser>("mongo_test_users");
-  const user1 = await users.distinct("username", {});
+  const user1 = await users.distinct("username");
   assertEquals(user1, ["user1"]);
 });
 
@@ -248,6 +248,13 @@ test("testDistinct", async () => {
 //   ]);
 //   console.log(result);
 // });
+
+test("testDropConnection", async () => {
+  const db = getClient().database("test");
+  db.collection("mongo_test_users_2").drop();
+  db.collection("mongo_test_users").drop();
+  // assertEquals(result, { success: true });
+});
 
 test("testClose", async () => {
   const result = getClient().close();

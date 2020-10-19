@@ -13,6 +13,7 @@ export enum CommandType {
   Count = "Count",
   CreateIndexes = "CreateIndexes",
   Distinct = "Distinct",
+  DropConnection = "DropConnection",
 }
 
 export interface ObjectId {

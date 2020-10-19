@@ -47,6 +47,7 @@ pub enum CommandType {
     Count,
     CreateIndexes,
     Distinct,
+    DropConnection,
 }
 
 #[derive(Deserialize, Clone)]
@@ -127,5 +128,6 @@ fn op_command(_interface: &mut dyn Interface, zero_copy: &mut [ZeroCopyBuf]) -> 
         CommandType::CreateIndexes => util::async_op(command::create_indexes, command),
         CommandType::Count => util::async_op(command::count, command),
         CommandType::Distinct => util::async_op(command::distinct, command),
+        CommandType::DropConnection => util::sync_op(command::drop_connection, command),
     }
 }

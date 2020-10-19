@@ -8,7 +8,7 @@ import {
   UpdateOptions,
 } from "./types.ts";
 import { convert, parse } from "./type_convert.ts";
-import { dispatchAsync, encode } from "./util.ts";
+import { dispatch, dispatchAsync, encode } from "./util.ts";
 
 export interface WithID {
   _id: ObjectId;
@@ -384,7 +384,6 @@ export class Collection<T extends any> {
 
   public async distinct(
     fieldName: string,
-    filter?: FilterType<T>,
   ): Promise<Array<T & WithID>> {
     const docs = await dispatchAsync(
       {
@@ -400,5 +399,18 @@ export class Collection<T extends any> {
       ),
     );
     return parse(docs) as Array<T & WithID>;
+  }
+
+  public drop() {
+    dispatch(
+      {
+        command_type: CommandType.DropConnection,
+        client_id: this.client.clientId,
+      },
+      encode(JSON.stringify({
+        dbName: this.dbName,
+        collectionName: this.collectionName,
+      })),
+    );
   }
 }
