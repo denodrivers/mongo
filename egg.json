@@ -1,0 +1,10 @@
+{
+  "name": "mongo",
+  "description": "MongoDB driver for Deno",
+  "homepage": "https://github.com/manyuanrong/deno_mongo",
+  "files": [
+    "./**/*.ts",
+    "README.md"
+  ],
+  "entry": "./mod.ts"
+}
