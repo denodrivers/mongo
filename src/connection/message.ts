@@ -1,6 +1,4 @@
-import { BufferWriter } from "../utils/writer.ts";
-
-export enum OP_CODE {
+export enum OpCode {
   REPLAY = 1,
   UPDATE = 2001,
   INSERT = 2002,
@@ -12,30 +10,28 @@ export enum OP_CODE {
   MSG = 2013,
 }
 
-let requestId = 0;
-
-export function nextRequestId() {
-  return requestId++;
+export interface MessageHeader {
+  messageLength: number;
+  requestId: number;
+  responseTo: number;
+  opCode: OpCode;
 }
 
-export function writeMsgHeader(
-  buffer: BufferWriter,
-  params: {
-    messageLength: number;
-    requestId: number;
-    responseTo: number;
-    opCode: OP_CODE;
-  }
-) {
-  if (buffer.length !== 0) {
-    throw new Error("Header information must be written in the head.");
-  }
-  buffer.writeUint32(params.messageLength);
-  buffer.writeUint32(params.requestId);
-  buffer.writeUint32(params.responseTo);
-  buffer.writeUint32(params.opCode);
+export function serializeHeader(header: MessageHeader): Uint8Array {
+  const view = new DataView(new ArrayBuffer(16));
+  view.setInt32(0, header.messageLength, true);
+  view.setInt32(4, header.requestId, true);
+  view.setInt32(8, header.responseTo, true);
+  view.setInt32(12, header.opCode, true);
+  return new Uint8Array(view.buffer);
 }
 
-export interface Message {
-  toBin(): Uint8Array;
+export function parseHeader(buffer: Uint8Array): MessageHeader {
+  const view = new DataView(buffer.buffer);
+  return {
+    messageLength: view.getUint32(0, true),
+    requestId: view.getUint32(4, true),
+    responseTo: view.getUint32(8, true),
+    opCode: view.getUint32(12, true),
+  };
 }

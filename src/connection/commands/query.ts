@@ -1,6 +1,6 @@
-import { Bson } from "../../../deps.ts";
-import { BufferWriter } from "../../utils/writer.ts";
-import { Message, nextRequestId, OP_CODE, writeMsgHeader } from "../message.ts";
+import { serializeBson } from "../../utils/bson.ts";
+import { MessageHeader, OpCode, serializeHeader } from "../message.ts";
+import { SequenceWriter, Serializer } from "../util.ts";
 
 // Query flags
 const OPTS_TAILABLE_CURSOR = 2;
@@ -20,48 +20,44 @@ export interface CommandQueryOptions {
   returnFieldSelector?: any;
 }
 
-export class CommandQuery implements Message {
-  private namespace: Uint8Array;
-  private requestId = nextRequestId();
-
+export class CommandQuery implements Serializer {
+  #namespace: Uint8Array;
   constructor(
-    ns: string,
+    namespace: string,
     private readonly query: any,
-    private readonly options?: CommandQueryOptions
+    private readonly options?: CommandQueryOptions,
   ) {
-    this.namespace = encoder.encode(ns);
+    this.#namespace = encoder.encode(`${namespace}\0`);
   }
 
-  toBin(): Uint8Array {
+  serialize(requestId: number): Uint8Array[] {
     let flags = 0;
 
-    const query = Bson.serialize(this.query);
+    const queryBody = serializeBson(this.query);
 
-    const buffer = new BufferWriter(
-      16 + // Header,
-        4 + // Flags
-        this.namespace.byteLength +
-        1 + // Namespace
+    const queryHeader = new SequenceWriter(
+      4 + // Flags
+        this.#namespace.byteLength +
         4 + // numberToSkip
-        4 + // numberToReturn
-        query.byteLength
+        4, // numberToReturn
     );
 
-    writeMsgHeader(buffer, {
-      messageLength: buffer.capacity,
-      requestId: this.requestId,
+    queryHeader
+      .writeUint32(flags).writeBuffer(this.#namespace).writeUint32(
+        this.options?.numberToSkip ?? 0,
+      ).writeUint32(this.options?.numberToReturn ?? 0);
+
+    const header: MessageHeader = {
+      messageLength: 16 + queryHeader.buffer.byteLength + queryBody.byteLength,
+      requestId,
       responseTo: 0,
-      opCode: OP_CODE.QUERY,
-    });
+      opCode: OpCode.QUERY,
+    };
 
-    buffer.writeUint32(flags);
-    buffer.writeBuffer(this.namespace);
-    buffer.skip(1);
-    buffer.writeUint32(this.options?.numberToSkip ?? 0);
-    buffer.writeUint32(this.options?.numberToReturn ?? 0);
-
-    buffer.writeBuffer(new Uint8Array(query.buffer));
-
-    return buffer.wroteData;
+    return [
+      serializeHeader(header),
+      queryHeader.buffer,
+      queryBody,
+    ];
   }
 }

@@ -1,6 +1,7 @@
 import { driverMetadata } from "../utils/metadata.ts";
 import { CommandQuery } from "./commands/query.ts";
 
+let nextRequestId = 0;
 export class Connection {
   constructor(private readonly conn: Deno.Conn) {}
 
@@ -13,6 +14,8 @@ export class Connection {
 
   async command(ns: string, command: any) {
     const query = new CommandQuery(ns, command);
-    await this.conn.write(query.toBin());
+    for (const chunk of query.serialize(nextRequestId++)) {
+      await Deno.writeAll(this.conn, chunk);
+    }
   }
 }
