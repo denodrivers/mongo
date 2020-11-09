@@ -1,14 +1,4 @@
-import { Connection } from "./connection/connection.ts";
+import { MongoClient } from "./src/client.ts";
 
-const conn = await Deno.connect({
-  hostname: "localhost",
-  port: 27017,
-  transport: "tcp",
-});
-
-const connection = new Connection(conn);
-await connection.connect();
-
-for await (const chunk of Deno.iter(conn)) {
-  console.log(chunk);
-}
+const client = new MongoClient();
+await client.connect({ hostname: "127.0.0.1", port: 27017 });

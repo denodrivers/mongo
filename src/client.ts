@@ -1,4 +1,4 @@
-import { Connection } from "./connection/connection.ts";
+import { WireProtocol } from "./protocol/mod.ts";
 
 interface ConnectOptions {
   hostname: string;
@@ -6,12 +6,12 @@ interface ConnectOptions {
 }
 
 export class MongoClient {
-  #connection?: Connection;
+  #protocol?: WireProtocol;
 
   async connect(options: ConnectOptions) {
     const conn = await Deno.connect(options);
-    this.#connection = new Connection(conn);
+    this.#protocol = new WireProtocol(conn);
 
-    await this.#connection.connect();
+    await this.#protocol.connect();
   }
 }
