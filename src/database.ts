@@ -22,12 +22,12 @@ export class Database {
     if (!options) {
       options = {};
     }
-    const res = await this.#protocol.command("admin", {
+    const res = await this.#protocol.command(this.name, {
       listCollections: 1,
       ...options,
     });
 
-    console.log(res);
+    console.log(JSON.stringify(res, undefined, 2));
     return [];
   }
 
@@ -39,6 +39,7 @@ export class Database {
     const collections = await this.listCollections({
       ...options,
       nameOnly: true,
+      authorizedCollections: true,
     });
     return collections.map((c) => c.name);
   }
