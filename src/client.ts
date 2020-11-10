@@ -9,7 +9,8 @@ export class MongoClient {
   #conn?: Deno.Conn;
 
   async connect(options: ConnectOptions | string) {
-    let hostname = "127.0.0.1", port = 27017;
+    let hostname = "127.0.0.1",
+      port = 27017;
     if (typeof options === "string") {
       const opt = parse(options);
       hostname = opt.servers[0].host;

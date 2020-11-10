@@ -1,61 +1,51 @@
 import { WireProtocol } from "./protocol/mod.ts";
 import { Document } from "./types.ts";
+import { Bson } from "../deps.ts";
+import { parseNamespace } from "./utils/ns.ts";
 
-interface CursorBatch {
-  name: string;
-  type: "collection" | "view";
-}
-
-export interface CursorOptions {
-  id: bigint | number;
-  db: string;
-  collection: string;
-  firstBatch: CursorBatch[];
+export interface CursorOptions<T> {
+  id: bigint | number | string;
+  ns: string;
+  firstBatch: T[];
   maxTimeMS?: number;
   comment?: Document;
 }
 
-export class Cursor {
+export class Cursor<T> {
+  #id: bigint;
   #protocol: WireProtocol;
-  #options: CursorOptions;
-  #batches: CursorBatch[];
+  #batches: T[];
+  #db: string;
+  #collection: string;
 
-  #pending = false;
-
-  constructor(protocol: WireProtocol, options: CursorOptions) {
+  constructor(protocol: WireProtocol, options: CursorOptions<T>) {
     this.#protocol = protocol;
-    this.#options = options;
     this.#batches = options.firstBatch;
+    this.#id = BigInt(options.id);
+    const { db, collection } = parseNamespace(options.ns);
+    this.#db = db;
+    this.#collection = collection;
+  }
+
+  async next(): Promise<T | undefined> {
+    if (this.#batches.length > 0) {
+      return this.#batches.shift();
+    }
+    if (this.#id === 0n) {
+      return undefined;
+    }
+    const { cursor } = await this.#protocol.commandSingle(this.#db, {
+      getMore: Bson.Long.fromBigInt(this.#id),
+      collection: this.#collection,
+    });
+    this.#batches = cursor.nextBatch || [];
+    this.#id = BigInt(cursor.id.toString());
+    return this.#batches.shift();
   }
 
   async *[Symbol.asyncIterator]() {
-    let done = false;
-    while (!done) {
-      if (this.#batches.length === 0) {
-        if (this.#pending === false) {
-          this.#pending = true;
-
-          const res = await this.#protocol.command(this.#options.db, {
-            getMore: BigInt(this.#options.id),
-            collection: this.#options.collection,
-          });
-
-          assertOk(res);
-          console.log(res);
-          this.#done = true;
-
-          this.#requesting = false;
-          for (const waiter of this.#waitingForMore) {
-            waiter.resolve();
-          }
-        } else {
-          const wait = deferred<void>();
-          this.#waitingForMore.push(wait);
-          await wait;
-        }
-      } else {
-        yield this.#buffer.shift() as T;
-      }
+    while (this.#batches.length > 0 || this.#id !== 0n) {
+      yield await this.next();
     }
   }
 }

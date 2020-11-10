@@ -12,10 +12,26 @@ export const driverMetadata = {
   },
 };
 
-export async function handshake(protocol: WireProtocol) {
-  const reply = await protocol.command("admin", {
+interface HandshakeResponse {
+  ismaster: string;
+  maxBsonObjectSize: number;
+  maxMessageSizeBytes: number;
+  maxWriteBatchSize: number;
+  localTime: Date;
+  logicalSessionTimeoutMinutes: number;
+  connectionId: number;
+  minWireVersion: number;
+  maxWireVersion: number;
+  readOnly: boolean;
+  ok: number;
+}
+
+export async function handshake(
+  protocol: WireProtocol
+): Promise<HandshakeResponse> {
+  const reply = await protocol.commandSingle("admin", {
     isMaster: true,
     client: driverMetadata,
   });
-  console.log(reply);
+  return reply;
 }

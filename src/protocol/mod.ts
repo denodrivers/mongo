@@ -14,16 +14,27 @@ export class WireProtocol {
   #pendingOps: Map<number, Deferred<Message>> = new Map();
   #reader: BufReader;
 
+  #connectionId: number = 0;
+
   constructor(socket: Socket) {
     this.#socket = socket;
     this.#reader = new BufReader(this.#socket);
   }
 
   async connect() {
-    await handshake(this);
+    const { connectionId } = await handshake(this);
+    this.#connectionId = connectionId;
   }
 
-  async command(db: string, body: Document) {
+  async commandSingle<T = Document>(
+    db: string,
+    body: Document
+  ): Promise<Document> {
+    const [doc] = await this.command<T>(db, body);
+    return doc;
+  }
+
+  async command<T>(db: string, body: Document): Promise<T[]> {
     const requestId = nextRequestId++;
     const chunks = serializeMessage({
       requestId,
@@ -46,7 +57,7 @@ export class WireProtocol {
     this.receive();
     const message = await this.#pendingOps.get(requestId);
 
-    let documents: Document[] = [];
+    let documents: T[] = [];
 
     message?.sections.forEach((section) => {
       if ("document" in section) {
@@ -67,7 +78,7 @@ export class WireProtocol {
       assert(headerBuffer);
       const header = parseHeader(headerBuffer!);
       const bodyBuffer = await this.#reader.readFull(
-        new Uint8Array(header.messageLength - 16),
+        new Uint8Array(header.messageLength - 16)
       );
       assert(bodyBuffer);
       const reply = deserializeMessage(header, bodyBuffer!);

@@ -1,6 +1,26 @@
 import { Collection } from "./collection.ts";
 import { WireProtocol } from "./protocol/mod.ts";
 import { Document } from "./types.ts";
+import { Cursor } from "./cursor.ts";
+
+interface ListCollectionsReponse {
+  cursor: {
+    id: bigint;
+    ns: string;
+    firstBatch: [
+      {
+        name: string;
+        type: "collection";
+      }
+    ];
+  };
+  ok: 1;
+}
+
+export interface ListCollectionsResult {
+  name: string;
+  type: "collection";
+}
 
 export class Database {
   #protocol: WireProtocol;
@@ -9,7 +29,7 @@ export class Database {
     this.#protocol = protocol;
   }
 
-  collection(name: string): Collection {
+  collection<T>(name: string): Collection<T> {
     return new Collection(this.#protocol, this.name, name);
   }
 
@@ -18,17 +38,24 @@ export class Database {
     nameOnly?: boolean;
     authorizedCollections?: boolean;
     comment?: Document;
-  }): Promise<any[]> {
+  }): Promise<Cursor<ListCollectionsResult>> {
     if (!options) {
       options = {};
     }
-    const res = await this.#protocol.command(this.name, {
-      listCollections: 1,
-      ...options,
-    });
+    const [{ cursor }]: ListCollectionsReponse[] = await this.#protocol.command(
+      this.name,
+      {
+        listCollections: 1,
+        ...options,
+        batchSize: 1,
+      }
+    );
 
-    console.log(JSON.stringify(res, undefined, 2));
-    return [];
+    return new Cursor<ListCollectionsResult>(this.#protocol, {
+      id: cursor.id,
+      ns: cursor.ns,
+      firstBatch: cursor.firstBatch,
+    });
   }
 
   async listCollectionNames(options?: {
@@ -36,11 +63,17 @@ export class Database {
     authorizedCollections?: boolean;
     comment?: Document;
   }): Promise<string[]> {
-    const collections = await this.listCollections({
+    const cursor = await this.listCollections({
       ...options,
       nameOnly: true,
       authorizedCollections: true,
     });
-    return collections.map((c) => c.name);
+
+    const names: string[] = [];
+    for await (const item of cursor) {
+      names.push(item!.name);
+    }
+
+    return names;
   }
 }

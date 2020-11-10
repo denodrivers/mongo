@@ -1,5 +1,5 @@
 import { MongoClient } from "./src/client.ts";
-import { assert } from "./test.deps.ts";
+import { assert, assertEquals } from "./test.deps.ts";
 interface IUser {
   username: string;
   password: string;
@@ -11,7 +11,7 @@ const dateNow = Date.now();
 
 async function testWithClient(
   name: string,
-  fn: (client: MongoClient) => void | Promise<void>,
+  fn: (client: MongoClient) => void | Promise<void>
 ) {
   test(name, async () => {
     const client = await getClient();
@@ -49,7 +49,7 @@ test("testConnectWithOptions", async () => {
 testWithClient("testListCollectionNames", async (client) => {
   const db = client.database("local");
   const names = await db.listCollectionNames();
-  // assertEquals(names, ["startup_log"]);
+  assertEquals(names, ["startup_log"]);
 });
 
 // test("testInsertOne", async () => {
@@ -124,17 +124,18 @@ testWithClient("testListCollectionNames", async (client) => {
 //   );
 // });
 
-// test("testFindOne", async () => {
-//   const db = getClient().database("test");
-//   const users = db.collection<IUser>("mongo_test_users");
-//   const user1 = await users.findOne();
-//   assert(user1 instanceof Object);
-//   assertEquals(Object.keys(user1), ["_id", "username", "password", "date"]);
+testWithClient("testFindOne", async (client) => {
+  const db = client.database("test");
+  const users = db.collection<IUser>("mongo_test_users");
+  const user1 = await users.findOne();
+  console.log(user1);
+  // assert(user1 instanceof Object);
+  // assertEquals(Object.keys(user1), ["_id", "username", "password", "date"]);
 
-//   const query = { test: 1 } as any;
-//   const findNull = await users.findOne(query);
-//   assertEquals(findNull, null);
-// });
+  // const query = { test: 1 } as any;
+  // const findNull = await users.findOne(query);
+  // assertEquals(findNull, null);
+});
 
 // test("testUpdateOne", async () => {
 //   const db = getClient().database("test");
