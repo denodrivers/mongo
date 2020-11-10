@@ -27,7 +27,7 @@ interface HandshakeResponse {
 }
 
 export async function handshake(
-  protocol: WireProtocol
+  protocol: WireProtocol,
 ): Promise<HandshakeResponse> {
   const reply = await protocol.commandSingle("admin", {
     isMaster: true,

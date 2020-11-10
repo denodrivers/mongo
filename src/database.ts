@@ -11,7 +11,7 @@ interface ListCollectionsReponse {
       {
         name: string;
         type: "collection";
-      }
+      },
     ];
   };
   ok: 1;
@@ -48,7 +48,7 @@ export class Database {
         listCollections: 1,
         ...options,
         batchSize: 1,
-      }
+      },
     );
 
     return new Cursor<ListCollectionsResult>(this.#protocol, {

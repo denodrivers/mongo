@@ -11,7 +11,7 @@ const dateNow = Date.now();
 
 async function testWithClient(
   name: string,
-  fn: (client: MongoClient) => void | Promise<void>
+  fn: (client: MongoClient) => void | Promise<void>,
 ) {
   test(name, async () => {
     const client = await getClient();

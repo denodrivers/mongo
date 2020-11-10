@@ -28,7 +28,7 @@ export class WireProtocol {
 
   async commandSingle<T = Document>(
     db: string,
-    body: Document
+    body: Document,
   ): Promise<Document> {
     const [doc] = await this.command<T>(db, body);
     return doc;
@@ -78,7 +78,7 @@ export class WireProtocol {
       assert(headerBuffer);
       const header = parseHeader(headerBuffer!);
       const bodyBuffer = await this.#reader.readFull(
-        new Uint8Array(header.messageLength - 16)
+        new Uint8Array(header.messageLength - 16),
       );
       assert(bodyBuffer);
       const reply = deserializeMessage(header, bodyBuffer!);

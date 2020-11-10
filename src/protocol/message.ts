@@ -27,7 +27,7 @@ export interface Message {
 }
 
 function serializeSections(
-  sections: Section[]
+  sections: Section[],
 ): { length: number; sections: Uint8Array[] } {
   let totalLen = 0;
   const buffers = sections.map((section) => {
@@ -47,7 +47,7 @@ function serializeSections(
         return document;
       });
       const section1 = new Uint8Array(
-        1 + 4 + identifier.byteLength + documentsLength
+        1 + 4 + identifier.byteLength + documentsLength,
       );
       const view = new DataView(section1.buffer);
 
@@ -93,7 +93,7 @@ export function serializeMessage(message: Message): Uint8Array[] {
 
 export function deserializeMessage(
   header: MessageHeader,
-  buffer: Uint8Array
+  buffer: Uint8Array,
 ): Message {
   const view = new DataView(buffer.buffer);
 
@@ -107,7 +107,7 @@ export function deserializeMessage(
     if (kind === 0) {
       const docLen = view.getInt32(pos, true);
       const document = deserializeBson(
-        new Uint8Array(view.buffer.slice(pos, pos + docLen))
+        new Uint8Array(view.buffer.slice(pos, pos + docLen)),
       );
       pos += docLen;
       sections.push({ document });
@@ -115,7 +115,7 @@ export function deserializeMessage(
       console.log("kind1");
       const len = view.getInt32(pos, true);
       const sectionBody = new Uint8Array(
-        view.buffer.slice(pos + 4, pos + len - 4)
+        view.buffer.slice(pos + 4, pos + len - 4),
       );
       const identifierEndPos = sectionBody.findIndex((byte) => byte === 0);
       const identifier = decoder.decode(buffer.slice(0, identifierEndPos));
