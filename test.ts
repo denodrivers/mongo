@@ -1,4 +1,5 @@
 import { MongoClient } from "./src/client.ts";
+import { assert } from "./test.deps.ts";
 interface IUser {
   username: string;
   password: string;
@@ -8,40 +9,48 @@ interface IUser {
 const { test } = Deno;
 const dateNow = Date.now();
 
-let testClient: MongoClient | undefined;
+async function testWithClient(
+  name: string,
+  fn: (client: MongoClient) => void | Promise<void>,
+) {
+  test(name, async () => {
+    const client = await getClient();
+    await fn(client);
+    client.close();
+  });
+}
 
 async function getClient(): Promise<MongoClient> {
-  if (testClient) return testClient;
   const client = new MongoClient();
   await client.connect("mongodb://localhost:27017");
-  testClient = client;
   return client;
 }
 
 test("testConnectWithUri", async () => {
   const client = new MongoClient();
   await client.connect("mongodb://localhost:27017");
-  //   const names = await client.listDatabases();
-  //   assert(names instanceof Array);
-  //   assert(names.length > 0);
+  const names = await client.listDatabases();
+  assert(names instanceof Array);
+  assert(names.length > 0);
   client.close();
 });
 
-// test("testConnectWithOptions", async () => {
-//   const client = new MongoClient();
-//   client.connectWithOptions({
-//     hosts: ["localhost:27017"],
-//   });
-//   const names = await client.listDatabases();
-//   assert(names instanceof Array);
-//   assert(names.length > 0);
-// });
+test("testConnectWithOptions", async () => {
+  const client = new MongoClient();
+  await client.connect({
+    servers: [{ host: "localhost", port: 27017 }],
+  });
+  const names = await client.listDatabases();
+  assert(names instanceof Array);
+  assert(names.length > 0);
+  client.close();
+});
 
-// test("testListCollectionNames", async () => {
-//   const db = getClient().database("local");
-//   const names = await db.listCollectionNames();
-//   assertEquals(names, ["startup_log"]);
-// });
+testWithClient("testListCollectionNames", async (client) => {
+  const db = client.database("local");
+  const names = await db.listCollectionNames();
+  // assertEquals(names, ["startup_log"]);
+});
 
 // test("testInsertOne", async () => {
 //   const db = getClient().database("test");
@@ -247,8 +256,3 @@ test("testConnectWithUri", async () => {
 //   db.collection("mongo_test_users").drop();
 //   // assertEquals(result, { success: true });
 // });
-
-test("close", async () => {
-  (await getClient()).close();
-  testClient = undefined;
-});

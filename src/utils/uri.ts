@@ -1,15 +1,7 @@
 // mongodb://username:password@example.com:27017,example2.com:27017,...,example.comN:27017/database?key=value&keyN=valueN
+import { ConnectOptions } from "../types.ts";
 
-export interface ClientOptions {
-  servers: {
-    host: string;
-    port: number;
-  }[];
-  dbName: string;
-  [key: string]: any;
-}
-
-export function parse(uri: string): ClientOptions {
+export function parse(uri: string): ConnectOptions {
   const uriObject = new URL(uri);
   const search: { [key: string]: any } = {};
   uriObject.searchParams.forEach((val, key) => {
