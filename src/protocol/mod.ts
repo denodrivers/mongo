@@ -44,7 +44,19 @@ export class WireProtocol {
 
     this.#pendingOps.set(requestId, deferred());
     this.receive();
-    return await this.#pendingOps.get(requestId);
+    const message = await this.#pendingOps.get(requestId);
+
+    let documents: Document[] = [];
+
+    message?.sections.forEach((section) => {
+      if ("document" in section) {
+        documents.push(section.document);
+      } else {
+        documents = documents.concat(section.documents);
+      }
+    });
+
+    return documents;
   }
 
   private async receive() {
@@ -55,7 +67,7 @@ export class WireProtocol {
       assert(headerBuffer);
       const header = parseHeader(headerBuffer!);
       const bodyBuffer = await this.#reader.readFull(
-        new Uint8Array(header.messageLength - 16)
+        new Uint8Array(header.messageLength - 16),
       );
       assert(bodyBuffer);
       const reply = deserializeMessage(header, bodyBuffer!);
