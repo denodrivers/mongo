@@ -4,94 +4,38 @@ on: [push, pull_request]
 
 jobs:
   build:
-    name: ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
+    name: ubuntu-16.04
+    runs-on: ubuntu-16.04
     timeout-minutes: 60
-    strategy:
-      matrix:
-        os: [macOS-latest, windows-2019, ubuntu-16.04]
 
     steps:
       - name: Setup Environment
         run: |
           git config --global core.autocrlf false
           git config --global core.eol lf
-          echo ::set-env name=GH_ACTIONS::1
-          echo ::set-env name=RUST_BACKTRACE::full
 
       - name: Clone repository
         uses: actions/checkout@v2
 
-      - name: Install rust
-        uses: hecrj/setup-rust-action@v1
-        with:
-          rust-version: 1.44.0
-      - name: Install clippy and rustfmt
-        run: |
-          rustup component add clippy
-          rustup component add rustfmt
       - name: Install Deno
         uses: denolib/setup-deno@master
         with:
-          deno-version: 1.2.2
+          deno-version: 1.x.x
+
       - name: Log versions
         run: |
           deno --version
-          rustc --version
-          cargo --version
-
-      - name: Cache
-        uses: actions/cache@v2
-        with:
-          path: |-
-            ~/.cargo/registry
-            ~/.cargo/git
-            target/*/.*
-            target/*/build
-            target/*/deps
-          key:
-            ${{ matrix.os }}-${{ hashFiles('Cargo.lock') }}
-          restore-keys: |
-            ${{ matrix.os }}-
 
       # Lint
-      - name: Clippy
-        run: cargo clippy --all-targets --release --locked -- -D clippy::all
-      - name: Format Rust
-        run: cargo fmt -- --check
       - name: Format TS
         run: deno fmt --check
 
-      # Build
-      - name: Build
-        run: cargo build --release --locked --all-targets
-
       # Start MongoDB
-      - name: Start MongoDB (MacOs)
-        if: startsWith(matrix.os, 'mac')
-        run: |
-          brew tap mongodb/brew
-          brew install mongodb-community@4.2
-          brew services start mongodb-community@4.2
       - name: Start MongoDB (Linux)
-        if: startsWith(matrix.os, 'ubuntu')
         uses: wbari/start-mongoDB@v0.2
         with:
           mongoDBVersion: 4.2
-      # MongoDB is auto started on Windows by default
-      # Tests
-      - name: Test Rust
-        run: cargo test --release --locked --all-targets
-      - name: Test TS
-        run: deno test -A --unstable ./test.ts
 
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          files: |
-            target/release/libdeno_mongo.dylib
-            target/release/libdeno_mongo.so
-            target/release/deno_mongo.dll
+      # Tests
+      - name: Test TS
+        run: deno test -A --unstable
