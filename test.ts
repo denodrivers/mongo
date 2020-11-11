@@ -1,5 +1,5 @@
 import { MongoClient } from "./src/client.ts";
-import { assert, assertEquals } from "./test.deps.ts";
+import { assert, assertEquals, assertThrowsAsync } from "./test.deps.ts";
 interface IUser {
   username: string;
   password: string;
@@ -106,24 +106,24 @@ await testWithClient("testInsertOne", async (client) => {
 //   });
 // });
 
-// testWithClient("testInsertOneTwice", async (client) => {
-//   const db = client.database("test");
-//   const users = db.collection<IUser>("mongo_test_users_2");
-//   await users.insertOne({
-//     _id: ("aaaaaaaaaaaaaaaaaaaaaaaa"),
-//     username: "user1",
-//   });
+testWithClient("testInsertOneTwice", async (client) => {
+  const db = client.database("test");
+  const users = db.collection<IUser>("mongo_test_users_2");
+  await users.insertOne({
+    _id: ("aaaaaaaaaaaaaaaaaaaaaaaa"),
+    username: "user1",
+  });
 
-//   await assertThrowsAsync(
-//     () =>
-//       users.insertOne({
-//         _id: ObjectId("aaaaaaaaaaaaaaaaaaaaaaaa"),
-//         username: "user1",
-//       }) as any,
-//     undefined,
-//     "E11000",
-//   );
-// });
+  await assertThrowsAsync(
+    () =>
+      users.insertOne({
+        _id: ("aaaaaaaaaaaaaaaaaaaaaaaa"),
+        username: "user1",
+      }) as any,
+    undefined,
+    "E11000",
+  );
+});
 
 await testWithClient("testFindOne", async (client) => {
   const db = client.database("test");
