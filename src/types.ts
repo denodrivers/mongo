@@ -11,10 +11,20 @@ export interface ConnectOptions {
   [key: string]: any;
 }
 
+export interface CountOptions {
+  limit?: number;
+  skip?: number;
+  hint?: Document | string;
+  comment?: Document;
+  readConcern?: Document;
+  collation?: Document;
+}
+
 export interface FindOptions {
   findOne?: boolean;
   skip?: number;
   limit?: number;
+  projection?: Document;
 }
 
 export interface ListDatabaseInfo {
@@ -25,7 +35,7 @@ export interface ListDatabaseInfo {
 
 export interface InsertOptions {
   /**
-   * Optional. If true, then when an insert of a document fails, return without inserting any remaining documents listed in the inserts array. 
+   * Optional. If true, then when an insert of a document fails, return without inserting any remaining documents listed in the inserts array.
    * If false, then when an insert of a document fails, continue to insert the remaining documents. Defaults to true.
    */
   ordered?: boolean;
@@ -45,6 +55,56 @@ export interface InsertOptions {
    * Optional. A user-provided comment to attach to this command.
    */
   comment?: Document;
+}
+export interface UpdateOptions {
+  /**
+   * optional list of array filters referenced in filtered positional operators
+   */
+  arrayFilters?: Document[];
+  /**
+   * Specify collation (MongoDB 3.4 or higher) settings for update operation (see 3.4 documentation for available fields).
+   */
+  collation?: Document;
+  /**
+   * Allow driver to bypass schema validation in MongoDB 3.2 or higher
+   */
+  bypassDocumentValidation?: boolean;
+  /**
+   * An optional hint for query optimization. See the update (https://docs.mongodb.com/manual/reference/command/update/#update-command-hint) command reference for more information.
+   */
+  hint?: Document;
+  /**
+   * When true, creates a new document if no document matches the query.
+   */
+  upsert?: boolean;
+  /**
+   * The write concern
+   */
+  w?: string | number;
+  /**
+   * The write concern timeout.
+   */
+  wtimeout?: number;
+  /**
+   * Specify a journal write concern.
+   */
+  j?: boolean;
+  /**
+   * If true, will throw if bson documents start with $ or include a . in any key value
+   */
+  checkKeys?: boolean;
+  /**
+   * Serialize functions on any object.
+   */
+  serializeFunctions?: boolean;
+  /**
+   * Specify if the BSON serializer should ignore undefined fields.
+   */
+  ignoreUndefined?: boolean;
+  /**
+   * optional session to use for this operation
+   */
+  // session?: ClientSession
 }
 
 export interface DeleteOptions {
@@ -66,7 +126,7 @@ export interface DeleteOptions {
   collation?: Document;
 
   /**
-   * Optional. A user-provided comment to attach to this command. 
+   * Optional. A user-provided comment to attach to this command.
    */
   comment?: Document;
 

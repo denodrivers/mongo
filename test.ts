@@ -8,6 +8,7 @@ interface IUser {
 }
 const { test } = Deno;
 const dateNow = Date.now();
+const hostName = "localhost";
 
 async function testWithClient(
   name: string,
@@ -22,13 +23,13 @@ async function testWithClient(
 
 async function getClient(): Promise<MongoClient> {
   const client = new MongoClient();
-  await client.connect("mongodb://localhost:27017");
+  await client.connect(`mongodb://${hostName}:27017`);
   return client;
 }
 
 test("testConnectWithUri", async () => {
   const client = new MongoClient();
-  await client.connect("mongodb://localhost:27017");
+  await client.connect(`mongodb://${hostName}:27017`);
   const names = await client.listDatabases();
   assert(names instanceof Array);
   assert(names.length > 0);
@@ -38,7 +39,7 @@ test("testConnectWithUri", async () => {
 test("testConnectWithOptions", async () => {
   const client = new MongoClient();
   await client.connect({
-    servers: [{ host: "localhost", port: 27017 }],
+    servers: [{ host: hostName, port: 27017 }],
   });
   const names = await client.listDatabases();
   assert(names instanceof Array);
@@ -46,13 +47,13 @@ test("testConnectWithOptions", async () => {
   client.close();
 });
 
-testWithClient("testListCollectionNames", async (client) => {
+await testWithClient("testListCollectionNames", async (client) => {
   const db = client.database("local");
   const names = await db.listCollectionNames();
   assertEquals(names, ["startup_log"]);
 });
 
-testWithClient("testInsertOne", async (client) => {
+await testWithClient("testInsertOne", async (client) => {
   const db = client.database("test");
   const users = db.collection<IUser>("mongo_test_users");
   const insertId = await users.insertOne({
@@ -124,7 +125,7 @@ testWithClient("testInsertOne", async (client) => {
 //   );
 // });
 
-testWithClient("testFindOne", async (client) => {
+await testWithClient("testFindOne", async (client) => {
   const db = client.database("test");
   const users = db.collection<IUser>("mongo_test_users");
   const user1 = await users.findOne();
@@ -133,14 +134,41 @@ testWithClient("testFindOne", async (client) => {
   const query = { test: 1 };
   const findNull = await users.findOne(query);
   assertEquals(findNull, undefined);
+  const projectionUser = await users.findOne(
+    {},
+    { projection: { _id: 0, username: 1 } },
+  );
+  assertEquals(Object.keys(projectionUser!), ["username"]);
+  const projectionUserWithId = await users.findOne(
+    {},
+    { projection: { username: 1 } },
+  );
+  assertEquals(Object.keys(projectionUserWithId!), ["_id", "username"]);
 });
-
-// testWithClient("testUpdateOne", async (client) => {
-//   const db = client.database("test");
-//   const users = db.collection("mongo_test_users");
-//   const result = await users.updateOne({}, { username: "USER1" });
-//   assertEquals(result, { matchedCount: 1, modifiedCount: 1, upsertedId: null });
-// });
+await testWithClient("testFind", async (client) => {
+  const db = client.database("test");
+  const users = db.collection<IUser>("mongo_test_users");
+  const user = await users.find();
+  assertEquals(user!.length > 0, true);
+});
+testWithClient("testUpdateOne", async (client) => {
+  const db = client.database("test");
+  const users = db.collection("mongo_test_users");
+  const result = await users.updateOne({}, { username: "USER1" });
+  assertEquals(result, { matchedCount: 1, modifiedCount: 1, upsertedId: null });
+});
+testWithClient("testUpdateOneWithUpsert", async (client) => {
+  const db = client.database("test");
+  const users = db.collection("mongo_test_users");
+  const result = await users.updateOne(
+    { username: "user2" },
+    { username: "USER2" },
+    { upsert: true },
+  );
+  assertEquals(result.matchedCount, 0);
+  assertEquals(result.modifiedCount, 1);
+  assertEquals(result.upsertedCount, 1);
+});
 
 testWithClient("testDeleteOne", async (client) => {
   const db = client.database("test");
@@ -167,44 +195,44 @@ testWithClient("testInsertMany", async (client) => {
   assertEquals(insertedIds.length, 2);
 });
 
-// testWithClient("testFindOr", async (client) => {
-//   const db = client.database("test");
-//   const users = db.collection<IUser>("mongo_test_users");
-//   const user1 = await users.find({
-//     $or: [
-//       {
-//         password: "pass1",
-//       },
-//       {
-//         password: "pass2",
-//       },
-//     ],
-//   });
+testWithClient("testFindOr", async (client) => {
+  const db = client.database("test");
+  const users = db.collection<IUser>("mongo_test_users");
+  const user1 = await users.find({
+    $or: [
+      {
+        password: "pass1",
+      },
+      {
+        password: "pass2",
+      },
+    ],
+  });
 
-//   assert(user1 instanceof Array);
-//   assertEquals(user1.length, 3);
-// });
+  assert(user1 instanceof Array);
+  assertEquals(user1.length, 2);
+});
 
-// testWithClient("testFind", async (client) => {
-//   const db = client.database("test");
-//   const users = db.collection("mongo_test_users");
-//   const findUsers = await users.find(
-//     { username: "many" },
-//     { skip: 1, limit: 1 },
-//   );
-//   assert(findUsers instanceof Array);
-//   assertEquals(findUsers.length, 1);
+testWithClient("testFind", async (client) => {
+  const db = client.database("test");
+  const users = db.collection("mongo_test_users");
+  const findUsers = await users.find(
+    { username: "many" },
+    { skip: 1, limit: 1 },
+  );
+  assert(findUsers instanceof Array);
+  assertEquals(findUsers.length, 1);
 
-//   const notFound = await users.find({ test: 1 });
-//   assertEquals(notFound, []);
-// });
+  const notFound = await users.find({ test: 1 });
+  assertEquals(notFound, []);
+});
 
-// testWithClient("testCount", async (client) => {
-//   const db = client.database("test");
-//   const users = db.collection("mongo_test_users");
-//   const count = await users.count({ username: "many" });
-//   assertEquals(count, 2);
-// });
+testWithClient("testCount", async (client) => {
+  const db = client.database("test");
+  const users = db.collection("mongo_test_users");
+  const count = await users.count({ username: "many" });
+  assertEquals(count, 2);
+});
 
 // testWithClient("testAggregation", async (client) => {
 //   const db = client.database("test");
@@ -216,21 +244,21 @@ testWithClient("testInsertMany", async (client) => {
 //   assertEquals(docs, [{ _id: "many", total: 2 }]);
 // });
 
-// testWithClient("testUpdateMany", async (client) => {
-//   const db = client.database("test");
-//   const users = db.collection("mongo_test_users");
-//   const result = await users.updateMany(
-//     { username: "many" },
-//     { $set: { username: "MANY" } },
-//   );
-//   assertEquals(result, { matchedCount: 2, modifiedCount: 2, upsertedId: null });
-// });
+testWithClient("testUpdateMany", async (client) => {
+  const db = client.database("test");
+  const users = db.collection("mongo_test_users");
+  const result = await users.updateMany(
+    { username: "many" },
+    { $set: { username: "MANY" } },
+  );
+  assertEquals(result, { matchedCount: 2, modifiedCount: 2, upsertedId: null });
+});
 
 testWithClient("testDeleteMany", async (client) => {
   const db = client.database("test");
   const users = db.collection("mongo_test_users");
-  const deleteCount = await users.deleteMany({ username: "many" });
-  // const deleteCount = await users.deleteMany({ username: "MANY" });
+  // const deleteCount = await users.deleteMany({ username: "many" });
+  const deleteCount = await users.deleteMany({ username: "MANY" });
   assertEquals(deleteCount, 2);
 });
 

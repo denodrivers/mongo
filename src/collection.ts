@@ -2,10 +2,12 @@ import { Bson } from "../deps.ts";
 import { Cursor } from "./cursor.ts";
 import { WireProtocol } from "./protocol/mod.ts";
 import {
+  CountOptions,
   DeleteOptions,
   Document,
   FindOptions,
   InsertOptions,
+  UpdateOptions,
 } from "./types.ts";
 
 export class Collection<T> {
@@ -17,25 +19,53 @@ export class Collection<T> {
     this.#dbName = dbName;
   }
 
-  async find(filter?: Document, options?: FindOptions): Promise<Cursor<T>> {
+  private async findCursor(
+    filter?: Document,
+    options?: FindOptions,
+  ): Promise<Cursor<T>> {
     const { cursor } = await this.#protocol.commandSingle(this.#dbName, {
       find: this.name,
       filter,
       batchSize: 1,
       noCursorTimeout: true,
+      ...options,
     });
     return new Cursor(this.#protocol, {
       ...cursor,
       id: cursor.id.toString(),
     });
   }
-
+  async find(
+    filter?: Document,
+    options?: FindOptions,
+  ): Promise<T[] | undefined> {
+    const cursor = await this.findCursor(filter, options);
+    const result = [];
+    for await (const cursorElement of cursor) {
+      cursorElement && result.push(cursorElement);
+    }
+    return result;
+  }
   async findOne(
     filter?: Document,
     options?: FindOptions,
   ): Promise<T | undefined> {
-    const cursor = await this.find(filter, options);
+    const cursor = await this.findCursor(filter, options);
     return await cursor.next();
+  }
+
+  async count(filter?: Document, options?: CountOptions): Promise<number> {
+    const res = await this.#protocol.commandSingle(this.#dbName, {
+      count: this.name,
+      query: filter,
+      ...options,
+    });
+    const { n, ok } = res;
+    if (ok === 1) {
+      return n;
+    } else {
+      return 0;
+    }
   }
 
   async insertOne(doc: Document, options?: InsertOptions) {
@@ -72,6 +102,49 @@ export class Collection<T> {
     };
   }
 
+  private async update(updates: Document[]) {
+    const res = await this.#protocol.commandSingle(this.#dbName, {
+      update: this.name,
+      updates,
+    });
+    const { n, nModified, upserted } = await res;
+    if (upserted) {
+      const upsertedCount = upserted.length;
+      const _id = upserted[0]._id;
+      const upsertedId = { _id };
+      return {
+        modifiedCount: n,
+        matchedCount: nModified,
+        upsertedId,
+        upsertedCount,
+      };
+    }
+    return {
+      modifiedCount: n,
+      matchedCount: nModified,
+      upsertedId: null,
+    };
+  }
+  async updateOne(
+    filter: Document,
+    update: Document,
+    options?: UpdateOptions,
+  ): Promise<Document> {
+    const updates = [
+      { q: filter, u: update, upsert: options?.upsert ?? false },
+    ];
+    return await this.update(updates);
+  }
+  async updateMany(
+    filter: Document,
+    update: Document,
+    options?: UpdateOptions,
+  ): Promise<Document> {
+    const updates: any = [
+      { q: filter, u: update, multi: true, upsert: options?.upsert ?? false },
+    ];
+    return await this.update(updates);
+  }
   async deleteMany(filter: Document, options?: DeleteOptions): Promise<number> {
     const res = await this.#protocol.commandSingle(this.#dbName, {
       delete: this.name,
