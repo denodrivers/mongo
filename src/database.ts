@@ -1,7 +1,7 @@
 import { Collection } from "./collection.ts";
+import { CommandCursor, Cursor } from "./cursor.ts";
 import { WireProtocol } from "./protocol/mod.ts";
 import { Document } from "./types.ts";
-import { Cursor } from "./cursor.ts";
 
 interface ListCollectionsReponse {
   cursor: {
@@ -33,29 +33,32 @@ export class Database {
     return new Collection(this.#protocol, this.name, name);
   }
 
-  async listCollections(options?: {
+  listCollections(options?: {
     filter?: Document;
     nameOnly?: boolean;
     authorizedCollections?: boolean;
     comment?: Document;
-  }): Promise<Cursor<ListCollectionsResult>> {
+  }): CommandCursor<ListCollectionsResult> {
     if (!options) {
       options = {};
     }
-    const [{ cursor }]: ListCollectionsReponse[] = await this.#protocol.command(
-      this.name,
-      {
-        listCollections: 1,
-        ...options,
-        batchSize: 1,
+    return new CommandCursor<ListCollectionsResult>(
+      this.#protocol,
+      async () => {
+        const { cursor } = await this.#protocol.commandSingle<
+          ListCollectionsReponse
+        >(this.name, {
+          listCollections: 1,
+          ...options,
+          batchSize: 1,
+        });
+        return {
+          id: cursor.id,
+          ns: cursor.ns,
+          firstBatch: cursor.firstBatch,
+        };
       },
     );
-
-    return new Cursor<ListCollectionsResult>(this.#protocol, {
-      id: cursor.id,
-      ns: cursor.ns,
-      firstBatch: cursor.firstBatch,
-    });
   }
 
   async listCollectionNames(options?: {
@@ -63,17 +66,15 @@ export class Database {
     authorizedCollections?: boolean;
     comment?: Document;
   }): Promise<string[]> {
-    const cursor = await this.listCollections({
+    const cursor = this.listCollections({
       ...options,
       nameOnly: true,
       authorizedCollections: true,
     });
-
     const names: string[] = [];
     for await (const item of cursor) {
       names.push(item!.name);
     }
-
     return names;
   }
 }

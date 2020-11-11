@@ -37,7 +37,7 @@ export class MongoClient {
     if (!options) {
       options = {};
     }
-    const [{ databases }] = await this.#protocol.command("admin", {
+    const { databases } = await this.#protocol.commandSingle("admin", {
       listDatabases: 1,
       ...options,
     });

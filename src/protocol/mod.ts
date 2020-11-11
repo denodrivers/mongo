@@ -1,4 +1,5 @@
 import { assert, BufReader, Deferred, deferred } from "../../deps.ts";
+import { MongoError, MongoErrorInfo } from "../error.ts";
 import { Document } from "../types.ts";
 import { handshake } from "./handshake.ts";
 import { parseHeader } from "./header.ts";
@@ -26,12 +27,13 @@ export class WireProtocol {
     this.#connectionId = connectionId;
   }
 
-  async commandSingle<T = Document>(
-    db: string,
-    body: Document,
-  ): Promise<T> {
-    const [doc] = await this.command<T>(db, body);
-    return doc;
+  async commandSingle<T = Document>(db: string, body: Document): Promise<T> {
+    const [doc] = await this.command<MongoErrorInfo | T>(db, body);
+    const maybeError = doc as MongoErrorInfo;
+    if (maybeError.ok === 0) {
+      throw new MongoError(maybeError);
+    }
+    return doc as T;
   }
 
   async command<T = Document>(db: string, body: Document): Promise<T[]> {

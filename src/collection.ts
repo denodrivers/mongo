@@ -5,6 +5,7 @@ import {
   CountOptions,
   DeleteOptions,
   Document,
+  DropOptions,
   FindOptions,
   InsertOptions,
   UpdateOptions,
@@ -19,38 +20,27 @@ export class Collection<T> {
     this.#dbName = dbName;
   }
 
-  private async findCursor(
-    filter?: Document,
-    options?: FindOptions,
-  ): Promise<Cursor<T>> {
-    const { cursor } = await this.#protocol.commandSingle(this.#dbName, {
-      find: this.name,
-      filter,
-      batchSize: 1,
-      noCursorTimeout: true,
-      ...options,
-    });
-    return new Cursor(this.#protocol, {
-      ...cursor,
-      id: cursor.id.toString(),
+  find(filter?: Document, options?: FindOptions): Cursor<T> {
+    return new Cursor<T>(this.#protocol, async () => {
+      const { cursor } = await this.#protocol.commandSingle(this.#dbName, {
+        find: this.name,
+        filter,
+        batchSize: 1,
+        noCursorTimeout: true,
+        ...options,
+      });
+      return {
+        ...cursor,
+        id: cursor.id.toString(),
+      };
     });
   }
-  async find(
-    filter?: Document,
-    options?: FindOptions,
-  ): Promise<T[] | undefined> {
-    const cursor = await this.findCursor(filter, options);
-    const result = [];
-    for await (const cursorElement of cursor) {
-      cursorElement && result.push(cursorElement);
-    }
-    return result;
-  }
+
   async findOne(
     filter?: Document,
     options?: FindOptions,
   ): Promise<T | undefined> {
-    const cursor = await this.findCursor(filter, options);
+    const cursor = this.find(filter, options);
     return await cursor.next();
   }
 
@@ -103,11 +93,13 @@ export class Collection<T> {
   }
 
   private async update(updates: Document[]) {
-    const res = await this.#protocol.commandSingle(this.#dbName, {
-      update: this.name,
-      updates,
-    });
-    const { n, nModified, upserted } = await res;
+    const { n, nModified, upserted } = await this.#protocol.commandSingle(
+      this.#dbName,
+      {
+        update: this.name,
+        updates,
+      },
+    );
     if (upserted) {
       const upsertedCount = upserted.length;
       const _id = upserted[0]._id;
@@ -125,6 +117,7 @@ export class Collection<T> {
       upsertedId: null,
     };
   }
+
   async updateOne(
     filter: Document,
     update: Document,
@@ -135,6 +128,7 @@ export class Collection<T> {
     ];
     return await this.update(updates);
   }
+
   async updateMany(
     filter: Document,
     update: Document,
@@ -145,16 +139,19 @@ export class Collection<T> {
     ];
     return await this.update(updates);
   }
+
   async deleteMany(filter: Document, options?: DeleteOptions): Promise<number> {
     const res = await this.#protocol.commandSingle(this.#dbName, {
       delete: this.name,
-      deletes: [{
-        q: filter,
-        limit: options?.limit ?? 0,
-        collation: options?.collation,
-        hint: options?.hint,
-        comment: options?.comment,
-      }],
+      deletes: [
+        {
+          q: filter,
+          limit: options?.limit ?? 0,
+          collation: options?.collation,
+          hint: options?.hint,
+          comment: options?.comment,
+        },
+      ],
       ordered: options?.ordered ?? true,
       writeConcern: options?.writeConcern,
     });
@@ -165,5 +162,12 @@ export class Collection<T> {
 
   async deleteOne(filter: Document, options?: DeleteOptions) {
     return this.delete(filter, { ...options, limit: 1 });
+  }
+
+  async drop(options?: DropOptions): Promise<void> {
+    const res = await this.#protocol.commandSingle(this.#dbName, {
+      drop: this.name,
+      ...options,
+    });
   }
 }

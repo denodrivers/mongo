@@ -142,3 +142,15 @@ export interface DeleteOptions {
    */
   hint?: Document | string;
 }
+
+export interface DropOptions {
+  /**
+   * Optional. A document expressing the write concern of the drop command. Omit to use the default write concern.
+   */
+  writeConcern?: Document;
+
+  /**
+   * Optional. A user-provided comment to attach to this command.
+   */
+  comment?: any;
+}

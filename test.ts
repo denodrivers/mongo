@@ -145,18 +145,21 @@ await testWithClient("testFindOne", async (client) => {
   );
   assertEquals(Object.keys(projectionUserWithId!), ["_id", "username"]);
 });
+
 await testWithClient("testFind", async (client) => {
   const db = client.database("test");
   const users = db.collection<IUser>("mongo_test_users");
-  const user = await users.find();
+  const user = await (await users.find()).toArray();
   assertEquals(user!.length > 0, true);
 });
+
 testWithClient("testUpdateOne", async (client) => {
   const db = client.database("test");
   const users = db.collection("mongo_test_users");
   const result = await users.updateOne({}, { username: "USER1" });
   assertEquals(result, { matchedCount: 1, modifiedCount: 1, upsertedId: null });
 });
+
 testWithClient("testUpdateOneWithUpsert", async (client) => {
   const db = client.database("test");
   const users = db.collection("mongo_test_users");
@@ -198,17 +201,11 @@ testWithClient("testInsertMany", async (client) => {
 testWithClient("testFindOr", async (client) => {
   const db = client.database("test");
   const users = db.collection<IUser>("mongo_test_users");
-  const user1 = await users.find({
-    $or: [
-      {
-        password: "pass1",
-      },
-      {
-        password: "pass2",
-      },
-    ],
-  });
-
+  const user1 = await users
+    .find({
+      $or: [{ password: "pass1" }, { password: "pass2" }],
+    })
+    .toArray();
   assert(user1 instanceof Array);
   assertEquals(user1.length, 2);
 });
@@ -216,10 +213,9 @@ testWithClient("testFindOr", async (client) => {
 testWithClient("testFind", async (client) => {
   const db = client.database("test");
   const users = db.collection("mongo_test_users");
-  const findUsers = await users.find(
-    { username: "many" },
-    { skip: 1, limit: 1 },
-  );
+  const findUsers = await users
+    .find({ username: "many" }, { skip: 1, limit: 1 })
+    .toArray();
   assert(findUsers instanceof Array);
   assertEquals(findUsers.length, 1);
 
@@ -257,7 +253,6 @@ testWithClient("testUpdateMany", async (client) => {
 testWithClient("testDeleteMany", async (client) => {
   const db = client.database("test");
   const users = db.collection("mongo_test_users");
-  // const deleteCount = await users.deleteMany({ username: "many" });
   const deleteCount = await users.deleteMany({ username: "MANY" });
   assertEquals(deleteCount, 2);
 });
@@ -279,9 +274,8 @@ testWithClient("testDeleteMany", async (client) => {
 // //   console.log(result);
 // // });
 
-// testWithClient("testDropConnection", async ()client => {
-//   const db = client.database("test");
-//   db.collection("mongo_test_users_2").drop();
-//   db.collection("mongo_test_users").drop();
-//   // assertEquals(result, { success: true });
-// });
+testWithClient("testDropConnection", async (client) => {
+  const db = client.database("test");
+  // await db.collection("mongo_test_users_2").drop();
+  await db.collection("mongo_test_users").drop();
+});
