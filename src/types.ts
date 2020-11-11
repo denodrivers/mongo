@@ -1,4 +1,6 @@
-export type Document = any;
+import { Bson } from "../deps.ts";
+
+export type Document = Bson.Document;
 
 export interface ConnectOptions {
   servers: {

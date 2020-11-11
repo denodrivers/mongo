@@ -29,7 +29,7 @@ interface HandshakeResponse {
 export async function handshake(
   protocol: WireProtocol,
 ): Promise<HandshakeResponse> {
-  const reply = await protocol.commandSingle("admin", {
+  const reply = await protocol.commandSingle<HandshakeResponse>("admin", {
     isMaster: true,
     client: driverMetadata,
   });
