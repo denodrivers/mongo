@@ -186,44 +186,44 @@ testWithClient("testInsertMany", async (client) => {
   assertEquals(insertedIds.length, 2);
 });
 
-// testWithClient("testFindOr", async (client) => {
-//   const db = client.database("test");
-//   const users = db.collection<IUser>("mongo_test_users");
-//   const user1 = await users.find({
-//     $or: [
-//       {
-//         password: "pass1",
-//       },
-//       {
-//         password: "pass2",
-//       },
-//     ],
-//   });
+testWithClient("testFindOr", async (client) => {
+  const db = client.database("test");
+  const users = db.collection<IUser>("mongo_test_users");
+  const user1 = await users.find({
+    $or: [
+      {
+        password: "pass1",
+      },
+      {
+        password: "pass2",
+      },
+    ],
+  });
 
-//   assert(user1 instanceof Array);
-//   assertEquals(user1.length, 3);
-// });
+  assert(user1 instanceof Array);
+  assertEquals(user1.length, 2);
+});
 
-// testWithClient("testFind", async (client) => {
-//   const db = client.database("test");
-//   const users = db.collection("mongo_test_users");
-//   const findUsers = await users.find(
-//     { username: "many" },
-//     { skip: 1, limit: 1 },
-//   );
-//   assert(findUsers instanceof Array);
-//   assertEquals(findUsers.length, 1);
+testWithClient("testFind", async (client) => {
+  const db = client.database("test");
+  const users = db.collection("mongo_test_users");
+  const findUsers = await users.find(
+    { username: "many" },
+    { skip: 1, limit: 1 },
+  );
+  assert(findUsers instanceof Array);
+  assertEquals(findUsers.length, 1);
 
-//   const notFound = await users.find({ test: 1 });
-//   assertEquals(notFound, []);
-// });
+  const notFound = await users.find({ test: 1 });
+  assertEquals(notFound, []);
+});
 
-// testWithClient("testCount", async (client) => {
-//   const db = client.database("test");
-//   const users = db.collection("mongo_test_users");
-//   const count = await users.count({ username: "many" });
-//   assertEquals(count, 2);
-// });
+testWithClient("testCount", async (client) => {
+  const db = client.database("test");
+  const users = db.collection("mongo_test_users");
+  const count = await users.count({ username: "many" });
+  assertEquals(count, 2);
+});
 
 // testWithClient("testAggregation", async (client) => {
 //   const db = client.database("test");

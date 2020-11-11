@@ -17,7 +17,7 @@ export class Collection<T> {
     this.#dbName = dbName;
   }
 
-  async findCursor(
+  private async findCursor(
     filter?: Document,
     options?: FindOptions,
   ): Promise<Cursor<T>> {
@@ -50,6 +50,11 @@ export class Collection<T> {
   ): Promise<T | undefined> {
     const cursor = await this.findCursor(filter, options);
     return await cursor.next();
+  }
+
+  async count(filter?: Document, options?: FindOptions): Promise<number> {
+    const result = await this.find(filter, options);
+    return result ? result.length : 0;
   }
 
   async insertOne(doc: Document, options?: InsertOptions) {
