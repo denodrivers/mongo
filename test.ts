@@ -126,7 +126,7 @@ testWithClient("testInsertOne", async (client) => {
 //   );
 // });
 
-testWithClient("testFindOne", async (client) => {
+await testWithClient("testFindOne", async (client) => {
   const db = client.database("test");
   const users = db.collection<IUser>("mongo_test_users");
   const user1 = await users.findOne();
@@ -140,7 +140,12 @@ testWithClient("testFindOne", async (client) => {
   const projectionUserWithId = await users.findOne({},{projection:{username:1}});
   assertEquals(Object.keys(projectionUserWithId!),['_id','username']);
 });
-
+await testWithClient("testFind",async (client)=>{
+  const db = client.database("test");
+  const users = db.collection<IUser>("mongo_test_users");
+  const user = await users.find();
+  assertEquals(user!.length>0,true);
+})
 // test("testUpdateOne", async () => {
 //   const db = getClient().database("test");
 //   const users = db.collection("mongo_test_users");

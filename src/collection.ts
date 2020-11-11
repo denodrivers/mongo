@@ -1,4 +1,4 @@
-import { Bson } from "../deps.ts";
+import {assert, Bson} from "../deps.ts";
 import { Cursor } from "./cursor.ts";
 import { WireProtocol } from "./protocol/mod.ts";
 import { Document, FindOptions, InsertOptions } from "./types.ts";
@@ -12,7 +12,7 @@ export class Collection<T> {
     this.#dbName = dbName;
   }
 
-  async find(filter?: Document, options?: FindOptions): Promise<Cursor<T>> {
+  async findCursor(filter?: Document, options?: FindOptions): Promise<Cursor<T>> {
     const { cursor } = await this.#protocol.commandSingle(this.#dbName, {
       find: this.name,
       filter,
@@ -25,12 +25,20 @@ export class Collection<T> {
       id: cursor.id.toString(),
     });
   }
-
+  async find(filter?:Document, options?:FindOptions):Promise<T[]|undefined>{
+    const cursor = await this.findCursor(filter,options);
+    const result = [];
+    for await (const cursorElement of cursor) {
+      assert(cursorElement);
+      result.push(cursorElement);
+    }
+    return result;
+  }
   async findOne(
     filter?: Document,
     options?: FindOptions,
   ): Promise<T | undefined> {
-    const cursor = await this.find(filter, options);
+    const cursor = await this.findCursor(filter, options);
     return await cursor.next();
   }
 
