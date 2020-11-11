@@ -1,7 +1,12 @@
 import { assert, Bson } from "../deps.ts";
 import { Cursor } from "./cursor.ts";
 import { WireProtocol } from "./protocol/mod.ts";
-import { Document, FindOptions, InsertOptions } from "./types.ts";
+import {
+  DeleteOptions,
+  Document,
+  FindOptions,
+  InsertOptions,
+} from "./types.ts";
 
 export class Collection<T> {
   #protocol: WireProtocol;
@@ -61,7 +66,7 @@ export class Collection<T> {
   async insertMany(
     docs: Document[],
     options?: InsertOptions,
-  ): Promise<{ insertedIds: Document; insertedCount: number }> {
+  ): Promise<{ insertedIds: Document[]; insertedCount: number }> {
     const insertedIds = docs.map((doc) => {
       if (!doc._id) {
         doc._id = new Bson.ObjectID();
@@ -80,5 +85,27 @@ export class Collection<T> {
       insertedIds,
       insertedCount: res.n,
     };
+  }
+
+  async deleteMany(filter: Document, options?: DeleteOptions): Promise<number> {
+    const res = await this.#protocol.commandSingle(this.#dbName, {
+      delete: this.name,
+      deletes: [{
+        q: filter,
+        limit: options?.limit ?? 0,
+        collation: options?.collation,
+        hint: options?.hint,
+        comment: options?.comment,
+      }],
+      ordered: options?.ordered ?? true,
+      writeConcern: options?.writeConcern,
+    });
+    return res.n;
+  }
+
+  delete = this.deleteMany;
+
+  async deleteOne(filter: Document, options?: DeleteOptions) {
+    return this.delete(filter, { ...options, limit: 1 });
   }
 }
