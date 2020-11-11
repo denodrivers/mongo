@@ -51,7 +51,7 @@ export class Collection<T> {
   async insertMany(
     docs: Document[],
     options?: InsertOptions,
-  ): Promise<{ insertedIds: Document; insertedCount: number }> {
+  ): Promise<{ insertedIds: Document[]; insertedCount: number }> {
     const insertedIds = docs.map((doc) => {
       if (!doc._id) {
         doc._id = new Bson.ObjectID();
@@ -72,12 +72,12 @@ export class Collection<T> {
     };
   }
 
-  async delete(filter: Document, options?: DeleteOptions): Promise<number> {
+  async deleteMany(filter: Document, options?: DeleteOptions): Promise<number> {
     const res = await this.#protocol.commandSingle(this.#dbName, {
       delete: this.name,
       deletes: [{
         q: filter,
-        limit: options?.limit,
+        limit: options?.limit ?? 0,
         collation: options?.collation,
         hint: options?.hint,
         comment: options?.comment,
@@ -87,6 +87,8 @@ export class Collection<T> {
     });
     return res.n;
   }
+
+  delete = this.deleteMany;
 
   async deleteOne(filter: Document, options?: DeleteOptions) {
     return this.delete(filter, { ...options, limit: 1 });
