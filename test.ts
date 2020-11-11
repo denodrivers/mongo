@@ -8,6 +8,7 @@ interface IUser {
 }
 const { test } = Deno;
 const dateNow = Date.now();
+const hostName = "localhost";
 
 async function testWithClient(
   name: string,
@@ -20,15 +21,16 @@ async function testWithClient(
   });
 }
 
+
 async function getClient(): Promise<MongoClient> {
   const client = new MongoClient();
-  await client.connect("mongodb://localhost:27017");
+  await client.connect(`mongodb://${hostName}:27017`);
   return client;
 }
 
 test("testConnectWithUri", async () => {
   const client = new MongoClient();
-  await client.connect("mongodb://localhost:27017");
+  await client.connect(`mongodb://${hostName}:27017`);
   const names = await client.listDatabases();
   assert(names instanceof Array);
   assert(names.length > 0);
@@ -38,7 +40,7 @@ test("testConnectWithUri", async () => {
 test("testConnectWithOptions", async () => {
   const client = new MongoClient();
   await client.connect({
-    servers: [{ host: "localhost", port: 27017 }],
+    servers: [{ host: hostName, port: 27017 }],
   });
   const names = await client.listDatabases();
   assert(names instanceof Array);
