@@ -1,4 +1,4 @@
-import { assert, Bson } from "../deps.ts";
+import { Bson } from "../deps.ts";
 import { Cursor } from "./cursor.ts";
 import { WireProtocol } from "./protocol/mod.ts";
 import {
@@ -40,8 +40,7 @@ export class Collection<T> {
     const cursor = await this.findCursor(filter, options);
     const result = [];
     for await (const cursorElement of cursor) {
-      assert(cursorElement);
-      result.push(cursorElement);
+      cursorElement && result.push(cursorElement);
     }
     return result;
   }

@@ -47,13 +47,13 @@ test("testConnectWithOptions", async () => {
   client.close();
 });
 
-testWithClient("testListCollectionNames", async (client) => {
+await testWithClient("testListCollectionNames", async (client) => {
   const db = client.database("local");
   const names = await db.listCollectionNames();
   assertEquals(names, ["startup_log"]);
 });
 
-testWithClient("testInsertOne", async (client) => {
+await testWithClient("testInsertOne", async (client) => {
   const db = client.database("test");
   const users = db.collection<IUser>("mongo_test_users");
   const insertId = await users.insertOne({
