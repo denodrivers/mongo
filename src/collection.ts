@@ -1,7 +1,12 @@
 import { Bson } from "../deps.ts";
 import { Cursor } from "./cursor.ts";
 import { WireProtocol } from "./protocol/mod.ts";
-import { Document, FindOptions, InsertOptions } from "./types.ts";
+import {
+  DeleteOptions,
+  Document,
+  FindOptions,
+  InsertOptions,
+} from "./types.ts";
 
 export class Collection<T> {
   #protocol: WireProtocol;
@@ -65,5 +70,25 @@ export class Collection<T> {
       insertedIds,
       insertedCount: res.n,
     };
+  }
+
+  async delete(filter: Document, options?: DeleteOptions): Promise<number> {
+    const res = await this.#protocol.commandSingle(this.#dbName, {
+      delete: this.name,
+      deletes: [{
+        q: filter,
+        limit: options?.limit,
+        collation: options?.collation,
+        hint: options?.hint,
+        comment: options?.comment,
+      }],
+      ordered: options?.ordered ?? true,
+      writeConcern: options?.writeConcern,
+    });
+    return res.n;
+  }
+
+  async deleteOne(filter: Document, options?: DeleteOptions) {
+    return this.delete(filter, { ...options, limit: 1 });
   }
 }

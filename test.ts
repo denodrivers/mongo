@@ -142,12 +142,12 @@ testWithClient("testFindOne", async (client) => {
 //   assertEquals(result, { matchedCount: 1, modifiedCount: 1, upsertedId: null });
 // });
 
-// test("testDeleteOne", async () => {
-//   const db = getClient().database("test");
-//   const users = db.collection("mongo_test_users");
-//   const deleteCount = await users.deleteOne({});
-//   assertEquals(deleteCount, 1);
-// });
+testWithClient("testDeleteOne", async (client) => {
+  const db = client.database("test");
+  const users = db.collection("mongo_test_users");
+  const deleteCount = await users.deleteOne({});
+  assertEquals(deleteCount, 1);
+});
 
 // test("testInsertMany", async () => {
 //   const db = getClient().database("test");
