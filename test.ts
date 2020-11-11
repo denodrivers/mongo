@@ -105,11 +105,11 @@ testWithClient("testInsertOne", async (client) => {
 //   });
 // });
 
-// test("testInsertOneTwice", async () => {
+// testWithClient("testInsertOneTwice", async (client) => {
 //   const db = client.database("test");
 //   const users = db.collection<IUser>("mongo_test_users_2");
-//   const insertId: ObjectId = await users.insertOne({
-//     _id: ObjectId("aaaaaaaaaaaaaaaaaaaaaaaa"),
+//   await users.insertOne({
+//     _id: ("aaaaaaaaaaaaaaaaaaaaaaaa"),
 //     username: "user1",
 //   });
 

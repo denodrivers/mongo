@@ -45,7 +45,7 @@ export class Collection<T> {
 
   async insert(docs: Document | Document[], options?: InsertOptions) {
     docs = Array.isArray(docs) ? docs : [docs];
-    return this.insertMany(docs, options);
+    return this.insertMany(docs as Document[], options);
   }
 
   async insertMany(

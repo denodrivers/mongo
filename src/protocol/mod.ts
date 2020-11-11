@@ -29,12 +29,12 @@ export class WireProtocol {
   async commandSingle<T = Document>(
     db: string,
     body: Document,
-  ): Promise<Document> {
+  ): Promise<T> {
     const [doc] = await this.command<T>(db, body);
     return doc;
   }
 
-  async command<T>(db: string, body: Document): Promise<T[]> {
+  async command<T = Document>(db: string, body: Document): Promise<T[]> {
     const requestId = nextRequestId++;
     const chunks = serializeMessage({
       requestId,
@@ -61,9 +61,9 @@ export class WireProtocol {
 
     message?.sections.forEach((section) => {
       if ("document" in section) {
-        documents.push(section.document);
+        documents.push(section.document as T);
       } else {
-        documents = documents.concat(section.documents);
+        documents = documents.concat(section.documents as T[]);
       }
     });
 
