@@ -101,6 +101,26 @@ export class Collection<T> {
     };
   }
 
+  async update(updates: any) {
+    const res = await this.#protocol.commandSingle(this.#dbName, {
+      update: this.name,
+      updates,
+    });
+    const { n, nModified } = await res;
+    return {
+      modifiedCount: nModified,
+      matchedCount: n,
+      upsertedId: null,
+    };
+  }
+  async updateOne(query: any, doc: Document): Promise<Document> {
+    const updates = [{ q: query, u: doc }];
+    return await this.update(updates);
+  }
+  async updateMany(query: any, doc: any): Promise<Document> {
+    const updates: any = [{ q: query, u: doc, multi: true }];
+    return await this.update(updates);
+  }
   async deleteMany(filter: Document, options?: DeleteOptions): Promise<number> {
     const res = await this.#protocol.commandSingle(this.#dbName, {
       delete: this.name,

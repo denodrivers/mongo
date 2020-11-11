@@ -151,15 +151,12 @@ await testWithClient("testFind", async (client) => {
   const user = await users.find();
   assertEquals(user!.length > 0, true);
 });
-// test("testUpdateOne", async () => {
-//   const db = getClient().database("test");
-
-// testWithClient("testUpdateOne", async (client) => {
-//   const db = client.database("test");
-//   const users = db.collection("mongo_test_users");
-//   const result = await users.updateOne({}, { username: "USER1" });
-//   assertEquals(result, { matchedCount: 1, modifiedCount: 1, upsertedId: null });
-// });
+testWithClient("testUpdateOne", async (client) => {
+  const db = client.database("test");
+  const users = db.collection("mongo_test_users");
+  const result = await users.updateOne({}, { username: "USER1" });
+  assertEquals(result, { matchedCount: 1, modifiedCount: 1, upsertedId: null });
+});
 
 testWithClient("testDeleteOne", async (client) => {
   const db = client.database("test");
@@ -235,21 +232,21 @@ testWithClient("testCount", async (client) => {
 //   assertEquals(docs, [{ _id: "many", total: 2 }]);
 // });
 
-// testWithClient("testUpdateMany", async (client) => {
-//   const db = client.database("test");
-//   const users = db.collection("mongo_test_users");
-//   const result = await users.updateMany(
-//     { username: "many" },
-//     { $set: { username: "MANY" } },
-//   );
-//   assertEquals(result, { matchedCount: 2, modifiedCount: 2, upsertedId: null });
-// });
+testWithClient("testUpdateMany", async (client) => {
+  const db = client.database("test");
+  const users = db.collection("mongo_test_users");
+  const result = await users.updateMany(
+    { username: "many" },
+    { $set: { username: "MANY" } },
+  );
+  assertEquals(result, { matchedCount: 2, modifiedCount: 2, upsertedId: null });
+});
 
 testWithClient("testDeleteMany", async (client) => {
   const db = client.database("test");
   const users = db.collection("mongo_test_users");
-  const deleteCount = await users.deleteMany({ username: "many" });
-  // const deleteCount = await users.deleteMany({ username: "MANY" });
+  // const deleteCount = await users.deleteMany({ username: "many" });
+  const deleteCount = await users.deleteMany({ username: "MANY" });
   assertEquals(deleteCount, 2);
 });
 

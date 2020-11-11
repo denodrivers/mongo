@@ -56,7 +56,36 @@ export interface InsertOptions {
    */
   comment?: Document;
 }
+export interface UpdateOptions {
+  /**
+   * An array of one or more update statements to perform on the named collection. For details of the update statements
+   */
+  updates: Document[];
+  /**
+   * Optional. If true, then when an update statement fails, return without performing the remaining update statements. If false, then when an update fails, continue with the remaining update statements, if any. Defaults to true.
+   */
+  ordered?: boolean;
+  /**
+   * Optional. A document expressing the write concern of the update command. Omit to use the default write concern.
 
+   Do not explicitly set the write concern for the operation if run in a transaction. To use write concern with transactions, see Transactions and Write Concern.
+   */
+  writeConcern?: Document;
+  /**
+   * Optional. Enables update to bypass document validation during the operation. This lets you update documents that do not meet the validation requirements.
+   New in version 3.2.
+   */
+  bypassDocumentValidation?: boolean;
+  /**
+   * Optional. A user-provided comment to attach to this command. Once set, this comment appears alongside records of this command in the following locations:
+   *
+   mongod log messages, in the attr.command.cursor.comment field.
+   Database profiler output, in the command.comment field.
+   currentOp output, in the command.comment field.
+   A comment can be any valid BSON type (string, integer, object, array, etc).
+   */
+  comment?: any;
+}
 export interface DeleteOptions {
   /**
    * Optional. If true, then when a delete statement fails, return without performing the remaining delete statements.
