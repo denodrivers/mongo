@@ -157,6 +157,18 @@ testWithClient("testUpdateOne", async (client) => {
   const result = await users.updateOne({}, { username: "USER1" });
   assertEquals(result, { matchedCount: 1, modifiedCount: 1, upsertedId: null });
 });
+testWithClient("testUpdateOneWithUpsert", async (client) => {
+  const db = client.database("test");
+  const users = db.collection("mongo_test_users");
+  const result = await users.updateOne(
+    { username: "user2" },
+    { username: "USER2" },
+    { upsert: true },
+  );
+  assertEquals(result.matchedCount, 0);
+  assertEquals(result.modifiedCount, 1);
+  assertEquals(result.upsertedCount, 1);
+});
 
 testWithClient("testDeleteOne", async (client) => {
   const db = client.database("test");
