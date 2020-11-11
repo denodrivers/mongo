@@ -58,34 +58,55 @@ export interface InsertOptions {
 }
 export interface UpdateOptions {
   /**
-   * An array of one or more update statements to perform on the named collection. For details of the update statements
+   * optional list of array filters referenced in filtered positional operators
    */
-  updates: Document[];
+  arrayFilters?: Document[]
   /**
-   * Optional. If true, then when an update statement fails, return without performing the remaining update statements. If false, then when an update fails, continue with the remaining update statements, if any. Defaults to true.
+   * Specify collation (MongoDB 3.4 or higher) settings for update operation (see 3.4 documentation for available fields).
    */
-  ordered?: boolean;
+  collation?:Document
   /**
-   * Optional. A document expressing the write concern of the update command. Omit to use the default write concern.
-
-   Do not explicitly set the write concern for the operation if run in a transaction. To use write concern with transactions, see Transactions and Write Concern.
+   * Allow driver to bypass schema validation in MongoDB 3.2 or higher
    */
-  writeConcern?: Document;
+  bypassDocumentValidation?: boolean
   /**
-   * Optional. Enables update to bypass document validation during the operation. This lets you update documents that do not meet the validation requirements.
-   New in version 3.2.
+   * An optional hint for query optimization. See the update (https://docs.mongodb.com/manual/reference/command/update/#update-command-hint) command reference for more information.
    */
-  bypassDocumentValidation?: boolean;
+  hint?: Document
   /**
-   * Optional. A user-provided comment to attach to this command. Once set, this comment appears alongside records of this command in the following locations:
-   *
-   mongod log messages, in the attr.command.cursor.comment field.
-   Database profiler output, in the command.comment field.
-   currentOp output, in the command.comment field.
-   A comment can be any valid BSON type (string, integer, object, array, etc).
+   * When true, creates a new document if no document matches the query.
    */
-  comment?: any;
+  upsert?:boolean
+  /**
+   * The write concern
+   */
+  w?: string|number;
+  /**
+   * The write concern timeout.
+   */
+  wtimeout?:number
+  /**
+   * Specify a journal write concern.
+   */
+  j?:boolean
+  /**
+   * If true, will throw if bson documents start with $ or include a . in any key value
+   */
+  checkKeys?: boolean
+  /**
+   * Serialize functions on any object.
+   */
+  serializeFunctions?:boolean
+  /**
+   * Specify if the BSON serializer should ignore undefined fields.
+   */
+  ignoreUndefined?: boolean
+  /**
+   * optional session to use for this operation
+   */
+  // session?: ClientSession
 }
+
 export interface DeleteOptions {
   /**
    * Optional. If true, then when a delete statement fails, return without performing the remaining delete statements.

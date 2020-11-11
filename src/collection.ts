@@ -6,7 +6,7 @@ import {
   DeleteOptions,
   Document,
   FindOptions,
-  InsertOptions,
+  InsertOptions, UpdateOptions,
 } from "./types.ts";
 
 export class Collection<T> {
@@ -101,7 +101,7 @@ export class Collection<T> {
     };
   }
 
-  async update(updates: any) {
+  async update(updates: Document[]) {
     const res = await this.#protocol.commandSingle(this.#dbName, {
       update: this.name,
       updates,
@@ -113,12 +113,12 @@ export class Collection<T> {
       upsertedId: null,
     };
   }
-  async updateOne(query: any, doc: Document): Promise<Document> {
-    const updates = [{ q: query, u: doc }];
+  async updateOne(filter: Document, update: Document,options?: UpdateOptions): Promise<Document> {
+    const updates = [{ q: filter, u: update }];
     return await this.update(updates);
   }
-  async updateMany(query: any, doc: any): Promise<Document> {
-    const updates: any = [{ q: query, u: doc, multi: true }];
+  async updateMany(filter: Document, update: Document,options?:UpdateOptions): Promise<Document> {
+    const updates: any = [{ q: filter, u: update, multi: true }];
     return await this.update(updates);
   }
   async deleteMany(filter: Document, options?: DeleteOptions): Promise<number> {
