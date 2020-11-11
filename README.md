@@ -1,6 +1,6 @@
 # deno_mongo
 
-> **deno_mongo** is a **MongoDB** database driver developed for deno, based on rust's official [`mongodb`](https://crates.io/crates/mongodb) library package.
+> **deno_mongo** is a **MongoDB** database driver developed for deno
 
 [![tag](https://img.shields.io/github/tag/manyuanrong/deno_mongo.svg)](https://github.com/manyuanrong/deno_mongo/releases)
 [![Build Status](https://github.com/manyuanrong/deno_mongo/workflows/ci/badge.svg?branch=master)](https://github.com/manyuanrong/deno_mongo/actions)
@@ -13,14 +13,6 @@
 - [Guides]() TODO
 - [Examples]() TODO
 - [Benchmarks]() TODO
-
-## Important
-
-Because the plug-in API of Deno is still in an unstable state, the `--unstable` flag needs to be used. The minimum permissions required to run deno_mongo should be
-
-```sh
-deno run --allow-net --allow-write --allow-read --allow-plugin --unstable xxx.ts
-```
 
 ## Examples
 
@@ -102,3 +94,11 @@ const skipTwo = await users.skip(2).find();
 // Limit
 const featuredUser = await users.limit(5).find();
 ```
+
+## Contributing
+
+### Command to be implemented
+https://docs.mongodb.com/manual/reference/command/
+
+### API style refer to
+http://mongodb.github.io/node-mongodb-native/3.6/api/
