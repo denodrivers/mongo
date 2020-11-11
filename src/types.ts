@@ -13,6 +13,7 @@ export interface FindOptions {
   findOne?: boolean;
   skip?: number;
   limit?: number;
+  projection?:Document;
 }
 
 export interface ListDatabaseInfo {
@@ -23,7 +24,7 @@ export interface ListDatabaseInfo {
 
 export interface InsertOptions {
   /**
-   * Optional. If true, then when an insert of a document fails, return without inserting any remaining documents listed in the inserts array. 
+   * Optional. If true, then when an insert of a document fails, return without inserting any remaining documents listed in the inserts array.
    * If false, then when an insert of a document fails, continue to insert the remaining documents. Defaults to true.
    */
   ordered?: boolean;

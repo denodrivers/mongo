@@ -133,6 +133,10 @@ testWithClient("testFindOne", async (client) => {
   const query = { test: 1 };
   const findNull = await users.findOne(query);
   assertEquals(findNull, undefined);
+  const projectionUser = await users.findOne({},{projection:{_id:0,username:1}});
+  assertEquals(Object.keys(projectionUser!),["username"]);
+  const projectionUserWithId = await users.findOne({},{projection:{username:1}});
+  assertEquals(Object.keys(projectionUserWithId!),['_id','username']);
 });
 
 // test("testUpdateOne", async () => {

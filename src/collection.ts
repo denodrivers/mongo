@@ -18,6 +18,7 @@ export class Collection<T> {
       filter,
       batchSize: 1,
       noCursorTimeout: true,
+      ...options
     });
     return new Cursor(this.#protocol, {
       ...cursor,
