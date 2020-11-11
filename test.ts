@@ -21,7 +21,6 @@ async function testWithClient(
   });
 }
 
-
 async function getClient(): Promise<MongoClient> {
   const client = new MongoClient();
   await client.connect(`mongodb://${hostName}:27017`);
@@ -135,17 +134,23 @@ await testWithClient("testFindOne", async (client) => {
   const query = { test: 1 };
   const findNull = await users.findOne(query);
   assertEquals(findNull, undefined);
-  const projectionUser = await users.findOne({},{projection:{_id:0,username:1}});
-  assertEquals(Object.keys(projectionUser!),["username"]);
-  const projectionUserWithId = await users.findOne({},{projection:{username:1}});
-  assertEquals(Object.keys(projectionUserWithId!),['_id','username']);
+  const projectionUser = await users.findOne(
+    {},
+    { projection: { _id: 0, username: 1 } },
+  );
+  assertEquals(Object.keys(projectionUser!), ["username"]);
+  const projectionUserWithId = await users.findOne(
+    {},
+    { projection: { username: 1 } },
+  );
+  assertEquals(Object.keys(projectionUserWithId!), ["_id", "username"]);
 });
-await testWithClient("testFind",async (client)=>{
+await testWithClient("testFind", async (client) => {
   const db = client.database("test");
   const users = db.collection<IUser>("mongo_test_users");
   const user = await users.find();
-  assertEquals(user!.length>0,true);
-})
+  assertEquals(user!.length > 0, true);
+});
 // test("testUpdateOne", async () => {
 //   const db = getClient().database("test");
 //   const users = db.collection("mongo_test_users");

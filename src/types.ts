@@ -13,7 +13,7 @@ export interface FindOptions {
   findOne?: boolean;
   skip?: number;
   limit?: number;
-  projection?:Document;
+  projection?: Document;
 }
 
 export interface ListDatabaseInfo {
