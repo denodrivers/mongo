@@ -9,6 +9,15 @@ export interface ConnectOptions {
   [key: string]: any;
 }
 
+export interface CountOptions {
+  limit?: number;
+  skip?: number;
+  hint?: Document | string;
+  comment?: Document;
+  readConcern?: Document;
+  collation?: Document;
+}
+
 export interface FindOptions {
   findOne?: boolean;
   skip?: number;
@@ -65,7 +74,7 @@ export interface DeleteOptions {
   collation?: Document;
 
   /**
-   * Optional. A user-provided comment to attach to this command. 
+   * Optional. A user-provided comment to attach to this command.
    */
   comment?: Document;
 

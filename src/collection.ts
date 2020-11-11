@@ -2,6 +2,7 @@ import { Bson } from "../deps.ts";
 import { Cursor } from "./cursor.ts";
 import { WireProtocol } from "./protocol/mod.ts";
 import {
+  CountOptions,
   DeleteOptions,
   Document,
   FindOptions,
@@ -52,9 +53,18 @@ export class Collection<T> {
     return await cursor.next();
   }
 
-  async count(filter?: Document, options?: FindOptions): Promise<number> {
-    const result = await this.find(filter, options);
-    return result ? result.length : 0;
+  async count(filter?: Document, options?: CountOptions): Promise<number> {
+    const res = await this.#protocol.commandSingle(this.#dbName, {
+      count: this.name,
+      query: filter,
+      ...options,
+    });
+    const { n, ok } = res;
+    if (ok === 1) {
+      return n;
+    } else {
+      return 0;
+    }
   }
 
   async insertOne(doc: Document, options?: InsertOptions) {
