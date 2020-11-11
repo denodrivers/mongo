@@ -53,6 +53,7 @@ export class MongoClient {
     if (this.#conn) {
       Deno.close(this.#conn.rid);
       this.#conn = undefined;
+      this.#protocol = undefined;
     }
   }
 }

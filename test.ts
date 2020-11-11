@@ -52,28 +52,28 @@ testWithClient("testListCollectionNames", async (client) => {
   assertEquals(names, ["startup_log"]);
 });
 
-// test("testInsertOne", async () => {
-//   const db = getClient().database("test");
-//   const users = db.collection<IUser>("mongo_test_users");
-//   const insertId: ObjectId = await users.insertOne({
-//     username: "user1",
-//     password: "pass1",
-//     date: new Date(dateNow),
-//   });
+testWithClient("testInsertOne", async (client) => {
+  const db = client.database("test");
+  const users = db.collection<IUser>("mongo_test_users");
+  const insertId = await users.insertOne({
+    username: "user1",
+    password: "pass1",
+    date: new Date(dateNow),
+  });
 
-//   assertEquals(Object.keys(insertId), ["$oid"]);
+  assertEquals(insertId.toString().length, 24);
 
-//   const user1 = await users.findOne({
-//     _id: ObjectId(insertId.$oid),
-//   });
+  const user1 = await users.findOne({
+    _id: insertId,
+  });
 
-//   assertEquals(user1, {
-//     _id: insertId,
-//     username: "user1",
-//     password: "pass1",
-//     date: new Date(dateNow),
-//   });
-// });
+  assertEquals(user1, {
+    _id: insertId,
+    username: "user1",
+    password: "pass1",
+    date: new Date(dateNow),
+  });
+});
 
 // test("testUpsertOne", async () => {
 //   const db = getClient().database("test");
@@ -128,13 +128,11 @@ testWithClient("testFindOne", async (client) => {
   const db = client.database("test");
   const users = db.collection<IUser>("mongo_test_users");
   const user1 = await users.findOne();
-  console.log(user1);
-  // assert(user1 instanceof Object);
-  // assertEquals(Object.keys(user1), ["_id", "username", "password", "date"]);
+  assertEquals(Object.keys(user1!), ["_id", "username", "password", "date"]);
 
-  // const query = { test: 1 } as any;
-  // const findNull = await users.findOne(query);
-  // assertEquals(findNull, null);
+  const query = { test: 1 };
+  const findNull = await users.findOne(query);
+  assertEquals(findNull, undefined);
 });
 
 // test("testUpdateOne", async () => {
