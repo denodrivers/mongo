@@ -6,7 +6,8 @@ import {
   DeleteOptions,
   Document,
   FindOptions,
-  InsertOptions, UpdateOptions,
+  InsertOptions,
+  UpdateOptions,
 } from "./types.ts";
 
 export class Collection<T> {
@@ -101,24 +102,47 @@ export class Collection<T> {
     };
   }
 
-  async update(updates: Document[]) {
+  private async update(updates: Document[]) {
     const res = await this.#protocol.commandSingle(this.#dbName, {
       update: this.name,
       updates,
     });
-    const { n, nModified } = await res;
+    const { n, nModified, upserted } = await res;
+    if (upserted) {
+      const upsertedCount = upserted.length;
+      const _id = upserted[0]._id;
+      const upsertedId = { _id };
+      return {
+        modifiedCount: n,
+        matchedCount: nModified,
+        upsertedId,
+        upsertedCount,
+      };
+    }
     return {
-      modifiedCount: nModified,
-      matchedCount: n,
+      modifiedCount: n,
+      matchedCount: nModified,
       upsertedId: null,
     };
   }
-  async updateOne(filter: Document, update: Document,options?: UpdateOptions): Promise<Document> {
-    const updates = [{ q: filter, u: update }];
+  async updateOne(
+    filter: Document,
+    update: Document,
+    options?: UpdateOptions,
+  ): Promise<Document> {
+    const updates = [
+      { q: filter, u: update, upsert: options?.upsert ?? false },
+    ];
     return await this.update(updates);
   }
-  async updateMany(filter: Document, update: Document,options?:UpdateOptions): Promise<Document> {
-    const updates: any = [{ q: filter, u: update, multi: true }];
+  async updateMany(
+    filter: Document,
+    update: Document,
+    options?: UpdateOptions,
+  ): Promise<Document> {
+    const updates: any = [
+      { q: filter, u: update, multi: true, upsert: options?.upsert ?? false },
+    ];
     return await this.update(updates);
   }
   async deleteMany(filter: Document, options?: DeleteOptions): Promise<number> {

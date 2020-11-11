@@ -60,47 +60,47 @@ export interface UpdateOptions {
   /**
    * optional list of array filters referenced in filtered positional operators
    */
-  arrayFilters?: Document[]
+  arrayFilters?: Document[];
   /**
    * Specify collation (MongoDB 3.4 or higher) settings for update operation (see 3.4 documentation for available fields).
    */
-  collation?:Document
+  collation?: Document;
   /**
    * Allow driver to bypass schema validation in MongoDB 3.2 or higher
    */
-  bypassDocumentValidation?: boolean
+  bypassDocumentValidation?: boolean;
   /**
    * An optional hint for query optimization. See the update (https://docs.mongodb.com/manual/reference/command/update/#update-command-hint) command reference for more information.
    */
-  hint?: Document
+  hint?: Document;
   /**
    * When true, creates a new document if no document matches the query.
    */
-  upsert?:boolean
+  upsert?: boolean;
   /**
    * The write concern
    */
-  w?: string|number;
+  w?: string | number;
   /**
    * The write concern timeout.
    */
-  wtimeout?:number
+  wtimeout?: number;
   /**
    * Specify a journal write concern.
    */
-  j?:boolean
+  j?: boolean;
   /**
    * If true, will throw if bson documents start with $ or include a . in any key value
    */
-  checkKeys?: boolean
+  checkKeys?: boolean;
   /**
    * Serialize functions on any object.
    */
-  serializeFunctions?:boolean
+  serializeFunctions?: boolean;
   /**
    * Specify if the BSON serializer should ignore undefined fields.
    */
-  ignoreUndefined?: boolean
+  ignoreUndefined?: boolean;
   /**
    * optional session to use for this operation
    */
