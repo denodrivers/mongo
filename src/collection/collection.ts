@@ -1,5 +1,5 @@
-import {Bson} from "../../deps.ts";
-import {WireProtocol} from "../protocol/mod.ts";
+import { Bson } from "../../deps.ts";
+import { WireProtocol } from "../protocol/mod.ts";
 import {
   CountOptions,
   DeleteOptions,
@@ -10,8 +10,8 @@ import {
   InsertOptions,
   UpdateOptions,
 } from "../types.ts";
-import {FindCursor} from "./commands/find.ts";
-import {AggregateCursor} from "./commands/aggregate.ts";
+import { FindCursor } from "./commands/find.ts";
+import { AggregateCursor } from "./commands/aggregate.ts";
 
 export class Collection<T> {
   #protocol: WireProtocol;
@@ -177,7 +177,7 @@ export class Collection<T> {
       distinct: this.name,
       key,
       query,
-      ...options
+      ...options,
     });
     return values;
   }
