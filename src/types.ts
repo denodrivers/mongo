@@ -1,4 +1,4 @@
-import { Bson } from "../deps.ts";
+import {Bson} from "../deps.ts";
 
 export type Document = Bson.Document;
 
@@ -153,4 +153,23 @@ export interface DropOptions {
    * Optional. A user-provided comment to attach to this command.
    */
   comment?: any;
+}
+
+export interface DistinctOptions {
+  /**
+   * The preferred read preference (ReadPreference.PRIMARY, ReadPreference.PRIMARY_PREFERRED, ReadPreference.SECONDARY, ReadPreference.SECONDARY_PREFERRED, ReadPreference.NEAREST).
+   */
+  readPreference?: string;
+  /**
+   * Number of milliseconds to wait before aborting the query.
+   */
+  maxTimeMS?:number;
+  /**
+   * pecify collation settings for operation. See aggregation documentation(https://docs.mongodb.com/manual/reference/command/aggregate).
+   */
+  collation?:Document;
+  /**
+   * optional session to use for this operation
+   */
+  // session?:ClientSession;
 }
