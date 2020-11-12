@@ -86,6 +86,11 @@ export class Collection<T> {
       bypassDocumentValidation: options?.bypassDocumentValidation,
       comment: options?.comment,
     });
+    const { writeErrors } = res;
+    if (writeErrors) {
+      const [{ errmsg }] = writeErrors;
+      throw new Error(errmsg);
+    }
     return {
       insertedIds,
       insertedCount: res.n,
