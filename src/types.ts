@@ -1,4 +1,4 @@
-import {Bson} from "../deps.ts";
+import { Bson } from "../deps.ts";
 
 export type Document = Bson.Document;
 
@@ -163,11 +163,11 @@ export interface DistinctOptions {
   /**
    * Number of milliseconds to wait before aborting the query.
    */
-  maxTimeMS?:number;
+  maxTimeMS?: number;
   /**
    * pecify collation settings for operation. See aggregation documentation(https://docs.mongodb.com/manual/reference/command/aggregate).
    */
-  collation?:Document;
+  collation?: Document;
   /**
    * optional session to use for this operation
    */
