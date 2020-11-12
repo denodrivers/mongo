@@ -164,7 +164,7 @@ testWithClient("testInsertMany", async (client) => {
   assertEquals(insertedIds.length, 2);
 });
 
-await testWithClient("testFind", async (client) => {
+await testWithClient("test chain call for Find", async (client) => {
   const db = client.database("test");
   const users = db.collection<IUser>("mongo_test_users");
   const user = await users
@@ -223,7 +223,7 @@ testWithClient("testFind", async (client) => {
   assert(findUsers instanceof Array);
   assertEquals(findUsers.length, 1);
 
-  const notFound = await users.find({ test: 1 });
+  const notFound = await users.find({ test: 1 }).toArray();
   assertEquals(notFound, []);
 });
 
