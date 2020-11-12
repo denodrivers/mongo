@@ -6,7 +6,7 @@
 [![Build Status](https://github.com/manyuanrong/deno_mongo/workflows/ci/badge.svg?branch=master)](https://github.com/manyuanrong/deno_mongo/actions)
 [![license](https://img.shields.io/github/license/manyuanrong/deno_mongo.svg)](https://github.com/manyuanrong/deno_mongo)
 [![downloads](https://img.shields.io/github/downloads/manyuanrong/deno_mongo/total)](https://github.com/manyuanrong/deno_mongo)
-[![tag](https://img.shields.io/badge/deno-v1.0.5-green.svg)](https://github.com/denoland/deno)
+[![tag](https://img.shields.io/badge/deno-v1.5.2-green.svg)](https://github.com/denoland/deno)
 
 ## Links
 
@@ -17,7 +17,7 @@
 ## Examples
 
 ```ts
-import { MongoClient } from "https://deno.land/x/mongo@v0.11.1/mod.ts";
+import { MongoClient } from "https://deno.land/x/mongo@v1.0.0/mod.ts";
 
 const client = new MongoClient();
 client.connectWithUri("mongodb://localhost:27017");
@@ -52,14 +52,12 @@ const insertIds = await users.insertMany([
 
 // findOne
 const user1 = await users.findOne({ _id: insertId });
-// Returns:
-// { _id: { $oid: "<oid>" }, username: "user1", password: "pass1" }
 
 // find
 const all_users = await users.find({ username: { $ne: null } });
 
 // find by ObjectId
-const user1_id = await users.findOne({ _id: { $oid: "<oid>" } });
+const user1_id = await users.findOne({ _id: "idxxx" });
 
 // count
 const count = await users.count({ username: { $ne: null } });
@@ -98,7 +96,9 @@ const featuredUser = await users.limit(5).find();
 ## Contributing
 
 ### Command to be implemented
+
 https://docs.mongodb.com/manual/reference/command/
 
 ### API style refer to
+
 http://mongodb.github.io/node-mongodb-native/3.6/api/

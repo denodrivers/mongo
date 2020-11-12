@@ -1,2 +1,2 @@
-import { MongoClient } from "./src/client.ts";
-export { MongoClient };
+export { MongoClient } from "./src/client.ts";
+export * from "./src/types.ts";

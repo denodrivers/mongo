@@ -28,7 +28,7 @@ Deno.test({
     "should correctly parse mongodb://localhost:27017test?appname=hello%20world",
   fn() {
     const options = parse(
-      "mongodb://localhost:27017/test?appname=hello%20world"
+      "mongodb://localhost:27017/test?appname=hello%20world",
     );
     assertEquals(options.appname, "hello world");
   },
@@ -39,7 +39,7 @@ Deno.test({
     "should correctly parse mongodb://localhost/?safe=true&readPreference=secondary",
   fn() {
     const options = parse(
-      "mongodb://localhost/?safe=true&readPreference=secondary"
+      "mongodb://localhost/?safe=true&readPreference=secondary",
     );
     assertEquals(options.dbName, "admin");
     assertEquals(options.servers.length, 1);

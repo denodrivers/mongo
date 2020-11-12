@@ -1,10 +1,10 @@
-import { MongoClient } from "../src/client.ts";
+import { MongoClient } from "../mod.ts";
 
 const hostname = "localhost";
 
 export async function testWithClient(
   name: string,
-  fn: (client: MongoClient) => void | Promise<void>
+  fn: (client: MongoClient) => void | Promise<void>,
 ) {
   Deno.test(name, async () => {
     const client = await getClient();
