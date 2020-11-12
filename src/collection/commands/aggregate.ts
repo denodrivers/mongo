@@ -1,13 +1,13 @@
 import { CommandCursor } from "../../protocol/cursor.ts";
 import { WireProtocol } from "../../protocol/protocol.ts";
-import { AggregateCursorOptions, Document } from "../../types.ts";
+import { AggregateOptions, Document } from "../../types.ts";
 
 interface AggregateCursorContext {
   dbName: string;
   collectionName: string;
   protocol: WireProtocol;
   pipeline: Document;
-  options?: AggregateCursorOptions;
+  options?: AggregateOptions;
 }
 
 export class AggregateCursor<T> extends CommandCursor<T> {

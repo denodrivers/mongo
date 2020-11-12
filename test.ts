@@ -1,4 +1,5 @@
 import { MongoClient } from "./src/client.ts";
+import { ObjectId } from "./src/utils/bson.ts";
 import { assert, assertEquals, assertThrowsAsync } from "./test.deps.ts";
 interface IUser {
   username: string;
@@ -76,13 +77,11 @@ await testWithClient("testInsertOne", async (client) => {
   });
 });
 
-// test("testUpsertOne", async () => {
+// testWithClient("testUpsertOne", async (client) => {
 //   const db = client.database("test");
 //   const users = db.collection<IUser>("mongo_test_users");
-//   const { upsertedId } = await users.updateOne(
-//     {
-//       _id: ObjectId("aaaaaaaaaaaaaaaaaaaaaaaa"),
-//     },
+//   const { upserted } = await users.updateOne(
+//     { _id: ("aaaaaaaaaaaaaaaaaaaaaaaa") },
 //     {
 //       username: "user1",
 //       password: "pass1",
@@ -91,15 +90,15 @@ await testWithClient("testInsertOne", async (client) => {
 //     { upsert: true },
 //   );
 
-//   assert(upsertedId);
-//   assertEquals(Object.keys(upsertedId), ["$oid"]);
+//   assert(upserted);
+//   assertEquals(Object.keys(upserted), ["_id"]);
 
 //   const user1 = await users.findOne({
-//     _id: ObjectId(upsertedId.$oid),
+//     _id: upserted,
 //   });
 
 //   assertEquals(user1, {
-//     _id: upsertedId,
+//     _id: upserted,
 //     username: "user1",
 //     password: "pass1",
 //     date: new Date(dateNow),
@@ -192,7 +191,7 @@ testWithClient("testUpdateOneWithUpsert", async (client) => {
   );
   assertEquals(result.matchedCount, 0);
   assertEquals(result.modifiedCount, 1);
-  assertEquals(result.upsertedCount, 1);
+  assertEquals(result.upserted?.length, 1);
 });
 
 testWithClient("testDeleteOne", async (client) => {

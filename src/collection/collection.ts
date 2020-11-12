@@ -94,28 +94,22 @@ export class Collection<T> {
   }
 
   private async update(updates: Document[]) {
-    const { n, nModified, upserted } = await this.#protocol.commandSingle(
+    const { n, nModified, upserted } = await this.#protocol.commandSingle<{
+      ok: number;
+      nModified: number;
+      n: number;
+      upserted?: { index: number; _id: Bson.ObjectID }[];
+    }>(
       this.#dbName,
       {
         update: this.name,
         updates,
       },
     );
-    if (upserted) {
-      const upsertedCount = upserted.length;
-      const _id = upserted[0]._id;
-      const upsertedId = { _id };
-      return {
-        modifiedCount: n,
-        matchedCount: nModified,
-        upsertedId,
-        upsertedCount,
-      };
-    }
     return {
       modifiedCount: n,
       matchedCount: nModified,
-      upsertedId: null,
+      upserted,
     };
   }
 
@@ -123,7 +117,7 @@ export class Collection<T> {
     filter: Document,
     update: Document,
     options?: UpdateOptions,
-  ): Promise<Document> {
+  ) {
     const updates = [
       { q: filter, u: update, upsert: options?.upsert ?? false },
     ];
@@ -134,7 +128,7 @@ export class Collection<T> {
     filter: Document,
     update: Document,
     options?: UpdateOptions,
-  ): Promise<Document> {
+  ) {
     const updates: any = [
       { q: filter, u: update, multi: true, upsert: options?.upsert ?? false },
     ];

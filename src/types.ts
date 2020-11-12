@@ -174,7 +174,7 @@ export interface DistinctOptions {
   // session?:ClientSession;
 }
 
-export interface AggregateCursorOptions {
+export interface AggregateOptions {
   /**
    * The preferred read preference (ReadPreference.PRIMARY, ReadPreference.PRIMARY_PREFERRED, ReadPreference.SECONDARY, ReadPreference.SECONDARY_PREFERRED, ReadPreference.NEAREST).
    */
