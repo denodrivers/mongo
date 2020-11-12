@@ -29,7 +29,7 @@ export class CommandCursor<T> {
     this.#executor = executor;
   }
 
-  private async excute() {
+  private async execute() {
     this.#excuted = true;
     const options = await this.#executor();
     this.#batches = options.firstBatch;
@@ -45,7 +45,7 @@ export class CommandCursor<T> {
     }
 
     if (this.#excuted === false) {
-      await this.excute();
+      await this.execute();
       return this.#batches.shift();
     }
 

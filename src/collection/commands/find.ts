@@ -12,7 +12,7 @@ interface FindCursorContext {
 export class FindCursor<T> extends CommandCursor<T> {
   #context: FindCursorContext;
 
-  private async excutor() {
+  private async executor() {
     const { protocol, filter, dbName, collectionName, options } = this.#context;
     const { cursor } = await protocol.commandSingle(dbName, {
       find: collectionName,
@@ -28,7 +28,7 @@ export class FindCursor<T> extends CommandCursor<T> {
   }
 
   constructor(context: FindCursorContext) {
-    super(context.protocol, () => this.excutor());
+    super(context.protocol, () => this.executor());
     this.#context = context;
   }
 

@@ -1,5 +1,5 @@
 import { Bson } from "../../deps.ts";
-import { CommandCursor, WireProtocol } from "../protocol/mod.ts";
+import { WireProtocol } from "../protocol/mod.ts";
 import {
   CountOptions,
   DeleteOptions,
@@ -11,6 +11,7 @@ import {
   UpdateOptions,
 } from "../types.ts";
 import { FindCursor } from "./commands/find.ts";
+import { AggregateCursor } from "./commands/aggregate.ts";
 
 export class Collection<T> {
   #protocol: WireProtocol;
@@ -176,7 +177,18 @@ export class Collection<T> {
       distinct: this.name,
       key,
       query,
+      ...options,
     });
     return values;
+  }
+
+  aggregate(pipeline: Document[], options?: any): AggregateCursor<T> {
+    return new AggregateCursor<T>({
+      pipeline,
+      protocol: this.#protocol,
+      dbName: this.#dbName,
+      collectionName: this.name,
+      options,
+    });
   }
 }

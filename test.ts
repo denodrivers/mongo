@@ -234,15 +234,15 @@ testWithClient("testCount", async (client) => {
   assertEquals(count, 2);
 });
 
-// testWithClient("testAggregation", async (client) => {
-//   const db = client.database("test");
-//   const users = db.collection("mongo_test_users");
-//   const docs = await users.aggregate([
-//     { $match: { username: "many" } },
-//     { $group: { _id: "$username", total: { $sum: 1 } } },
-//   ]);
-//   assertEquals(docs, [{ _id: "many", total: 2 }]);
-// });
+testWithClient("testAggregation", async (client) => {
+  const db = client.database("test");
+  const users = db.collection("mongo_test_users");
+  const docs = await users.aggregate([
+    { $match: { username: "many" } },
+    { $group: { _id: "$username", total: { $sum: 1 } } },
+  ]).toArray();
+  assertEquals(docs, [{ _id: "many", total: 2 }]);
+});
 
 testWithClient("testUpdateMany", async (client) => {
   const db = client.database("test");
