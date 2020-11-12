@@ -3,6 +3,7 @@ import { CommandCursor, WireProtocol } from "../protocol/mod.ts";
 import {
   CountOptions,
   DeleteOptions,
+  DistinctOptions,
   Document,
   DropOptions,
   FindOptions,
@@ -85,6 +86,11 @@ export class Collection<T> {
       bypassDocumentValidation: options?.bypassDocumentValidation,
       comment: options?.comment,
     });
+    const { writeErrors } = res;
+    if (writeErrors) {
+      const [{ errmsg }] = writeErrors;
+      throw new Error(errmsg);
+    }
     return {
       insertedIds,
       insertedCount: res.n,
@@ -168,5 +174,14 @@ export class Collection<T> {
       drop: this.name,
       ...options,
     });
+  }
+
+  async distinct(key: string, query?: Document, options?: DistinctOptions) {
+    const { values } = await this.#protocol.commandSingle(this.#dbName, {
+      distinct: this.name,
+      key,
+      query,
+    });
+    return values;
   }
 }
