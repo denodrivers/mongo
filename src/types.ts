@@ -58,49 +58,72 @@ export interface InsertOptions {
 }
 export interface UpdateOptions {
   /**
+   * Optional. A document expressing the write concern of the update command. Omit to use the default write concern.
+   */
+  writeConcern?: Document;
+
+  /**
+   * 	Optional. If true, then when an update statement fails, return without performing the remaining update statements.
+   *  If false, then when an update fails, continue with the remaining update statements, if any. Defaults to true.
+   */
+  ordered?: boolean;
+
+  /**
+   * 	Optional. If true, updates all documents that meet the query criteria.
+   *  If false, limit the update to one document that meet the query criteria. Defaults to false.
+   */
+  multi?: boolean;
+
+  /**
    * optional list of array filters referenced in filtered positional operators
    */
   arrayFilters?: Document[];
+
   /**
    * Specify collation (MongoDB 3.4 or higher) settings for update operation (see 3.4 documentation for available fields).
    */
   collation?: Document;
+
   /**
    * Allow driver to bypass schema validation in MongoDB 3.2 or higher
    */
   bypassDocumentValidation?: boolean;
+
   /**
    * An optional hint for query optimization. See the update (https://docs.mongodb.com/manual/reference/command/update/#update-command-hint) command reference for more information.
    */
   hint?: Document;
+
   /**
    * When true, creates a new document if no document matches the query.
    */
   upsert?: boolean;
-  /**
-   * The write concern
-   */
-  w?: string | number;
+
   /**
    * The write concern timeout.
    */
   wtimeout?: number;
-  /**
-   * Specify a journal write concern.
-   */
-  j?: boolean;
+
   /**
    * If true, will throw if bson documents start with $ or include a . in any key value
    */
   checkKeys?: boolean;
+
   /**
    * Serialize functions on any object.
    */
   serializeFunctions?: boolean;
+
   /**
    * Specify if the BSON serializer should ignore undefined fields.
    */
   ignoreUndefined?: boolean;
+
+  /**
+   * Optional. A user-provided comment to attach to this command.
+   */
+  comment?: Document;
+
   /**
    * optional session to use for this operation
    */

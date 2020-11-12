@@ -12,6 +12,7 @@ import {
 } from "../types.ts";
 import { FindCursor } from "./commands/find.ts";
 import { AggregateCursor } from "./commands/aggregate.ts";
+import { update } from "./commands/update.ts";
 
 export class Collection<T> {
   #protocol: WireProtocol;
@@ -93,46 +94,33 @@ export class Collection<T> {
     };
   }
 
-  private async update(updates: Document[]) {
-    const { n, nModified, upserted } = await this.#protocol.commandSingle<{
-      ok: number;
-      nModified: number;
-      n: number;
-      upserted?: { index: number; _id: Bson.ObjectID }[];
-    }>(
-      this.#dbName,
-      {
-        update: this.name,
-        updates,
-      },
-    );
+  async updateOne(filter: Document, update: Document, options?: UpdateOptions) {
+    const {
+      upsertedIds = [],
+      upsertedCount,
+      matchedCount,
+      modifiedCount,
+    } = await this.updateMany(filter, update, {
+      ...options,
+      multi: false,
+    });
     return {
-      modifiedCount: n,
-      matchedCount: nModified,
-      upserted,
+      upsertedId: upsertedIds ? upsertedIds[0] : undefined,
+      upsertedCount,
+      matchedCount,
+      modifiedCount,
     };
   }
 
-  async updateOne(
-    filter: Document,
-    update: Document,
-    options?: UpdateOptions,
-  ) {
-    const updates = [
-      { q: filter, u: update, upsert: options?.upsert ?? false },
-    ];
-    return await this.update(updates);
-  }
-
-  async updateMany(
-    filter: Document,
-    update: Document,
-    options?: UpdateOptions,
-  ) {
-    const updates: any = [
-      { q: filter, u: update, multi: true, upsert: options?.upsert ?? false },
-    ];
-    return await this.update(updates);
+  async updateMany(filter: Document, doc: Document, options?: UpdateOptions) {
+    return await update(
+      this.#protocol,
+      this.#dbName,
+      this.name,
+      filter,
+      doc,
+      options,
+    );
   }
 
   async deleteMany(filter: Document, options?: DeleteOptions): Promise<number> {

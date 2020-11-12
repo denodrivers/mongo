@@ -13,7 +13,7 @@ const hostName = "localhost";
 
 async function testWithClient(
   name: string,
-  fn: (client: MongoClient) => void | Promise<void>,
+  fn: (client: MongoClient) => void | Promise<void>
 ) {
   test(name, async () => {
     const client = await getClient();
@@ -77,50 +77,49 @@ await testWithClient("testInsertOne", async (client) => {
   });
 });
 
-// testWithClient("testUpsertOne", async (client) => {
-//   const db = client.database("test");
-//   const users = db.collection<IUser>("mongo_test_users");
-//   const { upserted } = await users.updateOne(
-//     { _id: ("aaaaaaaaaaaaaaaaaaaaaaaa") },
-//     {
-//       username: "user1",
-//       password: "pass1",
-//       date: new Date(dateNow),
-//     },
-//     { upsert: true },
-//   );
+testWithClient("testUpsertOne", async (client) => {
+  const db = client.database("test");
+  const users = db.collection<IUser>("mongo_test_users");
+  const { upsertedId } = await users.updateOne(
+    { _id: "aaaaaaaaaaaaaaaaaaaaaaaa" },
+    {
+      username: "user1",
+      password: "pass1",
+      date: new Date(dateNow),
+    },
+    { upsert: true }
+  );
 
-//   assert(upserted);
-//   assertEquals(Object.keys(upserted), ["_id"]);
+  assert(upsertedId);
 
-//   const user1 = await users.findOne({
-//     _id: upserted,
-//   });
+  const user1 = await users.findOne({
+    _id: upsertedId,
+  });
 
-//   assertEquals(user1, {
-//     _id: upserted,
-//     username: "user1",
-//     password: "pass1",
-//     date: new Date(dateNow),
-//   });
-// });
+  assertEquals(user1, {
+    _id: upsertedId,
+    username: "user1",
+    password: "pass1",
+    date: new Date(dateNow),
+  });
+});
 
 testWithClient("testInsertOneTwice", async (client) => {
   const db = client.database("test");
   const users = db.collection<IUser>("mongo_test_users_2");
   await users.insertOne({
-    _id: ("aaaaaaaaaaaaaaaaaaaaaaaa"),
+    _id: "aaaaaaaaaaaaaaaaaaaaaaaa",
     username: "user1",
   });
 
   await assertThrowsAsync(
     () =>
       users.insertOne({
-        _id: ("aaaaaaaaaaaaaaaaaaaaaaaa"),
+        _id: "aaaaaaaaaaaaaaaaaaaaaaaa",
         username: "user1",
       }) as any,
     undefined,
-    "E11000",
+    "E11000"
   );
 });
 
@@ -135,12 +134,12 @@ await testWithClient("testFindOne", async (client) => {
   assertEquals(findNull, undefined);
   const projectionUser = await users.findOne(
     {},
-    { projection: { _id: 0, username: 1 } },
+    { projection: { _id: 0, username: 1 } }
   );
   assertEquals(Object.keys(projectionUser!), ["username"]);
   const projectionUserWithId = await users.findOne(
     {},
-    { projection: { username: 1 } },
+    { projection: { username: 1 } }
   );
   assertEquals(Object.keys(projectionUserWithId!), ["_id", "username"]);
 });
@@ -166,11 +165,7 @@ testWithClient("testInsertMany", async (client) => {
 await testWithClient("test chain call for Find", async (client) => {
   const db = client.database("test");
   const users = db.collection<IUser>("mongo_test_users");
-  const user = await users
-    .find()
-    .skip(1)
-    .limit(1)
-    .toArray();
+  const user = await users.find().skip(1).limit(1).toArray();
   assertEquals(user!.length > 0, true);
 });
 
@@ -178,7 +173,12 @@ testWithClient("testUpdateOne", async (client) => {
   const db = client.database("test");
   const users = db.collection("mongo_test_users");
   const result = await users.updateOne({}, { username: "USER1" });
-  assertEquals(result, { matchedCount: 1, modifiedCount: 1, upsertedId: null });
+  assertEquals(result, {
+    matchedCount: 1,
+    modifiedCount: 1,
+    upsertedCount: 0,
+    upsertedId: undefined,
+  });
 });
 
 testWithClient("testUpdateOneWithUpsert", async (client) => {
@@ -187,11 +187,11 @@ testWithClient("testUpdateOneWithUpsert", async (client) => {
   const result = await users.updateOne(
     { username: "user2" },
     { username: "USER2" },
-    { upsert: true },
+    { upsert: true }
   );
-  assertEquals(result.matchedCount, 0);
-  assertEquals(result.modifiedCount, 1);
-  assertEquals(result.upserted?.length, 1);
+  assertEquals(result.matchedCount, 1);
+  assertEquals(result.modifiedCount, 0);
+  assertEquals(result.upsertedCount, 1);
 });
 
 testWithClient("testDeleteOne", async (client) => {
@@ -210,7 +210,7 @@ testWithClient("testFindOr", async (client) => {
     })
     .toArray();
   assert(user1 instanceof Array);
-  assertEquals(user1.length, 2);
+  assertEquals(user1.length, 3);
 });
 
 testWithClient("testFind", async (client) => {
@@ -236,10 +236,12 @@ testWithClient("testCount", async (client) => {
 testWithClient("testAggregation", async (client) => {
   const db = client.database("test");
   const users = db.collection("mongo_test_users");
-  const docs = await users.aggregate([
-    { $match: { username: "many" } },
-    { $group: { _id: "$username", total: { $sum: 1 } } },
-  ]).toArray();
+  const docs = await users
+    .aggregate([
+      { $match: { username: "many" } },
+      { $group: { _id: "$username", total: { $sum: 1 } } },
+    ])
+    .toArray();
   assertEquals(docs, [{ _id: "many", total: 2 }]);
 });
 
@@ -248,23 +250,28 @@ testWithClient("testUpdateMany", async (client) => {
   const users = db.collection("mongo_test_users");
   const result = await users.updateMany(
     { username: "many" },
-    { $set: { username: "MANY" } },
+    { $set: { username: "MANY" } }
   );
-  assertEquals(result, { matchedCount: 2, modifiedCount: 2, upsertedId: null });
+  assertEquals(result, {
+    matchedCount: 1,
+    modifiedCount: 1,
+    upsertedCount: 0,
+    upsertedIds: undefined,
+  });
 });
 
 testWithClient("testDeleteMany", async (client) => {
   const db = client.database("test");
   const users = db.collection("mongo_test_users");
   const deleteCount = await users.deleteMany({ username: "MANY" });
-  assertEquals(deleteCount, 2);
+  assertEquals(deleteCount, 1);
 });
 
 testWithClient("testDistinct", async (client) => {
   const db = client.database("test");
   const users = db.collection<IUser>("mongo_test_users");
   const user1 = await users.distinct("username");
-  assertEquals(user1, ["USER2"]);
+  assertEquals(user1, ["USER2", "many", "user1"]);
 });
 
 // // TODO mongdb_rust official library has not implemented this feature
