@@ -173,3 +173,70 @@ export interface DistinctOptions {
    */
   // session?:ClientSession;
 }
+
+export interface AggregateCursorOptions {
+  /**
+   * The preferred read preference (ReadPreference.PRIMARY, ReadPreference.PRIMARY_PREFERRED, ReadPreference.SECONDARY, ReadPreference.SECONDARY_PREFERRED, ReadPreference.NEAREST).
+   */
+  readPreference?: string;
+  /**
+   * @default 1000
+   * The number of documents to return per batch. See aggregation documentation(https://docs.mongodb.com/manual/reference/command/aggregate).
+   */
+  batchSize?: number;
+  /**
+   * @default false
+   * Explain returns the aggregation execution plan (requires mongodb 2.6 >).
+   */
+  explain?: boolean;
+  /**
+   * @default false
+   * allowDiskUse lets the server know if it can use disk to store temporary results for the aggregation (requires mongodb 2.6 >).
+   */
+  allowDiskUse?: boolean;
+  /**
+   * maxTimeMS specifies a cumulative time limit in milliseconds for processing operations on the cursor. MongoDB interrupts the operation at the earliest following interrupt point.
+   */
+  maxTimeMS?: number;
+  /**
+   * @default false
+   * Allow driver to bypass schema validation in MongoDB 3.2 or higher.
+   */
+  bypassDocumentValidation?: boolean;
+  /**
+   * @default false
+   *Return document results as raw BSON buffers.
+   */
+  raw?: boolean;
+  /**
+   * @default true
+   * Promotes Long values to number if they fit inside the 53 bits resolution.
+   */
+  promoteLongs?: boolean;
+  /**
+   * @default true
+   * Promotes BSON values to native types where possible, set to false to only receive wrapper types.
+   */
+  promoteValues?: boolean;
+  /**
+   * @default false
+   * Promotes Binary BSON values to native Node Buffers.
+   */
+  promoteBuffers?: boolean;
+  /**
+   * Specify collation settings for operation. See aggregation documentation(https://docs.mongodb.com/manual/reference/command/aggregate).
+   */
+  collation?: Document;
+  /**
+   * Add a comment to an aggregation command
+   */
+  comment?: string;
+  /**
+   * Add an index selection hint to an aggregation command
+   */
+  hint?: string | Document;
+  /**
+   * optional session to use for this operation
+   */
+  // session?:ClientSession;
+}
