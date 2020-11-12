@@ -1,7 +1,7 @@
-import { Bson } from "../deps.ts";
-import { WireProtocol } from "./protocol/mod.ts";
-import { Document } from "./types.ts";
-import { parseNamespace } from "./utils/ns.ts";
+import { Bson } from "../../deps.ts";
+import { WireProtocol } from "./protocol.ts";
+import { Document } from "../types.ts";
+import { parseNamespace } from "../utils/ns.ts";
 
 export interface CommandCursorOptions<T> {
   id: bigint | number | string;
@@ -93,5 +93,3 @@ export class CommandCursor<T> {
     return this.map((item) => item);
   }
 }
-
-export class Cursor<T> extends CommandCursor<T> {}

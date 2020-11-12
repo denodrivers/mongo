@@ -1,6 +1,5 @@
-import { Collection } from "./collection.ts";
-import { CommandCursor, Cursor } from "./cursor.ts";
-import { WireProtocol } from "./protocol/mod.ts";
+import { Collection } from "./collection/mod.ts";
+import { CommandCursor, WireProtocol } from "./protocol/mod.ts";
 import { Document } from "./types.ts";
 
 interface ListCollectionsReponse {

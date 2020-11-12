@@ -1,4 +1,4 @@
-import { WireProtocol } from "./mod.ts";
+import { WireProtocol } from "./protocol.ts";
 
 export const driverMetadata = {
   driver: {

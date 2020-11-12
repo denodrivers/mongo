@@ -1,6 +1,5 @@
-import { Bson } from "../deps.ts";
-import { Cursor } from "./cursor.ts";
-import { WireProtocol } from "./protocol/mod.ts";
+import { Bson } from "../../deps.ts";
+import { CommandCursor, WireProtocol } from "../protocol/mod.ts";
 import {
   CountOptions,
   DeleteOptions,
@@ -9,7 +8,7 @@ import {
   FindOptions,
   InsertOptions,
   UpdateOptions,
-} from "./types.ts";
+} from "../types.ts";
 
 export class Collection<T> {
   #protocol: WireProtocol;
@@ -20,8 +19,8 @@ export class Collection<T> {
     this.#dbName = dbName;
   }
 
-  find(filter?: Document, options?: FindOptions): Cursor<T> {
-    return new Cursor<T>(this.#protocol, async () => {
+  find(filter?: Document, options?: FindOptions): CommandCursor<T> {
+    return new CommandCursor<T>(this.#protocol, async () => {
       const { cursor } = await this.#protocol.commandSingle(this.#dbName, {
         find: this.name,
         filter,
