@@ -146,10 +146,32 @@ await testWithClient("testFindOne", async (client) => {
   assertEquals(Object.keys(projectionUserWithId!), ["_id", "username"]);
 });
 
+testWithClient("testInsertMany", async (client) => {
+  const db = client.database("test");
+  const users = db.collection("mongo_test_users");
+  const { insertedCount, insertedIds } = await users.insertMany([
+    {
+      username: "many",
+      password: "pass1",
+    },
+    {
+      username: "many",
+      password: "pass2",
+    },
+  ]);
+
+  assertEquals(insertedCount, 2);
+  assertEquals(insertedIds.length, 2);
+});
+
 await testWithClient("testFind", async (client) => {
   const db = client.database("test");
   const users = db.collection<IUser>("mongo_test_users");
-  const user = await (await users.find()).toArray();
+  const user = await users
+    .find()
+    .skip(1)
+    .limit(1)
+    .toArray();
   assertEquals(user!.length > 0, true);
 });
 
@@ -178,24 +200,6 @@ testWithClient("testDeleteOne", async (client) => {
   const users = db.collection("mongo_test_users");
   const deleteCount = await users.deleteOne({});
   assertEquals(deleteCount, 1);
-});
-
-testWithClient("testInsertMany", async (client) => {
-  const db = client.database("test");
-  const users = db.collection("mongo_test_users");
-  const { insertedCount, insertedIds } = await users.insertMany([
-    {
-      username: "many",
-      password: "pass1",
-    },
-    {
-      username: "many",
-      password: "pass2",
-    },
-  ]);
-
-  assertEquals(insertedCount, 2);
-  assertEquals(insertedIds.length, 2);
 });
 
 testWithClient("testFindOr", async (client) => {
@@ -276,6 +280,6 @@ testWithClient("testDistinct", async (client) => {
 
 testWithClient("testDropConnection", async (client) => {
   const db = client.database("test");
-  // await db.collection("mongo_test_users_2").drop();
+  await db.collection("mongo_test_users_2").drop();
   await db.collection("mongo_test_users").drop();
 });

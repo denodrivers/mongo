@@ -10,6 +10,7 @@ import {
   InsertOptions,
   UpdateOptions,
 } from "../types.ts";
+import { FindCursor } from "./commands/find.ts";
 
 export class Collection<T> {
   #protocol: WireProtocol;
@@ -20,19 +21,13 @@ export class Collection<T> {
     this.#dbName = dbName;
   }
 
-  find(filter?: Document, options?: FindOptions): CommandCursor<T> {
-    return new CommandCursor<T>(this.#protocol, async () => {
-      const { cursor } = await this.#protocol.commandSingle(this.#dbName, {
-        find: this.name,
-        filter,
-        batchSize: 1,
-        noCursorTimeout: true,
-        ...options,
-      });
-      return {
-        ...cursor,
-        id: cursor.id.toString(),
-      };
+  find(filter?: Document, options?: FindOptions): FindCursor<T> {
+    return new FindCursor<T>({
+      filter,
+      protocol: this.#protocol,
+      collectionName: this.name,
+      dbName: this.#dbName,
+      options: options ?? {},
     });
   }
 
