@@ -13,7 +13,7 @@ const hostName = "localhost";
 
 async function testWithClient(
   name: string,
-  fn: (client: MongoClient) => void | Promise<void>
+  fn: (client: MongoClient) => void | Promise<void>,
 ) {
   test(name, async () => {
     const client = await getClient();
@@ -87,7 +87,7 @@ testWithClient("testUpsertOne", async (client) => {
       password: "pass1",
       date: new Date(dateNow),
     },
-    { upsert: true }
+    { upsert: true },
   );
 
   assert(upsertedId);
@@ -119,7 +119,7 @@ testWithClient("testInsertOneTwice", async (client) => {
         username: "user1",
       }) as any,
     undefined,
-    "E11000"
+    "E11000",
   );
 });
 
@@ -134,12 +134,12 @@ await testWithClient("testFindOne", async (client) => {
   assertEquals(findNull, undefined);
   const projectionUser = await users.findOne(
     {},
-    { projection: { _id: 0, username: 1 } }
+    { projection: { _id: 0, username: 1 } },
   );
   assertEquals(Object.keys(projectionUser!), ["username"]);
   const projectionUserWithId = await users.findOne(
     {},
-    { projection: { username: 1 } }
+    { projection: { username: 1 } },
   );
   assertEquals(Object.keys(projectionUserWithId!), ["_id", "username"]);
 });
@@ -187,7 +187,7 @@ testWithClient("testUpdateOneWithUpsert", async (client) => {
   const result = await users.updateOne(
     { username: "user2" },
     { username: "USER2" },
-    { upsert: true }
+    { upsert: true },
   );
   assertEquals(result.matchedCount, 1);
   assertEquals(result.modifiedCount, 0);
@@ -250,7 +250,7 @@ testWithClient("testUpdateMany", async (client) => {
   const users = db.collection("mongo_test_users");
   const result = await users.updateMany(
     { username: "many" },
-    { $set: { username: "MANY" } }
+    { $set: { username: "MANY" } },
   );
   assertEquals(result, {
     matchedCount: 1,
