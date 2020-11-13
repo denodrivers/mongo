@@ -263,3 +263,54 @@ export interface AggregateOptions {
    */
   // session?:ClientSession;
 }
+
+export interface CreateUserOptions {
+  /**
+   * The name of the new user.
+   */
+  username?: string;
+
+  /**
+   * The user’s password. The pwd field is not required if you run createUser on the $external database to create users who have credentials stored externally to MongoDB.
+   */
+  password?: string;
+
+  /**
+   * Optional. Any arbitrary information. This field can be used to store any data an admin wishes to associate with this particular user. For example, this could be the user’s full name or employee id.
+   */
+  customData?: Document;
+
+  /**
+   * The roles granted to the user. Can specify an empty array [] to create users without roles.
+   */
+  roles?: (string | {
+    role: string;
+    db: string;
+  })[];
+
+  /**
+   * Optional. Indicates whether the server or the client digests the password.
+   * See https://docs.mongodb.com/manual/reference/command/createUser/#dbcmd.createUser
+   */
+  digestPassword?: boolean;
+
+  /**
+   * Optional. The level of write concern for the creation operation. The writeConcern document takes the same fields as the getLastError command.
+   */
+  writeConcern?: Document;
+
+  /**
+   * Optional. The authentication restrictions the server enforces on the created user. Specifies a list of IP addresses and CIDR ranges from which the user is allowed to connect to the server or from which the server can accept users.
+   */
+  authenticationRestrictions?: Document[];
+
+  /**
+   * Optional. Specify the specific SCRAM mechanism or mechanisms for creating SCRAM user credentials.
+   */
+  mechanisms?: ("SCRAM-SHA-1" | "SCRAM-SHA-256")[];
+
+  /**
+   * Optional. A user-provided comment to attach to this command.
+   */
+  comment?: Document;
+}

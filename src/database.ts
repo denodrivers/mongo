@@ -1,6 +1,6 @@
 import { Collection } from "./collection/mod.ts";
 import { CommandCursor, WireProtocol } from "./protocol/mod.ts";
-import { Document } from "./types.ts";
+import { CreateUserOptions, Document } from "./types.ts";
 
 interface ListCollectionsReponse {
   cursor: {
@@ -75,5 +75,34 @@ export class Database {
       names.push(item!.name);
     }
     return names;
+  }
+
+  async createUser(
+    username: string,
+    password: string,
+    options?: CreateUserOptions,
+  ) {
+    await this.#protocol.commandSingle(this.name, {
+      createUser: options?.username ?? username,
+      pwd: options?.password ?? password,
+      customData: options?.customData,
+      roles: options?.roles ?? [],
+      writeConcern: options?.writeConcern,
+      authenticationRestrictions: options?.authenticationRestrictions,
+      mechanisms: options?.mechanisms,
+      digestPassword: options?.digestPassword,
+      comment: options?.comment,
+    });
+  }
+
+  async dropUser(username: string, options?: {
+    writeConcern?: Document;
+    comment?: Document;
+  }) {
+    await this.#protocol.commandSingle(this.name, {
+      dropUser: username,
+      writeConcern: options?.writeConcern,
+      comment: options?.comment,
+    });
   }
 }
