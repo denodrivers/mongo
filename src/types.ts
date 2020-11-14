@@ -6,6 +6,7 @@ export interface ConnectOptions {
   servers: {
     host: string;
     port: number;
+    domain_socket?: string;
   }[];
   dbName?: string;
   [key: string]: any;
