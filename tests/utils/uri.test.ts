@@ -69,5 +69,17 @@ Deno.test({
     assertEquals(options.auth.password, "foobar");
   },
 });
+
+Deno.test({
+  name: "should correctly parse mongodb://fred:foo%20bar@localhost/baz",
+  fn() {
+    const options = parse("mongodb://fred:foo%20bar@localhost/baz");
+    assertEquals(options.dbName, "baz");
+    assertEquals(options.servers.length, 1);
+    assertEquals(options.servers[0].host, "localhost");
+    assertEquals(options.auth.user, "fred");
+    assertEquals(options.auth.password, "foo bar");
+  },
+});
 //mongodb+srv://crawler:8yGYXY9PdNtMVVp@sandbox.r3evj.mongodb.net/?retryWrites=true&w=majority
 // TODO: add more tests (https://github.com/mongodb/node-mongodb-native/blob/3.6/test/functional/url_parser.test.js)

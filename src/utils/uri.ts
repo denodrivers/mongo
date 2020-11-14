@@ -2,15 +2,15 @@
 import { ConnectOptions } from "../types.ts";
 
 export function parse(uri: string): ConnectOptions {
-  const uriObject = new URL(uri);
+  const uriObject = new URL(decodeURIComponent(uri));
   const search: { [key: string]: any } = {};
   uriObject.searchParams.forEach((val, key) => {
     search[key] = val;
   });
   const dbName = uriObject.pathname.slice(1) || "admin";
   const auth = {
-    user: uriObject.username,
-    password: uriObject.password,
+    user: decodeURIComponent(uriObject.username),
+    password: decodeURIComponent(uriObject.password),
   };
   return {
     servers: [
