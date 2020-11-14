@@ -7,6 +7,11 @@ export function parse(uri: string): ConnectOptions {
   uriObject.searchParams.forEach((val, key) => {
     search[key] = val;
   });
+  const dbName = uriObject.pathname.slice(1) || "admin";
+  const auth = {
+    user: uriObject.username,
+    password: uriObject.password,
+  };
   return {
     servers: [
       {
@@ -14,7 +19,8 @@ export function parse(uri: string): ConnectOptions {
         port: parseInt(uriObject.port) || 27017,
       },
     ],
-    dbName: "admin",
+    dbName,
+    auth,
     ...search,
   };
 }
