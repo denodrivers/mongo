@@ -58,5 +58,80 @@ Deno.test({
     assertEquals(options.servers[0].port, 28101);
   },
 });
+Deno.test({
+  name: "should correctly parse mongodb://fred:foobar@localhost/baz",
+  fn() {
+    const options = parse("mongodb://fred:foobar@localhost/baz");
+    assertEquals(options.dbName, "baz");
+    assertEquals(options.servers.length, 1);
+    assertEquals(options.servers[0].host, "localhost");
+    assertEquals(options.auth!.user, "fred");
+    assertEquals(options.auth!.password, "foobar");
+  },
+});
 
+Deno.test({
+  name: "should correctly parse mongodb://fred:foo%20bar@localhost/baz",
+  fn() {
+    const options = parse("mongodb://fred:foo%20bar@localhost/baz");
+    assertEquals(options.dbName, "baz");
+    assertEquals(options.servers.length, 1);
+    assertEquals(options.servers[0].host, "localhost");
+    assertEquals(options.auth!.user, "fred");
+    assertEquals(options.auth!.password, "foo bar");
+  },
+});
+
+Deno.test({
+  name: "should correctly parse mongodb://%2Ftmp%2Fmongodb-27017.sock",
+  fn() {
+    const options = parse("mongodb://%2Ftmp%2Fmongodb-27017.sock");
+    assertEquals(options.servers.length, 1);
+    assertEquals(options.servers[0].domainSocket, "/tmp/mongodb-27017.sock");
+    assertEquals(options.dbName, "admin");
+  },
+});
+
+Deno.test({
+  name: "should correctly parse mongodb://fred:foo@%2Ftmp%2Fmongodb-27017.sock",
+  fn() {
+    const options = parse("mongodb://fred:foo@%2Ftmp%2Fmongodb-27017.sock");
+    assertEquals(options.servers.length, 1);
+    assertEquals(options.servers[0].domainSocket, "/tmp/mongodb-27017.sock");
+    assertEquals(options.auth!.user, "fred");
+    assertEquals(options.auth!.password, "foo");
+    assertEquals(options.dbName, "admin");
+  },
+});
+
+Deno.test({
+  name:
+    "should correctly parse mongodb://fred:foo@%2Ftmp%2Fmongodb-27017.sock/somedb",
+  fn() {
+    const options = parse(
+      "mongodb://fred:foo@%2Ftmp%2Fmongodb-27017.sock/somedb",
+    );
+    assertEquals(options.servers.length, 1);
+    assertEquals(options.servers[0].domainSocket, "/tmp/mongodb-27017.sock");
+    assertEquals(options.auth!.user, "fred");
+    assertEquals(options.auth!.password, "foo");
+    assertEquals(options.dbName, "somedb");
+  },
+});
+
+Deno.test({
+  name:
+    "should correctly parse mongodb://fred:foo@%2Ftmp%2Fmongodb-27017.sock/somedb?safe=true",
+  fn() {
+    const options = parse(
+      "mongodb://fred:foo@%2Ftmp%2Fmongodb-27017.sock/somedb?safe=true",
+    );
+    assertEquals(options.servers.length, 1);
+    assertEquals(options.servers[0].domainSocket, "/tmp/mongodb-27017.sock");
+    assertEquals(options.auth!.user, "fred");
+    assertEquals(options.auth!.password, "foo");
+    assertEquals(options.dbName, "somedb");
+    assertEquals(options.safe, "true");
+  },
+});
 // TODO: add more tests (https://github.com/mongodb/node-mongodb-native/blob/3.6/test/functional/url_parser.test.js)

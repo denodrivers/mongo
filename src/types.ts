@@ -6,7 +6,12 @@ export interface ConnectOptions {
   servers: {
     host: string;
     port: number;
+    domainSocket?: string;
   }[];
+  auth?: {
+    user: string;
+    password: string;
+  };
   dbName?: string;
   [key: string]: any;
 }
