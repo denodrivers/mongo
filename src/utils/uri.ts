@@ -26,17 +26,28 @@ export function parse(uri: string): ConnectOptions {
     ...search,
   };
 
+  function isSock(pathname: string, sockFlag: string) {
+    return pathname.includes(sockFlag);
+  }
+
   function getDomainSocket() {
-    if (uriObject.pathname.endsWith(".sock")) {
-      return decodeURIComponent(uriObject.pathname);
+    const pathname = uriObject.pathname;
+    const sockFlag = ".sock";
+    if (isSock(pathname, sockFlag)) {
+      const index = pathname.indexOf(sockFlag);
+      return decodeURIComponent(pathname.slice(0, index + 5));
     }
     return "";
   }
 
   function getDbName() {
-    if (uriObject.pathname.endsWith(".sock")) {
-      return "admin";
+    const defaultDbName = "admin";
+    const pathname = uriObject.pathname;
+    const sockFlag = ".sock";
+    if (isSock(pathname, sockFlag)) {
+      const index = pathname.indexOf(sockFlag) + sockFlag.length + 1;
+      return pathname.slice(index) || defaultDbName;
     }
-    return uriObject.pathname.slice(1) || "admin";
+    return pathname.slice(1) || defaultDbName;
   }
 }
