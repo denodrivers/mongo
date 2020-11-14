@@ -65,8 +65,8 @@ Deno.test({
     assertEquals(options.dbName, "baz");
     assertEquals(options.servers.length, 1);
     assertEquals(options.servers[0].host, "localhost");
-    assertEquals(options.auth.user, "fred");
-    assertEquals(options.auth.password, "foobar");
+    assertEquals(options.auth!.user, "fred");
+    assertEquals(options.auth!.password, "foobar");
   },
 });
 
@@ -77,8 +77,8 @@ Deno.test({
     assertEquals(options.dbName, "baz");
     assertEquals(options.servers.length, 1);
     assertEquals(options.servers[0].host, "localhost");
-    assertEquals(options.auth.user, "fred");
-    assertEquals(options.auth.password, "foo bar");
+    assertEquals(options.auth!.user, "fred");
+    assertEquals(options.auth!.password, "foo bar");
   },
 });
 
@@ -88,6 +88,18 @@ Deno.test({
     const options = parse("mongodb://%2Ftmp%2Fmongodb-27017.sock");
     assertEquals(options.servers.length, 1);
     assertEquals(options.servers[0].domain_socket, "/tmp/mongodb-27017.sock");
+    assertEquals(options.dbName, "admin");
+  },
+});
+
+Deno.test({
+  name: "should correctly parse mongodb://fred:foo@%2Ftmp%2Fmongodb-27017.sock",
+  fn() {
+    const options = parse("mongodb://fred:foo@%2Ftmp%2Fmongodb-27017.sock");
+    assertEquals(options.servers.length, 1);
+    assertEquals(options.servers[0].domain_socket, "/tmp/mongodb-27017.sock");
+    assertEquals(options.auth!.user, "fred");
+    assertEquals(options.auth!.password, "foo");
     assertEquals(options.dbName, "admin");
   },
 });

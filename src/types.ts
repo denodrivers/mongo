@@ -8,6 +8,10 @@ export interface ConnectOptions {
     port: number;
     domain_socket?: string;
   }[];
+  auth?: {
+    user: string;
+    password: string;
+  };
   dbName?: string;
   [key: string]: any;
 }
