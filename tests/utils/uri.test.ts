@@ -118,5 +118,18 @@ Deno.test({
     assertEquals(options.dbName, "somedb");
   },
 });
+
+Deno.test({
+  name:"should correctly parse mongodb://fred:foo@%2Ftmp%2Fmongodb-27017.sock/somedb?safe=true",
+  fn(){
+    const options = parse("mongodb://fred:foo@%2Ftmp%2Fmongodb-27017.sock/somedb?safe=true");
+    assertEquals(options.servers.length, 1);
+    assertEquals(options.servers[0].domain_socket, "/tmp/mongodb-27017.sock");
+    assertEquals(options.auth!.user,"fred");
+    assertEquals(options.auth!.password,"foo");
+    assertEquals(options.dbName,"somedb");
+    assertEquals(options.safe,"true");
+  }
+})
 //mongodb+srv://crawler:8yGYXY9PdNtMVVp@sandbox.r3evj.mongodb.net/?retryWrites=true&w=majority
 // TODO: add more tests (https://github.com/mongodb/node-mongodb-native/blob/3.6/test/functional/url_parser.test.js)
