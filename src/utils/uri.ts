@@ -7,8 +7,9 @@ export function parse(uri: string): ConnectOptions {
   uriObject.searchParams.forEach((val, key) => {
     search[key] = val;
   });
-  const dbName = getDbName();
   const domain_socket = getDomainSocket();
+
+  const dbName = getDbName();
   const auth = {
     user: decodeURIComponent(uriObject.username),
     password: decodeURIComponent(uriObject.password),
@@ -18,7 +19,7 @@ export function parse(uri: string): ConnectOptions {
       {
         host: uriObject.hostname,
         port: parseInt(uriObject.port) || 27017,
-        domain_socket,
+        domainSocket: domain_socket,
       },
     ],
     dbName,
