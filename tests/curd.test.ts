@@ -215,8 +215,8 @@ testWithClient("testUpdateMany", async (client) => {
     { $set: { username: "MANY" } },
   );
   assertEquals(result, {
-    matchedCount: 1,
-    modifiedCount: 1,
+    matchedCount: 2,
+    modifiedCount: 2,
     upsertedCount: 0,
     upsertedIds: undefined,
   });
@@ -226,14 +226,14 @@ testWithClient("testDeleteMany", async (client) => {
   const db = client.database("test");
   const users = db.collection("mongo_test_users");
   const deleteCount = await users.deleteMany({ username: "MANY" });
-  assertEquals(deleteCount, 1);
+  assertEquals(deleteCount, 2);
 });
 
 testWithClient("testDistinct", async (client) => {
   const db = client.database("test");
   const users = db.collection<IUser>("mongo_test_users");
   const user1 = await users.distinct("username");
-  assertEquals(user1, ["USER2", "many", "user1"]);
+  assertEquals(user1, ["USER2", "user1"]);
 });
 
 // // TODO mongdb_rust official library has not implemented this feature
