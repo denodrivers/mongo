@@ -113,13 +113,15 @@ export class Collection<T> {
   }
 
   async updateMany(filter: Document, doc: Document, options?: UpdateOptions) {
+    const multi = options?.multi !== false;
+    const updateOptions = Object.assign({}, options, { multi });
     return await update(
       this.#protocol,
       this.#dbName,
       this.name,
       filter,
       doc,
-      options,
+      updateOptions,
     );
   }
 
