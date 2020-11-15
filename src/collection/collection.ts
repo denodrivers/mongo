@@ -35,7 +35,7 @@ export class Collection<T> {
 
   async findOne(
     filter?: Document,
-    options?: FindOptions,
+    options?: FindOptions
   ): Promise<T | undefined> {
     const cursor = this.find(filter, options);
     return await cursor.next();
@@ -67,7 +67,7 @@ export class Collection<T> {
 
   async insertMany(
     docs: Document[],
-    options?: InsertOptions,
+    options?: InsertOptions
   ): Promise<{ insertedIds: Document[]; insertedCount: number }> {
     const insertedIds = docs.map((doc) => {
       if (!doc._id) {
@@ -113,16 +113,10 @@ export class Collection<T> {
   }
 
   async updateMany(filter: Document, doc: Document, options?: UpdateOptions) {
-    const multi = options?.multi !== false;
-    const updateOptions = Object.assign({}, options, { multi });
-    return await update(
-      this.#protocol,
-      this.#dbName,
-      this.name,
-      filter,
-      doc,
-      updateOptions,
-    );
+    return await update(this.#protocol, this.#dbName, this.name, filter, doc, {
+      ...options,
+      multi: options?.multi ?? true,
+    });
   }
 
   async deleteMany(filter: Document, options?: DeleteOptions): Promise<number> {
