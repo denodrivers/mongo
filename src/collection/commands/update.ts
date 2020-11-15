@@ -18,7 +18,7 @@ export async function update(
   collectionName: string,
   query: Document,
   doc: Document,
-  options?: UpdateOptions
+  options?: UpdateOptions,
 ) {
   const { n, nModified, upserted } = await protocol.commandSingle<
     UpdateResponse
