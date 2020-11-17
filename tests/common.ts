@@ -1,6 +1,6 @@
 import { MongoClient } from "../mod.ts";
 
-const hostname = "localhost";
+const hostname = "127.0.0.1";
 
 export async function testWithClient(
   name: string,
