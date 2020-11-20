@@ -11,3 +11,6 @@ export function HI(data: string, salt: string, iterations: number) {
 export function clientKeyFor(key:string){
   return new HmacSha1(key).update('Client Key').hex();
 }
+export function serverKeyFor(key:string){
+  return new HmacSha1(key).update('Server Key').hex();
+}
