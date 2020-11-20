@@ -49,3 +49,7 @@ export function clientFirstMessageBare(username: string, nonce: Uint8Array) {
     return new TextEncoder().encode(input);
   }
 }
+
+export function cleanUsername(username:string){
+  return username.replace('=','=3D').replace(',',"=2C");
+}

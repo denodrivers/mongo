@@ -1,4 +1,5 @@
 import {
+  cleanUsername,
   clientFirstMessageBare,
   clientKeyFor,
   nonceFor,
@@ -84,3 +85,13 @@ Deno.test({
     assertEquals(expected, result);
   },
 });
+
+Deno.test({
+  name:'cleanUsername',
+  fn() {
+    const username:string = "first=12,last=34";
+    const expected:string = "first=3D12=2Clast=34";
+    const result: string = cleanUsername(username);
+    assertEquals(expected,result);
+  }
+})
