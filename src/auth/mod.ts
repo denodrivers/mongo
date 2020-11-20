@@ -1,4 +1,4 @@
-import { createHash, HmacSha1, pbkdf2Sync, randomBytes } from "../../deps.ts";
+import {createHash, HmacSha1, pbkdf2Sync, randomBytes} from "../../deps.ts";
 
 export function passwordDigest(username: string, password: string): string {
   const hash = createHash("md5");
@@ -31,4 +31,21 @@ export function storedKeyFor(data: string) {
 
 export function nonceFor() {
   return randomBytes(24);
+}
+export function clientFirstMessageBare(username: string, nonce: string) {
+  return Uint8Array.from(
+    [
+      ...getUint8Array("n="),
+      ...getUint8Array(username),
+      ...getUint8Array(",r="),
+      ...getUint8Array(nonce),
+    ],
+  );
+
+  /**
+   * @param input
+   */
+  function getUint8Array(input: string) {
+    return new TextEncoder().encode(input);
+  }
 }

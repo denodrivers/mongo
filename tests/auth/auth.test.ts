@@ -1,4 +1,5 @@
 import {
+  clientFirstMessageBare,
   clientKeyFor,
   nonceFor,
   passwordDigest,
@@ -70,5 +71,16 @@ Deno.test({
   fn() {
     const buf = nonceFor();
     assertEquals(buf.length, 24);
+  },
+});
+
+Deno.test({
+  name: "clientFirstMessageBare",
+  fn() {
+    const username = "1234";
+    const nonce = "qwer";
+    const result: Uint8Array = clientFirstMessageBare(username, nonce);
+    const expected: Uint8Array = Uint8Array.from([ 110,  61,  49, 50,  51, 52,  44, 114, 61, 113, 119, 101, 114]);
+    assertEquals(expected, result);
   },
 });
