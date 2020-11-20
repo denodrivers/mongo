@@ -1,4 +1,4 @@
-import { createHash, pbkdf2Sync } from "../../deps.ts";
+import {createHash, HmacSha1, pbkdf2Sync} from "../../deps.ts";
 
 export function passwordDigest(username: string, password: string): string {
   const hash = createHash("md5");
@@ -7,4 +7,7 @@ export function passwordDigest(username: string, password: string): string {
 }
 export function HI(data: string, salt: string, iterations: number) {
   return pbkdf2Sync(data, salt, iterations, 20, "sha1");
+}
+export function clientKeyFor(key:string){
+  return new HmacSha1(key).update('Client Key').hex();
 }

@@ -1,4 +1,4 @@
-import { passwordDigest } from "../../src/auth/mod.ts";
+import { clientKeyFor, passwordDigest } from "../../src/auth/mod.ts";
 import { assertEquals } from "../test.deps.ts";
 
 interface PasswordValid {
@@ -26,4 +26,14 @@ passwordValdis.forEach(({ username, password, digest }) => {
       assertEquals(digestRes, digest);
     },
   });
+});
+
+Deno.test({
+  name: "clientKey",
+  fn() {
+    const key: string = "48549cb611401e7456e9072741898ea4006e4ee6";
+    const expected = `6f7ca2af959e3b7823886dca969c04b166ed3b7d`;
+    const result: string = clientKeyFor(key);
+    assertEquals(expected, result);
+  },
 });
