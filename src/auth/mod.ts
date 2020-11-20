@@ -24,3 +24,7 @@ function keyFor(key: string, serverKey: string):string {
 export function serverKeyFor(key:string){
   return keyFor(key, 'Server Key');
 }
+
+export function storedKeyFor(data:string){
+  return createHash('sha1').update(data).toString();
+}

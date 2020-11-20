@@ -2,6 +2,7 @@ import {
   clientKeyFor,
   passwordDigest,
   serverKeyFor,
+  storedKeyFor,
 } from "../../src/auth/mod.ts";
 import { assertEquals } from "../test.deps.ts";
 
@@ -49,6 +50,16 @@ Deno.test({
     const key: string = "48549cb611401e7456e9072741898ea4006e4ee6";
     const expected: string = `550083f8dbe04acbb85a0081a6eacf1607b4835e`;
     const result: string = serverKeyFor(key);
+    assertEquals(expected, result);
+  },
+});
+
+Deno.test({
+  name: "storedKey",
+  fn() {
+    const data: string = "48549cb611401e7456e9072741898ea4006e4ee6";
+    const expected: string = "504ce7448255f3996b66ca99c09a6c5463d18dd7";
+    const result: string = storedKeyFor(data);
     assertEquals(expected, result);
   },
 });
