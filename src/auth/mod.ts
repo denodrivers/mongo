@@ -1,4 +1,4 @@
-import {createHash, HmacSha1, pbkdf2Sync} from "../../deps.ts";
+import { createHash, HmacSha1, pbkdf2Sync, randomBytes } from "../../deps.ts";
 
 export function passwordDigest(username: string, password: string): string {
   const hash = createHash("md5");
@@ -8,8 +8,8 @@ export function passwordDigest(username: string, password: string): string {
 export function HI(data: string, salt: string, iterations: number) {
   return pbkdf2Sync(data, salt, iterations, 20, "sha1");
 }
-export function clientKeyFor(key:string){
-  return keyFor(key,'Client Key');
+export function clientKeyFor(key: string) {
+  return keyFor(key, "Client Key");
 }
 
 /**
@@ -17,14 +17,18 @@ export function clientKeyFor(key:string){
  * @param key
  * @return string
  */
-function keyFor(key: string, serverKey: string):string {
+function keyFor(key: string, serverKey: string): string {
   return new HmacSha1(key).update(serverKey).hex();
 }
 
-export function serverKeyFor(key:string){
-  return keyFor(key, 'Server Key');
+export function serverKeyFor(key: string) {
+  return keyFor(key, "Server Key");
 }
 
-export function storedKeyFor(data:string){
-  return createHash('sha1').update(data).toString();
+export function storedKeyFor(data: string) {
+  return createHash("sha1").update(data).toString();
+}
+
+export function nonceFor() {
+  return randomBytes(24);
 }

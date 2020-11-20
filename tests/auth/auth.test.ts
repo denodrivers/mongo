@@ -1,5 +1,6 @@
 import {
   clientKeyFor,
+  nonceFor,
   passwordDigest,
   serverKeyFor,
   storedKeyFor,
@@ -61,5 +62,13 @@ Deno.test({
     const expected: string = "504ce7448255f3996b66ca99c09a6c5463d18dd7";
     const result: string = storedKeyFor(data);
     assertEquals(expected, result);
+  },
+});
+
+Deno.test({
+  name: "nonce",
+  fn() {
+    const buf = nonceFor();
+    assertEquals(buf.length, 24);
   },
 });
