@@ -2,12 +2,14 @@ import {
   cleanUsername,
   clientFirstMessageBare,
   clientKeyFor,
+  makeFirstMessage,
   nonceFor,
   passwordDigest,
   serverKeyFor,
   storedKeyFor,
 } from "../../src/auth/mod.ts";
 import { assertEquals } from "../test.deps.ts";
+import { Binary } from "../../bson/mod.ts";
 
 interface PasswordValid {
   username: string;
@@ -81,17 +83,63 @@ Deno.test({
     const username = "1234";
     const nonce = new TextEncoder().encode("qwer");
     const result: Uint8Array = clientFirstMessageBare(username, nonce);
-    const expected: Uint8Array = Uint8Array.from([ 110,  61,  49, 50,  51, 52,  44, 114, 61, 113, 119, 101, 114]);
+    const expected: Uint8Array = Uint8Array.from(
+      [110, 61, 49, 50, 51, 52, 44, 114, 61, 113, 119, 101, 114],
+    );
     assertEquals(expected, result);
   },
 });
 
 Deno.test({
-  name:'cleanUsername',
+  name: "cleanUsername",
   fn() {
-    const username:string = "first=12,last=34";
-    const expected:string = "first=3D12=2Clast=34";
+    const username: string = "first=12,last=34";
+    const expected: string = "first=3D12=2Clast=34";
     const result: string = cleanUsername(username);
-    assertEquals(expected,result);
-  }
-})
+    assertEquals(expected, result);
+  },
+});
+
+function getUint8Array(str: string) {
+  return new TextEncoder().encode(str);
+}
+
+Deno.test({
+  name: "makeFirstMessage",
+  fn: function () {
+    const username = "admin";
+    const credentials = { username };
+    const nonce = getUint8Array(username);
+    const payload = new Binary(
+      [
+        110,
+        44,
+        44,
+        110,
+        61,
+        97,
+        100,
+        109,
+        105,
+        110,
+        44,
+        114,
+        61,
+        97,
+        100,
+        109,
+        105,
+        110,
+      ],
+    );
+    const expected = {
+      saslStart: 1,
+      mechanism: "SCRAM-SHA-1",
+      payload,
+      autoAuthorize: 1,
+      options: { skipEmptyExchange: true },
+    };
+    const result = makeFirstMessage(credentials, nonce);
+    assertEquals(expected, result);
+  },
+});

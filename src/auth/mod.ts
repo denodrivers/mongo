@@ -1,4 +1,5 @@
-import {createHash, HmacSha1, pbkdf2Sync, randomBytes} from "../../deps.ts";
+import { createHash, HmacSha1, pbkdf2Sync, randomBytes } from "../../deps.ts";
+import { Binary } from "../../bson/mod.ts";
 
 export function passwordDigest(username: string, password: string): string {
   const hash = createHash("md5");
@@ -41,15 +42,36 @@ export function clientFirstMessageBare(username: string, nonce: Uint8Array) {
       ...nonce,
     ],
   );
-
-  /**
-   * @param input
-   */
-  function getUint8Array(input: string) {
-    return new TextEncoder().encode(input);
-  }
 }
 
-export function cleanUsername(username:string){
-  return username.replace('=','=3D').replace(',',"=2C");
+/**
+ * @param input
+ */
+function getUint8Array(input: string) {
+  return new TextEncoder().encode(input);
+}
+
+export function cleanUsername(username: string) {
+  return username.replace("=", "=3D").replace(",", "=2C");
+}
+
+export function makeFirstMessage(
+  credentials: { username: string },
+  nonce: Uint8Array,
+) {
+  const username = cleanUsername(credentials.username);
+  const mechanism = "SCRAM-SHA-1";
+  return {
+    saslStart: 1,
+    mechanism,
+    autoAuthorize: 1,
+    payload: new Binary(
+      Uint8Array.from(
+        [...getUint8Array("n,,"), ...clientFirstMessageBare(username, nonce)],
+      ),
+    ),
+    options: {
+      skipEmptyExchange: true,
+    },
+  };
 }
