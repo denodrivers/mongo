@@ -32,13 +32,13 @@ export function storedKeyFor(data: string) {
 export function nonceFor() {
   return randomBytes(24);
 }
-export function clientFirstMessageBare(username: string, nonce: string) {
+export function clientFirstMessageBare(username: string, nonce: Uint8Array) {
   return Uint8Array.from(
     [
       ...getUint8Array("n="),
       ...getUint8Array(username),
       ...getUint8Array(",r="),
-      ...getUint8Array(nonce),
+      ...nonce,
     ],
   );
 
