@@ -1,7 +1,7 @@
 import { assert } from "./test.deps.ts";
 import { MongoClient } from "../src/client.ts";
 
-const hostname = "localhost";
+const hostname = "127.0.0.1";
 
 Deno.test("testConnectWithUri", async () => {
   const client = new MongoClient();

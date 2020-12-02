@@ -319,3 +319,25 @@ export interface CreateUserOptions {
    */
   comment?: Document;
 }
+
+export interface Credential {
+  /**
+   * The username to authenticate with. This applies to all mechanisms but may be omitted when authenticating via MONGODB-X509.
+   */
+  username?: string;
+
+  /**
+   * The password to authenticate with. This does not apply to all mechanisms.
+   */
+  password?: string;
+
+  /**
+   * The database used to authenticate. This applies to all mechanisms and defaults to "admin" in SCRAM authentication mechanisms and "$external" for GSSAPI, MONGODB-X509 and PLAIN.
+   */
+  source?: string;
+
+  /**
+   * Which authentication mechanism to use. If not provided, one will be negotiated with the server.
+   */
+  mechanism?: "SCRAM-SHA-1" | "SCRAM-SHA-256";
+}
