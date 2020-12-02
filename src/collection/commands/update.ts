@@ -29,7 +29,7 @@ export async function update(
         q: query,
         u: doc,
         upsert: options?.upsert ?? false,
-        multi: options?.multi,
+        multi: options?.multi ?? true,
         collation: options?.collation,
         arrayFilters: options?.arrayFilters,
         hint: options?.hint,

@@ -113,14 +113,10 @@ export class Collection<T> {
   }
 
   async updateMany(filter: Document, doc: Document, options?: UpdateOptions) {
-    return await update(
-      this.#protocol,
-      this.#dbName,
-      this.name,
-      filter,
-      doc,
-      options,
-    );
+    return await update(this.#protocol, this.#dbName, this.name, filter, doc, {
+      ...options,
+      multi: options?.multi ?? true,
+    });
   }
 
   async deleteMany(filter: Document, options?: DeleteOptions): Promise<number> {
