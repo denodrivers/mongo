@@ -30,6 +30,7 @@ export interface FindOptions {
   skip?: number;
   limit?: number;
   projection?: Document;
+  $orderby?: Document;
 }
 
 export interface ListDatabaseInfo {
