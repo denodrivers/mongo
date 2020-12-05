@@ -17,7 +17,7 @@
 ## Examples
 
 ```ts
-import { MongoClient } from "https://deno.land/x/mongo@v1.0.0/mod.ts";
+import { MongoClient, Bson } from "https://deno.land/x/mongo@v1.0.0/mod.ts";
 
 const client = new MongoClient();
 client.connectWithUri("mongodb://localhost:27017");
@@ -57,7 +57,7 @@ const user1 = await users.findOne({ _id: insertId });
 const all_users = await users.find({ username: { $ne: null } });
 
 // find by ObjectId
-const user1_id = await users.findOne({ _id: "idxxx" });
+const user1_id = await users.findOne({ _id: new Bson.ObjectId("SOME OBJECTID STRING") });
 
 // count
 const count = await users.count({ username: { $ne: null } });
