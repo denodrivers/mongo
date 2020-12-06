@@ -5,6 +5,7 @@ interface IUser {
   username: string;
   password: string;
   _id: { $oid: string };
+  uid?: number;
   date?: Date;
 }
 
@@ -250,4 +251,42 @@ testWithClient("testDropConnection", async (client) => {
   const db = client.database("test");
   await db.collection("mongo_test_users_2").drop();
   await db.collection("mongo_test_users").drop();
+});
+
+testWithClient("testFindWithSort", async (client) => {
+  const db = client.database("test");
+  const users = db.collection<IUser>("mongo_test_users");
+
+  const condition = { uid: { $ne: null } };
+
+    // prepare data
+  for (let i = 0; i < 10; i ++) {
+    await users.insertOne({
+      username: "testFindWithSort",
+      password: "pass1",
+      uid: i
+    });
+  }
+  const all = await users.find().toArray();
+
+  // test sorting
+  const acceding = await users
+    .find(condition, { sort: { uid: 1 } })
+    .toArray();
+  const descending = await users
+    .find(condition, { sort: { uid: -1 } })
+    .toArray();
+
+  assertEquals(
+    acceding,
+    all.sort((lhs, rhs) => {
+      return lhs.uid! - rhs.uid!;
+    })
+  );
+  assertEquals(
+    descending,
+    all.sort((lhs, rhs) => {
+      return - lhs.uid! - rhs.uid!;
+    })
+  )
 });

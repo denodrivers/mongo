@@ -41,4 +41,9 @@ export class FindCursor<T> extends CommandCursor<T> {
     this.#context.options.skip = skip;
     return this;
   }
+
+  sort(sort: Document): this {
+    this.#context.options.sort = sort;
+    return this;
+  }
 }
