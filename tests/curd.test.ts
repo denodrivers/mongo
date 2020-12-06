@@ -259,12 +259,12 @@ testWithClient("testFindWithSort", async (client) => {
 
   const condition = { uid: { $ne: null } };
 
-    // prepare data
-  for (let i = 0; i < 10; i ++) {
+  // prepare data
+  for (let i = 0; i < 10; i++) {
     await users.insertOne({
       username: "testFindWithSort",
       password: "pass1",
-      uid: i
+      uid: i,
     });
   }
   const all = await users.find().toArray();
@@ -281,12 +281,12 @@ testWithClient("testFindWithSort", async (client) => {
     acceding,
     all.sort((lhs, rhs) => {
       return lhs.uid! - rhs.uid!;
-    })
+    }),
   );
   assertEquals(
     descending,
     all.sort((lhs, rhs) => {
-      return - lhs.uid! - rhs.uid!;
-    })
-  )
+      return -lhs.uid! - rhs.uid!;
+    }),
+  );
 });
