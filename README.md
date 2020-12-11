@@ -20,7 +20,7 @@
 import { MongoClient, Bson } from "https://deno.land/x/mongo@v1.0.0/mod.ts";
 
 const client = new MongoClient();
-client.connectWithUri("mongodb://localhost:27017");
+client.connect("mongodb://localhost:27017");
 
 // Defining schema interface
 interface UserSchema {
