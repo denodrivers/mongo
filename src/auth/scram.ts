@@ -171,7 +171,7 @@ export async function continueScramConversation(
   const withoutProof = `c=biws,r=${rnonce}`;
   const saltedPassword = HI(
     processedPassword,
-    enc.encode(atob(salt)),
+    b64.decode(salt),
     iterations,
     cryptoMethod,
   );
@@ -201,7 +201,7 @@ export async function continueScramConversation(
   var result = await protocol.commandSingle(db, saslContinueCmd);
 
   const parsedResponse = parsePayload(dec.decode(response.payload.buffer));
-  if (!compareDigest(enc.encode(atob(parsedResponse.v)), serverSignature)) {
+  if (!compareDigest(b64.decode(parsedResponse.v), serverSignature)) {
     throw new MongoError("Server returned an invalid signature");
   }
 
