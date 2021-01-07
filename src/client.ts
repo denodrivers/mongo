@@ -9,7 +9,7 @@ import {
 } from "./types.ts";
 import { parse } from "./utils/uri.ts";
 import { AuthContext, ScramAuthPlugin } from "./auth/mod.ts";
-import { MongoErrorInfo, MongoError } from "./error.ts";
+import { MongoError } from "./error.ts";
 
 const DENO_DRIVER_VERSION = "0.0.1";
 
