@@ -196,10 +196,14 @@ export async function continueScramConversation(
   const parsedResponse = parsePayload(
     fixPayload(dec.decode(response.payload.buffer)),
   );
-  if (!compareDigest(b64.decode(parsedResponse.v), serverSignature)) {
-    throw new MongoError("Server returned an invalid signature");
+  if(parsedResponse.v){
+    if (!compareDigest(b64.decode(parsedResponse.s), serverSignature)) {
+      throw new MongoError("Server returned an invalid signature");
+    }
   }
-
+  if(response.done){
+    return response;
+  }
   const retrySaslContinueCmd = {
     saslContinue: 1,
     conversationId: result.conversationId,
