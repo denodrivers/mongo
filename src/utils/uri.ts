@@ -3,7 +3,6 @@ import { ConnectOptions, Credential } from "../types.ts";
 
 export function parse_url(url: string): any {
   const uriObject = new URL(decodeURIComponent(url));
-  url = uriObject.href;
   // Variables
   var connection_part: string | string[] = "";
   var auth_part = "";
