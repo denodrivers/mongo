@@ -1,4 +1,5 @@
 import { WireProtocol } from "./protocol.ts";
+import { ConnectOptions, Document } from "../types.ts";
 
 export const driverMetadata = {
   driver: {
@@ -11,6 +12,13 @@ export const driverMetadata = {
     architecture: Deno.build.arch,
   },
 };
+
+export interface HandshakeDocument extends Document {
+  ismaster: boolean;
+  client: ConnectOptions;
+  compression: string[];
+  saslSupportedMechs?: string;
+}
 
 interface HandshakeResponse {
   ismaster: string;

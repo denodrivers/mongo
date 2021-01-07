@@ -3,16 +3,14 @@ import { Bson } from "../deps.ts";
 export type Document = Bson.Document;
 
 export interface ConnectOptions {
+  compression?: string;
   servers: {
     host: string;
     port: number;
     domainSocket?: string;
   }[];
-  auth?: {
-    user: string;
-    password: string;
-  };
-  dbName?: string;
+  db: string;
+  credential?: Credential;
   [key: string]: any;
 }
 
@@ -335,7 +333,7 @@ export interface Credential {
   /**
    * The database used to authenticate. This applies to all mechanisms and defaults to "admin" in SCRAM authentication mechanisms and "$external" for GSSAPI, MONGODB-X509 and PLAIN.
    */
-  source?: string;
+  db?: string;
 
   /**
    * Which authentication mechanism to use. If not provided, one will be negotiated with the server.
