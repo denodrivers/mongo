@@ -16,6 +16,7 @@ Deno.test("testConnectWithOptions", async () => {
   const client = new MongoClient();
   await client.connect({
     servers: [{ host: hostname, port: 27017 }],
+    db: "admin",
   });
   const names = await client.listDatabases();
   assert(names instanceof Array);

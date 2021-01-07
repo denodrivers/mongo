@@ -2,11 +2,16 @@ import { ConnectOptions, Credential, Document } from "../types.ts";
 import { Binary } from "../../bson/mod.ts";
 import { decode, encode } from "../utils/encoding/mod.ts";
 import { saslprep } from "../utils/saslprep/mod.ts";
-import { hmac } from "../utils/crypt/hmac/mod.ts";
 import { AuthContext, AuthPlugin } from "./base.ts";
 import { HandshakeDocument } from "../protocol/handshake.ts";
 import { MongoError } from "../error.ts";
-import { b64, createHash, HmacSha1, pbkdf2Sync } from "../../deps.ts";
+import {
+  b64,
+  createHash,
+  HmacSha1,
+  HmacSha256,
+  pbkdf2Sync,
+} from "../../deps.ts";
 import { driverMetadata } from "../protocol/mod.ts";
 
 type CryptoMethod = "sha1" | "sha256";
@@ -52,11 +57,11 @@ export class ScramAuthPlugin extends AuthPlugin {
     return await executeScram(this.cryptoMethod, authContext);
   }
 }
-function cleanUsername(username: string) {
+export function cleanUsername(username: string) {
   return username.replace("=", "=3D").replace(",", "=2C");
 }
 
-function clientFirstMessageBare(username: string, nonce: Uint8Array) {
+export function clientFirstMessageBare(username: string, nonce: Uint8Array) {
   // NOTE: This is done b/c Javascript uses UTF-16, but the server is hashing in UTF-8.
   // Since the username is not sasl-prep-d, we need to do this here.
   return Uint8Array.from(
@@ -69,7 +74,7 @@ function clientFirstMessageBare(username: string, nonce: Uint8Array) {
   );
 }
 
-function makeFirstMessage(
+export function makeFirstMessage(
   cryptoMethod: CryptoMethod,
   credentials: Credential,
   nonce: Uint8Array,
@@ -92,7 +97,7 @@ function makeFirstMessage(
   };
 }
 
-async function executeScram(
+export async function executeScram(
   cryptoMethod: CryptoMethod,
   authContext: AuthContext,
 ) {
@@ -111,7 +116,7 @@ async function executeScram(
   await continueScramConversation(cryptoMethod, result, authContext);
 }
 
-async function continueScramConversation(
+export async function continueScramConversation(
   cryptoMethod: CryptoMethod,
   response: Document,
   authContext: AuthContext,
@@ -207,7 +212,7 @@ async function continueScramConversation(
   return await protocol.commandSingle(db, retrySaslContinueCmd);
 }
 
-function parsePayload(payload: string) {
+export function parsePayload(payload: string) {
   const dict: Document = {};
   const parts = payload.split(",");
   for (let i = 0; i < parts.length; i++) {
@@ -218,7 +223,7 @@ function parsePayload(payload: string) {
   return dict;
 }
 
-function passwordDigest(username: string, password: string) {
+export function passwordDigest(username: string, password: string) {
   if (typeof username !== "string") {
     throw new MongoError("username must be a string");
   }
@@ -237,7 +242,7 @@ function passwordDigest(username: string, password: string) {
 }
 
 // XOR two buffers
-function xor(a: any, b: any) {
+export function xor(a: any, b: any) {
   if (!(a instanceof Uint8Array)) {
     a = encode(a);
   }
@@ -256,16 +261,20 @@ function xor(a: any, b: any) {
   return b64.encode(res);
 }
 
-function H(method: CryptoMethod, text: Uint8Array) {
-  return createHash(method).update(text).digest() as Uint8Array;
+export function H(method: CryptoMethod, text: Uint8Array) {
+  return new Uint8Array(createHash(method).update(text).digest());
 }
 
-function HMAC(
+export function HMAC(
   method: CryptoMethod,
   key: Uint8Array,
   text: Uint8Array | string,
 ) {
-  return hmac(method, key, text, "utf8") as Uint8Array;
+  if (method === "sha256") {
+    return new Uint8Array(new HmacSha256(key).update(text).digest());
+  } else {
+    return new Uint8Array(new HmacSha1(key).update(text).digest());
+  }
 }
 
 interface HICache {
@@ -284,7 +293,7 @@ const hiLengthMap = {
   sha1: 20,
 };
 
-function HI(
+export function HI(
   data: string,
   salt: Uint8Array,
   iterations: number,
@@ -314,10 +323,10 @@ function HI(
 
   _hiCache[key] = saltedData;
   _hiCacheCount += 1;
-  return saltedData;
+  return new Uint8Array(saltedData);
 }
 
-function compareDigest(lhs: Uint8Array, rhs: Uint8Array) {
+export function compareDigest(lhs: Uint8Array, rhs: Uint8Array) {
   if (lhs.length !== rhs.length) {
     return false;
   }
