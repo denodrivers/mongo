@@ -31,6 +31,7 @@ export class ScramAuthPlugin extends AuthPlugin {
       client: driverMetadata,
       compression: options.compression,
     };
+    console.log(handshakeDoc);
     const request = {
       ...handshakeDoc,
       ...{
@@ -197,7 +198,7 @@ export async function continueScramConversation(
     fixPayload(dec.decode(response.payload.buffer)),
   );
   if (parsedResponse.v) {
-    if (!compareDigest(b64.decode(parsedResponse.s), serverSignature)) {
+    if (!compareDigest(b64.decode(parsedResponse.v), serverSignature)) {
       throw new MongoError("Server returned an invalid signature");
     }
   }
