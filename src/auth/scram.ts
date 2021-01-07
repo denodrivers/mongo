@@ -196,11 +196,8 @@ export async function continueScramConversation(
   const parsedResponse = parsePayload(
     fixPayload(dec.decode(result.payload.buffer)),
   );
-
-  if (parsedResponse.v) {
-    if (!compareDigest(b64.decode(parsedResponse.v), serverSignature)) {
-      throw new MongoError("Server returned an invalid signature");
-    }
+  if (!compareDigest(b64.decode(parsedResponse.v), serverSignature)) {
+    throw new MongoError("Server returned an invalid signature");
   }
   if (result.done) {
     return result;
