@@ -144,14 +144,7 @@ export async function continueScramConversation(
     processedPassword = passwordDigest(username, password);
   }
 
-  var payload = dec.decode(response.payload.buffer);
-  //this is a hack to fix codification in payload (in being and end exists a codification problem, needs investigation, is protocol implementation? is Deno api? ...)
-  //begin hack
-  var temp = payload.split("=");
-  temp.shift();
-  var it = parseInt(temp.pop()!, 10);
-  payload = "r=" + temp.join("=") + "=" + it;
-  //end hack
+  var payload = fixPayload(dec.decode(response.payload.buffer));
   const dict = parsePayload(payload);
 
   const iterations = parseInt(dict.i, 10);
@@ -200,8 +193,10 @@ export async function continueScramConversation(
 
   var result = await protocol.commandSingle(db, saslContinueCmd);
 
-  const parsedResponse = parsePayload(dec.decode(response.payload.buffer));
-  if (!compareDigest(b64.decode(parsedResponse.v), serverSignature)) {
+  const parsedResponse = parsePayload(
+    fixPayload(dec.decode(response.payload.buffer)),
+  );
+  if (!compareDigest(b64.decode(parsedResponse.s), serverSignature)) {
     throw new MongoError("Server returned an invalid signature");
   }
 
@@ -212,6 +207,15 @@ export async function continueScramConversation(
   };
 
   return await protocol.commandSingle(db, retrySaslContinueCmd);
+}
+
+//this is a hack to fix codification in payload (in being and end of payload exists a codification problem, needs investigation ...)
+export function fixPayload(payload: string) {
+  var temp = payload.split("=");
+  temp.shift();
+  var it = parseInt(temp.pop()!, 10);
+  payload = "r=" + temp.join("=") + "=" + it;
+  return payload;
 }
 
 export function parsePayload(payload: string) {
