@@ -6,7 +6,6 @@ import {
 import { assertEquals } from "../test.deps.ts";
 import { Credential } from "../../src/types.ts";
 import { Binary } from "../../bson/mod.ts";
-import { decode, encode } from "../../src/utils/encoding/mod.ts";
 
 interface PasswordValid {
   username: string;

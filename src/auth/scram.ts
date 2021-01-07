@@ -1,6 +1,5 @@
 import { ConnectOptions, Credential, Document } from "../types.ts";
 import { Binary } from "../../bson/mod.ts";
-import { decode, encode } from "../utils/encoding/mod.ts";
 import { saslprep } from "../utils/saslprep/mod.ts";
 import { AuthContext, AuthPlugin } from "./base.ts";
 import { HandshakeDocument } from "../protocol/handshake.ts";
@@ -15,6 +14,9 @@ import {
 import { driverMetadata } from "../protocol/mod.ts";
 
 type CryptoMethod = "sha1" | "sha256";
+
+const enc = new TextEncoder();
+const dec = new TextDecoder();
 
 export class ScramAuthPlugin extends AuthPlugin {
   cryptoMethod: CryptoMethod;
@@ -66,10 +68,10 @@ export function clientFirstMessageBare(username: string, nonce: Uint8Array) {
   // Since the username is not sasl-prep-d, we need to do this here.
   return Uint8Array.from(
     [
-      ...encode("n="),
-      ...encode(username),
-      ...encode(",r="),
-      ...encode(b64.encode(nonce)),
+      ...enc.encode("n="),
+      ...enc.encode(username),
+      ...enc.encode(",r="),
+      ...enc.encode(b64.encode(nonce)),
     ],
   );
 }
@@ -89,7 +91,7 @@ export function makeFirstMessage(
     mechanism,
     payload: new Binary(
       Uint8Array.from(
-        [...encode("n,,"), ...clientFirstMessageBare(username, nonce)],
+        [...enc.encode("n,,"), ...clientFirstMessageBare(username, nonce)],
       ),
     ),
     autoAuthorize: 1,
@@ -142,7 +144,7 @@ export async function continueScramConversation(
     processedPassword = passwordDigest(username, password);
   }
 
-  var payload = decode(response.payload.buffer);
+  var payload = dec.decode(response.payload.buffer);
   //this is a hack to fix codification in payload (in being and end exists a codification problem, needs investigation, is protocol implementation? is Deno api? ...)
   //begin hack
   var temp = payload.split("=");
@@ -169,7 +171,7 @@ export async function continueScramConversation(
   const withoutProof = `c=biws,r=${rnonce}`;
   const saltedPassword = HI(
     processedPassword,
-    encode(atob(salt)),
+    enc.encode(atob(salt)),
     iterations,
     cryptoMethod,
   );
@@ -179,7 +181,7 @@ export async function continueScramConversation(
   const serverKey = HMAC(cryptoMethod, saltedPassword, "Server Key");
   const storedKey = H(cryptoMethod, clientKey);
   const authMessage = [
-    decode(clientFirstMessageBare(username, nonce)),
+    dec.decode(clientFirstMessageBare(username, nonce)),
     payload,
     withoutProof,
   ].join(",");
@@ -193,13 +195,13 @@ export async function continueScramConversation(
   const saslContinueCmd = {
     saslContinue: 1,
     conversationId: response.conversationId,
-    payload: new Binary(encode(clientFinal)),
+    payload: new Binary(enc.encode(clientFinal)),
   };
 
   var result = await protocol.commandSingle(db, saslContinueCmd);
 
-  const parsedResponse = parsePayload(decode(response.payload.buffer));
-  if (!compareDigest(encode(atob(parsedResponse.v)), serverSignature)) {
+  const parsedResponse = parsePayload(dec.decode(response.payload.buffer));
+  if (!compareDigest(enc.encode(atob(parsedResponse.v)), serverSignature)) {
     throw new MongoError("Server returned an invalid signature");
   }
 
@@ -244,11 +246,11 @@ export function passwordDigest(username: string, password: string) {
 // XOR two buffers
 export function xor(a: any, b: any) {
   if (!(a instanceof Uint8Array)) {
-    a = encode(a);
+    a = enc.encode(a);
   }
 
   if (!(b instanceof Uint8Array)) {
-    b = encode(b);
+    b = enc.encode(b);
   }
 
   const length = Math.max(a.length, b.length);
