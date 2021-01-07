@@ -86,7 +86,7 @@ export function parse_url(url: string): any {
     if (domainSocket.indexOf("@") != -1) {
       domainSocket = domainSocket.split("@")[1];
     }
-    servers = [{ domain_socket: domainSocket }];
+    servers = [{ domain_socket: decodeURIComponent(domainSocket) }];
   } else {
     // Split up the db
     hostPart = connection_part;
