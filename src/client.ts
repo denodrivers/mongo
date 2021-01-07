@@ -9,6 +9,7 @@ import {
 } from "./types.ts";
 import { parse } from "./utils/uri.ts";
 import { AuthContext, ScramAuthPlugin } from "./auth/mod.ts";
+import { MongoError } from "./error.ts";
 
 const DENO_DRIVER_VERSION = "0.0.1";
 
@@ -40,10 +41,16 @@ export class MongoClient {
       } else if (mechanism === "SCRAM-SHA-1") {
         authPlugin = new ScramAuthPlugin("sha1");
       } else {
-        throw `Auth mechanism not implemented: ${mechanism}`;
+        throw new MongoError(`Auth mechanism not implemented: ${mechanism}`);
       }
       var request = authPlugin.prepare(options as ConnectOptions, authContext);
-      await this.#protocol.commandSingle("admin", request);
+      authContext.response = await this.#protocol.commandSingle(
+        "admin",
+        request,
+      );
+      if (authContext.response.ok === 0) {
+        throw new MongoError(authContext.response);
+      }
       await authPlugin.auth(authContext);
     } else {
       await this.#protocol.connect();
