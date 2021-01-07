@@ -48,8 +48,8 @@ export class MongoClient {
         "admin",
         request,
       );
-      if (authContext.response.ok === 0) {
-        throw new MongoError(authContext.response);
+      if (authContext.response!.ok === 0) {
+        throw new MongoError(authContext.response!);
       }
       await authPlugin.auth(authContext);
     } else {
