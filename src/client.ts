@@ -9,7 +9,7 @@ import {
 } from "./types.ts";
 import { parse } from "./utils/uri.ts";
 import { AuthContext, ScramAuthPlugin } from "./auth/mod.ts";
-import { MongoError } from "./error.ts";
+import { MongoErrorInfo, MongoError } from "./error.ts";
 
 const DENO_DRIVER_VERSION = "0.0.1";
 
@@ -48,9 +48,6 @@ export class MongoClient {
         "admin",
         request,
       );
-      if (authContext.response!.ok === 0) {
-        throw new MongoError(authContext.response!);
-      }
       await authPlugin.auth(authContext);
     } else {
       await this.#protocol.connect();
