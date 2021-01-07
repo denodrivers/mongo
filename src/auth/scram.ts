@@ -31,7 +31,6 @@ export class ScramAuthPlugin extends AuthPlugin {
       client: driverMetadata,
       compression: options.compression,
     };
-    console.log(handshakeDoc);
     const request = {
       ...handshakeDoc,
       ...{
