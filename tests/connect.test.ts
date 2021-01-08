@@ -30,7 +30,6 @@ Deno.test("connect authorization test 1 - admin db", async () => {
   const client = new MongoClient();
   await client.connect(`mongodb://${username}:${password}@${hostname}:27017`);
   const names = await client.listDatabases();
-  console.log(names);
   assert(names instanceof Array);
   assert(names.length > 0);
   client.close();
