@@ -1,4 +1,7 @@
+import { assert } from "./test.deps.ts";
 import { testWithClient } from "./common.ts";
+
+const hostname = "127.0.0.1";
 
 testWithClient("createUser", async (client) => {
   const db = client.database("test");
