@@ -64,7 +64,10 @@ export class CommandCursor<T> {
 
   async *[Symbol.asyncIterator]() {
     while (this.#batches.length > 0 || this.#id !== 0n) {
-      yield await this.next();
+      const value = await this.next();
+      if (value !== undefined) {
+        yield value;
+      }
     }
   }
 

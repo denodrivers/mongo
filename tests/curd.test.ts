@@ -290,3 +290,14 @@ testWithClient("testFindWithSort", async (client) => {
     }),
   );
 });
+
+testWithClient("testFindEmptyAsyncIteration", async (client) => {
+  const db = client.database("test");
+  const users = db.collection<IUser>("mongo_test_users");
+  const cursor = users.find({ nonexistent: 'foo' });
+  const docs = [];
+  for await (const doc of cursor) {
+    docs.push(doc);
+  }
+  assertEquals(docs, []);
+});
