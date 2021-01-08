@@ -6,7 +6,7 @@ export interface MongoErrorInfo {
 }
 
 export class MongoError extends Error {
-  constructor(info: MongoErrorInfo) {
+  constructor(info: MongoErrorInfo | string) {
     super(`MongoError: ${JSON.stringify(info)}`);
   }
 }
