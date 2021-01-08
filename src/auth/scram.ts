@@ -194,7 +194,7 @@ export async function continueScramConversation(
   var result = await protocol.commandSingle(db, saslContinueCmd);
 
   const parsedResponse = parsePayload(
-    fixPayload(dec.decode(result.payload.buffer)),
+    fixPayload2(dec.decode(result.payload.buffer)),
   );
   if (!compareDigest(b64.decode(parsedResponse.v), serverSignature)) {
     throw new MongoError("Server returned an invalid signature");
@@ -218,6 +218,15 @@ export function fixPayload(payload: string) {
   var it = parseInt(temp.pop()!, 10);
   payload = "r=" + temp.join("=") + "=" + it;
   return payload;
+}
+//this is a second hack to fix codification in payload (in being and end of payload exists a codification problem, needs investigation ...)
+export function fixPayload2(payload: string) {
+  var temp = payload.split("v=");
+  temp.shift();
+  payload = temp.join("");
+  temp = payload.split("ok");
+  temp.pop();
+  return "v=" + temp.join("");
 }
 
 export function parsePayload(payload: string) {
