@@ -23,25 +23,3 @@ Deno.test("testconnect With Options", async () => {
   assert(names.length > 0);
   client.close();
 });
-
-Deno.test("connect authorization test 1 - admin db", async () => {
-  var username = "user1";
-  var password = "y3mq3mpZ3J6PGfgg";
-  const client = new MongoClient();
-  await client.connect(`mongodb://${username}:${password}@${hostname}:27017`);
-  const names = await client.listDatabases();
-  assert(names instanceof Array);
-  assert(names.length > 0);
-  client.close();
-});
-
-Deno.test("connect authorization test 2 - admin db", async () => {
-  var username = "user2";
-  var password = "Qa6WkQSuXF425sWZ";
-  const client = new MongoClient();
-  await client.connect(`mongodb://${username}:${password}@${hostname}:27017`);
-  const names = await client.listDatabases();
-  assert(names instanceof Array);
-  assert(names.length > 0);
-  client.close();
-});
