@@ -1,5 +1,6 @@
 import { assert } from "./test.deps.ts";
 import { testWithClient } from "./common.ts";
+import { MongoClient } from "../src/client.ts";
 
 const hostname = "127.0.0.1";
 
