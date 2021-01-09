@@ -62,7 +62,7 @@ export class CommandCursor<T> {
     return this.#batches.shift();
   }
 
-  async *[Symbol.asyncIterator]() {
+  async *[Symbol.asyncIterator](): AsyncGenerator<T> {
     while (this.#batches.length > 0 || this.#id !== 0n) {
       const value = await this.next();
       if (value !== undefined) {
