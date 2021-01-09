@@ -25,11 +25,11 @@ export class ScramAuthPlugin extends AuthPlugin {
     this.cryptoMethod = cryptoMethod || "sha1";
   }
 
-  prepare(options: ConnectOptions, authContext: AuthContext): Document {
+  prepare(authContext: AuthContext): Document {
     const handshakeDoc = {
       ismaster: true,
       client: driverMetadata,
-      compression: options.compression,
+      compression: authContext.options.compression,
     };
     const request = {
       ...handshakeDoc,
@@ -37,10 +37,10 @@ export class ScramAuthPlugin extends AuthPlugin {
         speculativeAuthenticate: {
           ...makeFirstMessage(
             this.cryptoMethod,
-            options.credential!,
+            authContext.options.credential!,
             authContext.nonce!,
           ),
-          ...{ db: options.credential!.db },
+          ...{ db: authContext.options.credential!.db },
         },
       },
     };
@@ -115,7 +115,7 @@ export async function executeScram(
 
   const saslStartCmd = makeFirstMessage(cryptoMethod, credentials, nonce);
   var result = await protocol.commandSingle(db, saslStartCmd);
-  await continueScramConversation(cryptoMethod, result, authContext);
+  return await continueScramConversation(cryptoMethod, result, authContext);
 }
 
 export async function continueScramConversation(
