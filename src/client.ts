@@ -52,6 +52,7 @@ export class MongoClient {
     } else {
       await this.#protocol.connect();
     }
+    return this.database((options as ConnectOptions).db);
   }
 
   async listDatabases(options?: {
