@@ -223,10 +223,10 @@ export function fixPayload(payload: string) {
 export function fixPayload2(payload: string) {
   var temp = payload.split("v=");
   temp.shift();
-  payload = temp.join("");
+  payload = temp.join("v=");
   temp = payload.split("ok");
   temp.pop();
-  return "v=" + temp.join("");
+  return "v=" + temp.join("ok");
 }
 
 export function parsePayload(payload: string) {
