@@ -43,7 +43,7 @@ export class MongoClient {
       } else {
         throw new MongoError(`Auth mechanism not implemented: ${mechanism}`);
       }
-      var request = authPlugin.prepare(options as ConnectOptions, authContext);
+      var request = authPlugin.prepare(authContext);
       authContext.response = await this.#protocol.commandSingle(
         "admin",
         request,
@@ -52,6 +52,7 @@ export class MongoClient {
     } else {
       await this.#protocol.connect();
     }
+    return this.database((options as ConnectOptions).db);
   }
 
   async listDatabases(options?: {

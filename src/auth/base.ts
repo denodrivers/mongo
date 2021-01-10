@@ -3,7 +3,9 @@ import { WireProtocol } from "../protocol/mod.ts";
 
 export abstract class AuthPlugin {
   abstract prepare(
-    connectOptions: ConnectOptions,
+    authContext: AuthContext,
+  ): Document;
+  abstract auth(
     authContext: AuthContext,
   ): Document;
 }
