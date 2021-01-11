@@ -138,15 +138,11 @@ export function parse_url(url: string): any {
         serverOptions.auto_reconnect = value === "true";
         break;
       case "ssl":
-        if (value === "prefer") {
-          serverOptions.ssl = value;
-          replSetServersOptions.ssl = value;
-          mongosOptions.ssl = value;
-          break;
-        }
-        serverOptions.ssl = value === "true";
-        replSetServersOptions.ssl = value === "true";
-        mongosOptions.ssl = value === "true";
+        throw new Error("For ssl use certFile");
+      case "certFile":
+        serverOptions.certFile = decodeURIComponent(value);
+        replSetServersOptions.certFile = decodeURIComponent(value);
+        mongosOptions.certFile = decodeURIComponent(value);
         break;
       case "sslValidate":
         serverOptions.sslValidate = value === "true";
@@ -377,9 +373,6 @@ export function parse(url: string, optOverride: any = {}): ConnectOptions {
   var connectOptions: any = {};
   connectOptions.servers = data.servers;
   connectOptions.db = data.dbName;
-  if (data.compression) {
-    connectOptions.compression = data.compression;
-  }
   if (data.auth) {
     connectOptions.credential = <Credential> {
       username: data.auth.user,
@@ -391,5 +384,8 @@ export function parse(url: string, optOverride: any = {}): ConnectOptions {
   connectOptions.compression = data.server_options.compression
     ? data.server_options.compression.compressors
     : [];
+  if (data.server_options.certFile) {
+    connectOptions.certFile = data.server_options.certFile;
+  }
   return connectOptions as ConnectOptions;
 }

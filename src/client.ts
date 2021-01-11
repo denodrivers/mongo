@@ -21,10 +21,19 @@ export class MongoClient {
     if (typeof options === "string") {
       options = parse(options);
     }
-    const conn = await Deno.connect({
-      hostname: options.servers[0].host,
-      port: options.servers[0].port,
-    });
+    if (options.certFile) {
+      const conn = await Deno.connectTls({
+        certFile: options.certFile,
+        hostname: options.servers[0].host,
+        port: options.servers[0].port,
+      });
+    } else {
+      const conn = await Deno.connect({
+        hostname: options.servers[0].host,
+        port: options.servers[0].port,
+      });
+    }
+
     this.#conn = conn;
     this.#protocol = new WireProtocol(conn);
 
