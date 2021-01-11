@@ -142,10 +142,10 @@ export function parse_url(url: string): any {
         replSetServersOptions.ssl = value === "true";
         mongosOptions.ssl = value === "true";
         break;
-      case "certFile":
-        serverOptions.certFile = decodeURIComponent(value);
-        replSetServersOptions.certFile = decodeURIComponent(value);
-        mongosOptions.certFile = decodeURIComponent(value);
+      case "tlsCAFile":
+        serverOptions.tlsCAFile = decodeURIComponent(value);
+        replSetServersOptions.tlsCAFile = decodeURIComponent(value);
+        mongosOptions.tlsCAFile = decodeURIComponent(value);
         break;
       case "sslValidate":
         serverOptions.sslValidate = value === "true";
@@ -390,8 +390,8 @@ export function parse(url: string, optOverride: any = {}): ConnectOptions {
   if (data.server_options.ssl) {
     connectOptions.ssl = data.server_options.ssl;
   }
-  if (data.server_options.certFile) {
-    connectOptions.certFile = data.server_options.certFile;
+  if (data.server_options.tlsCAFile) {
+    connectOptions.certFile = data.server_options.tlsCAFile;
   }
   return connectOptions as ConnectOptions;
 }
