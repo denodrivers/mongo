@@ -22,17 +22,17 @@ export class MongoClient {
       options = parse(options);
     }
     var conn;
-    if (options.certFile) {
-      conn = await Deno.connectTls({
-        certFile: options.certFile,
-        hostname: options.servers[0].host,
-        port: options.servers[0].port,
-      });
+    var denoConnectOps: any = {
+      hostname: options.servers[0].host,
+      port: options.servers[0].port,
+    };
+    if (options.ssl) {
+      if (options.certFile) {
+        denoConnectOps.certFile = options.certFile;
+      }
+      conn = await Deno.connectTls(denoConnectOps);
     } else {
-      conn = await Deno.connect({
-        hostname: options.servers[0].host,
-        port: options.servers[0].port,
-      });
+      conn = await Deno.connect(denoConnectOps);
     }
 
     this.#conn = conn;
