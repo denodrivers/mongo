@@ -4,6 +4,7 @@ export type Document = Bson.Document;
 
 export interface ConnectOptions {
   compression?: string;
+  certFile?: string;
   servers: {
     host: string;
     port: number;
