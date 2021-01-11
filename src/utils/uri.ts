@@ -372,7 +372,7 @@ export function parse_url(url: string): any {
   return object;
 }
 export function parse(url: string, optOverride: any = {}): ConnectOptions {
-  var data = { ...parse_url(url), ...optOverride };
+  var data = parse_url(url);
   var connectOptions: any = {};
   connectOptions.servers = data.servers;
   connectOptions.db = data.dbName;
@@ -393,5 +393,5 @@ export function parse(url: string, optOverride: any = {}): ConnectOptions {
   if (data.server_options.tlsCAFile) {
     connectOptions.certFile = data.server_options.tlsCAFile;
   }
-  return connectOptions as ConnectOptions;
+  return { ...connectOptions, ...optOverride } as ConnectOptions;
 }
