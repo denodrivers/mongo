@@ -26,7 +26,7 @@ export class MongoClient {
       hostname: options.servers[0].host,
       port: options.servers[0].port,
     };
-    if (options.ssl) {
+    if (options.tls) {
       if (options.certFile) {
         denoConnectOps.certFile = options.certFile;
       }

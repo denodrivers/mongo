@@ -137,10 +137,10 @@ export function parse_url(url: string): any {
       case "auto_reconnect":
         serverOptions.auto_reconnect = value === "true";
         break;
-      case "ssl":
-        serverOptions.ssl = value === "true";
-        replSetServersOptions.ssl = value === "true";
-        mongosOptions.ssl = value === "true";
+      case "tls":
+        serverOptions.tls = value === "true";
+        replSetServersOptions.tls = value === "true";
+        mongosOptions.tls = value === "true";
         break;
       case "tlsCAFile":
         serverOptions.tlsCAFile = decodeURIComponent(value);
@@ -387,8 +387,8 @@ export function parse(url: string, optOverride: any = {}): ConnectOptions {
   connectOptions.compression = data.server_options.compression
     ? data.server_options.compression.compressors
     : [];
-  if (data.server_options.ssl) {
-    connectOptions.ssl = data.server_options.ssl;
+  if (data.server_options.tls) {
+    connectOptions.tls = data.server_options.tls;
   }
   if (data.server_options.tlsCAFile) {
     connectOptions.certFile = data.server_options.tlsCAFile;
