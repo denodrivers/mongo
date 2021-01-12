@@ -123,6 +123,5 @@ export function parse(url: string, optOverride: any = {}): ConnectOptions {
   if (data.search.safe) {
     connectOptions.safe = data.search.safe === "true";
   }
-  console.log(connectOptions);
   return { ...connectOptions, ...optOverride } as ConnectOptions;
 }
