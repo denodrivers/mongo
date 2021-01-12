@@ -46,9 +46,7 @@ export function parse_url(url: string): Parts {
   function parse(url: string): Parts {
     const parsed: Parts = parse_simple(url);
     if (parsed.auth) parsed.auth = decodeAuth(parsed.auth);
-    parsed.search = parsed.search
-      ? queryString("?", parsed.search)
-      : {};
+    parsed.search = parsed.search ? queryString("?", parsed.search) : {};
     parsed.hash = parsed.hash ? queryString("#", parsed.hash.toString()) : {};
     return parsed;
   }
