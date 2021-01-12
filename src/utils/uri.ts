@@ -101,7 +101,7 @@ export function parse(url: string, optOverride: any = {}): ConnectOptions {
     connectOptions.credential = <Credential> {
       username: decodeURIComponent(data.auth.user),
       password: decodeURIComponent(data.auth.password),
-      db: decodeURIComponent(connectOptions.db),
+      db: connectOptions.db,
       mechanism: data.search.authMechanism || "SCRAM-SHA-256",
     };
   }
