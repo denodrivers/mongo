@@ -28,7 +28,7 @@ export class MongoClient {
       options = parse(options);
     }
     let conn;
-    let denoConnectOps: DenoConnectOptions = {
+    const denoConnectOps: DenoConnectOptions = {
       hostname: options.servers[0].host,
       port: options.servers[0].port,
     };
