@@ -3,7 +3,7 @@ import { Bson } from "../deps.ts";
 export type Document = Bson.Document;
 
 export interface ConnectOptions {
-  compression?: string;
+  compression?: string[];
   certFile?: string;
   tls?: boolean;
   safe?: boolean;
