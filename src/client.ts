@@ -13,6 +13,12 @@ import { MongoError } from "./error.ts";
 
 const DENO_DRIVER_VERSION = "0.0.1";
 
+export interface DenoConnectOptions {
+  hostname: string;
+  port: number;
+  certFile?: string;
+}
+
 export class MongoClient {
   #protocol?: WireProtocol;
   #conn?: Deno.Conn;
@@ -21,8 +27,8 @@ export class MongoClient {
     if (typeof options === "string") {
       options = parse(options);
     }
-    var conn;
-    var denoConnectOps: any = {
+    let conn;
+    let denoConnectOps: DenoConnectOptions = {
       hostname: options.servers[0].host,
       port: options.servers[0].port,
     };
@@ -44,8 +50,8 @@ export class MongoClient {
         (options as ConnectOptions).credential,
         options as ConnectOptions,
       );
-      var mechanism = (options as ConnectOptions).credential!.mechanism;
-      var authPlugin;
+      let mechanism = (options as ConnectOptions).credential!.mechanism;
+      let authPlugin;
       if (mechanism === "SCRAM-SHA-256") {
         authPlugin = new ScramAuthPlugin("sha256"); //TODO AJUST sha256
       } else if (mechanism === "SCRAM-SHA-1") {
@@ -53,7 +59,7 @@ export class MongoClient {
       } else {
         throw new MongoError(`Auth mechanism not implemented: ${mechanism}`);
       }
-      var request = authPlugin.prepare(authContext);
+      let request = authPlugin.prepare(authContext);
       authContext.response = await this.#protocol.commandSingle(
         "admin",
         request,
