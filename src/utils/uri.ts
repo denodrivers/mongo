@@ -32,7 +32,11 @@ export function parse_url(url: string): Parts {
     parts.href = url;
     const matches = url.match(pattern);
     var l = fragments.length;
-    while (l--) parts[fragments[l]] = matches![l + 1];
+    while (l--) {
+      parts[fragments[l]] = matches![l + 1]
+        ? decodeURIComponent(matches![l + 1])
+        : matches![l + 1];
+    }
     parts.path = parts.search
       ? (parts.pathname ? parts.pathname + parts.search : parts.search)
       : parts.pathname;
@@ -86,39 +90,39 @@ export function parse(url: string, optOverride: any = {}): ConnectOptions {
   const data = parse_url(url);
   const connectOptions: any = {};
   var server: any = {
-    host: decodeURIComponent(data.hostname!),
+    host: data.hostname!,
     port: data.port ? parseInt(data.port) : 27017,
   };
   if (data.hostname!.includes(".sock")) {
-    server.domainSocket = decodeURIComponent(data.hostname!);
+    server.domainSocket = data.hostname!;
   }
   connectOptions.servers = [server];
-  connectOptions.db =
-    (data.pathname && decodeURIComponent(data.pathname).length > 1)
-      ? decodeURIComponent(data.pathname).substring(1)
-      : "admin";
+  connectOptions.db = (data.pathname && data.pathname.length > 1)
+    ? data.pathname.substring(1)
+    : "admin";
   if (data.auth) {
     connectOptions.credential = <Credential> {
-      username: decodeURIComponent(data.auth.user),
-      password: decodeURIComponent(data.auth.password),
+      username: data.auth.user,
+      password: data.auth.password,
       db: connectOptions.db,
       mechanism: data.search.authMechanism || "SCRAM-SHA-256",
     };
   }
   connectOptions.compression = data.search.compressors
-    ? decodeURIComponent(data.search.compressors).split(",")
+    ? data.search.compressors.split(",")
     : [];
   if (data.search.appname) {
-    connectOptions.appname = decodeURIComponent(data.search.appname);
+    connectOptions.appname = data.search.appname;
   }
   if (data.search.tls) {
     connectOptions.tls = data.search.tls === "true";
   }
   if (data.search.tlsCAFile) {
-    connectOptions.certFile = decodeURIComponent(data.search.tlsCAFile);
+    connectOptions.certFile = data.search.tlsCAFile;
   }
   if (data.search.safe) {
     connectOptions.safe = data.search.safe === "true";
   }
+  console.log(connectOptions);
   return { ...connectOptions, ...optOverride } as ConnectOptions;
 }
