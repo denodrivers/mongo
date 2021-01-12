@@ -340,3 +340,151 @@ export interface Credential {
    */
   mechanism?: "SCRAM-SHA-1" | "SCRAM-SHA-256";
 }
+
+export interface IndexOptions {
+  /**
+   * Specifies the index’s fields. For each field, specify a key-value pair in which 
+   * the key is the name of the field to index and the value is either the index direction 
+   * or index type. If specifying direction, specify 1 for ascending or -1 for descending.
+   */
+  key: Document;
+
+  /**
+   * 	A name that uniquely identifies the index.
+   */
+  name: string;
+
+  /**
+   * Optional. Deprecated in MongoDB 4.2.
+   */
+  background?: boolean;
+
+  /**
+   * Optional. Creates a unique index so that the collection will not accept insertion 
+   * or update of documents where the index key value matches an existing value in the index.
+   * Specify true to create a unique index. The default value is false.
+   */
+  unique?: boolean;
+
+  /**
+   * Optional. If specified, the index only references documents that match the filter expression. 
+   * See Partial Indexes for more information.
+   */
+  partialFilterExpression?: Document;
+
+  /**
+   * Optional. If true, the index only references documents with the specified field. 
+   * These indexes use less space but behave differently in some situations (particularly sorts). 
+   * The default value is false. See Sparse Indexes for more information.
+   */
+  sparse?: boolean;
+
+  /**
+   * Optional. Specifies a value, in seconds, as a TTL to control how long MongoDB retains 
+   * documents in this collection. See Expire Data from Collections by Setting TTL for 
+   * more information on this functionality. This applies only to TTL indexes.
+   */
+  expireAfterSeconds?: number;
+
+  /**
+   * Optional. A flag that determines whether the index is hidden from the query planner. 
+   * A hidden index is not evaluated as part of query plan selection. Default is false.
+   */
+  hidden?: boolean;
+
+  /**
+   * Optional. Allows users to configure the storage engine on a per-index basis when creating an index.
+   */
+  storageEngine?: Document;
+
+  /**
+   * Optional. For text indexes, a document that contains field and weight pairs. 
+   * The weight is an integer ranging from 1 to 99,999 and denotes the significance 
+   * of the field relative to the other indexed fields in terms of the score. 
+   * You can specify weights for some or all the indexed fields. 
+   * See Control Search Results with Weights to adjust the scores. 
+   * The default value is 1.
+   */
+  weights?: Document;
+
+  /**
+   * Optional. For text indexes, the language that determines the list of 
+   * stop words and the rules for the stemmer and tokenizer. 
+   * See Text Search Languages for the available languages and Specify a Language 
+   * for Text Index for more information and examples. The default value is english.
+   */
+  default_language?: string;
+
+  /**
+   * Optional. For text indexes, the name of the field, in the collection’s documents, 
+   * that contains the override language for the document. The default value is language. 
+   * See Use any Field to Specify the Language for a Document for an example.
+   */
+  language_override?: string;
+
+  /**
+   * Optional. The text index version number. Users can use this option to override the default version number.
+   */
+  textIndexVersion?: number;
+
+  /**
+   * Optional. The 2dsphere index version number. Users can use this option to override the default version number.
+   */
+  "2dsphereIndexVersion"?: number;
+
+  /**
+   * Optional. For 2d indexes, the number of precision of the stored geohash value of the location data.
+   * The bits value ranges from 1 to 32 inclusive. The default value is 26.
+   */
+  bits?: number;
+
+  /**
+   * Optional. For 2d indexes, the lower inclusive boundary for the longitude and latitude values. The default value is -180.0.
+   */
+  min?: number;
+
+  /**
+   * Optional. For 2d indexes, the upper inclusive boundary for the longitude and latitude values. The default value is 180.0.
+   */
+  max?: number;
+
+  /**
+   * For geoHaystack indexes, specify the number of units within which to group the location values; 
+   * i.e. group in the same bucket those location values that are within the specified number 
+   * of units to each other. The value must be greater than 0.
+   */
+  bucketSize?: number;
+
+  /**
+   * Optional. Specifies the collation for the index.
+   */
+  collation?: Document;
+
+  /**
+   * Allows users to include or exclude specific field paths from a wildcard index using 
+   * the { "$**" : 1} key pattern. This option is only valid if creating a wildcard index 
+   * on all document fields. You cannot specify this option if creating a wildcard index 
+   * on a specific field path and its subfields, e.g. { "path.to.field.$**" : 1 }
+   */
+  wildcardProjection?: Document;
+}
+
+export interface CreateIndexOptions {
+  /** 
+   * Specifies the indexes to create. Each document in the array specifies a separate index.
+   */
+  indexes: IndexOptions[];
+
+  /** Optional. A document expressing the write concern. Omit to use the default write concern. */
+  writeConcern?: Document;
+
+  /**
+   * Optional. The minimum number of data-bearing voting replica set members (i.e. commit quorum), 
+   * including the primary, that must report a successful index build before the primary marks the indexes as ready. 
+   * A “voting” member is any replica set member where members[n].votes is greater than 0.
+   */
+  commitQuorum?: number | string;
+
+  /** Optional. A user-provided comment to attach to this command. Once set */
+  comment?: Document;
+}

@@ -8,6 +8,7 @@ testWithClient("createUser", async (client) => {
   const db = client.database("test");
   await db.createUser("user1", "y3mq3mpZ3J6PGfgg");
 });
+
 Deno.test("connect authorization test 1 - test db", async () => {
   var username = "user1";
   var password = "y3mq3mpZ3J6PGfgg";
@@ -20,6 +21,7 @@ Deno.test("connect authorization test 1 - test db", async () => {
   assert(names.length > 0);
   client.close();
 });
+
 testWithClient("dropUser", async (client) => {
   const db = client.database("test");
   await db.dropUser("user1");
@@ -29,6 +31,7 @@ testWithClient("createUser", async (client) => {
   const db = client.database("test");
   await db.createUser("user2", "Qa6WkQSuXF425sWZ");
 });
+
 Deno.test("connect authorization test 2 - test db", async () => {
   var username = "user2";
   var password = "Qa6WkQSuXF425sWZ";
@@ -41,6 +44,7 @@ Deno.test("connect authorization test 2 - test db", async () => {
   assert(names.length > 0);
   client.close();
 });
+
 testWithClient("dropUser", async (client) => {
   const db = client.database("test");
   await db.dropUser("user2");

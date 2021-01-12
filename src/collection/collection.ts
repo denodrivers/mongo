@@ -2,6 +2,7 @@ import { Bson } from "../../deps.ts";
 import { WireProtocol } from "../protocol/mod.ts";
 import {
   CountOptions,
+  CreateIndexOptions,
   DeleteOptions,
   DistinctOptions,
   Document,
@@ -10,8 +11,8 @@ import {
   InsertOptions,
   UpdateOptions,
 } from "../types.ts";
-import { FindCursor } from "./commands/find.ts";
 import { AggregateCursor } from "./commands/aggregate.ts";
+import { FindCursor } from "./commands/find.ts";
 import { update } from "./commands/update.ts";
 
 export class Collection<T> {
@@ -167,6 +168,27 @@ export class Collection<T> {
       dbName: this.#dbName,
       collectionName: this.name,
       options,
+    });
+  }
+
+  // TODO: add test cases
+  async createIndexes(options: CreateIndexOptions) {
+    const res = await this.#protocol.commandSingle<{
+      ok: number;
+      errmsg: string;
+      code: number;
+      codeName: string;
+    }>(this.#dbName, {
+      createIndexes: this.name,
+      ...options,
+    });
+    return res;
+  }
+
+  // TODO: add type definition
+  async listIndexes() {
+    return await this.#protocol.commandSingle(this.#dbName, {
+      listIndexes: this.name,
     });
   }
 }

@@ -72,6 +72,12 @@ export class MongoClient {
     return databases;
   }
 
+  // TODO: add test cases
+  async runCommand<T = any>(db: string, body: Document): Promise<T> {
+    assert(this.#protocol);
+    return await this.#protocol.commandSingle(db, body);
+  }
+
   database(name: string): Database {
     assert(this.#protocol);
     return new Database(this.#protocol, name);
