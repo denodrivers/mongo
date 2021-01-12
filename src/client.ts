@@ -50,7 +50,7 @@ export class MongoClient {
         (options as ConnectOptions).credential,
         options as ConnectOptions,
       );
-      let mechanism = (options as ConnectOptions).credential!.mechanism;
+      const mechanism = (options as ConnectOptions).credential!.mechanism;
       let authPlugin;
       if (mechanism === "SCRAM-SHA-256") {
         authPlugin = new ScramAuthPlugin("sha256"); //TODO AJUST sha256
@@ -59,7 +59,7 @@ export class MongoClient {
       } else {
         throw new MongoError(`Auth mechanism not implemented: ${mechanism}`);
       }
-      let request = authPlugin.prepare(authContext);
+      const request = authPlugin.prepare(authContext);
       authContext.response = await this.#protocol.commandSingle(
         "admin",
         request,
