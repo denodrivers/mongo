@@ -88,11 +88,11 @@ export function parse(url: string, optOverride: any = {}): ConnectOptions {
   const data = parse_url(url);
   const connectOptions: ConnectOptions = { servers: [], db: "" };
   var server: any = {
-    host: data.hostname!,
+    host: data.hostname,
     port: data.port ? parseInt(data.port) : 27017,
   };
   if (data.hostname!.includes(".sock")) {
-    server.domainSocket = data.hostname!;
+    server.domainSocket = data.hostname;
   }
   connectOptions.servers = [server];
   connectOptions.db = (data.pathname && data.pathname.length > 1)
