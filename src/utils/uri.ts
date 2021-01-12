@@ -44,8 +44,8 @@ export function parse_url(url: string): Parts {
   }
 
   function parse(url: string): Parts {
-    const parsed: Parts = parse_simple(url);
-    if (parsed.auth) parsed.auth = decodeAuth(parsed.auth.toString());
+    const parsed: any = parse_simple(url);
+    if (parsed.auth) parsed.auth = decodeAuth(parsed.auth);
     parsed.search = parsed.search ? queryString("?", parsed.search) : {};
     parsed.hash = parsed.hash ? queryString("#", parsed.hash) : {};
     return parsed;
@@ -86,7 +86,7 @@ export function parse_url(url: string): Parts {
 }
 export function parse(url: string, optOverride: any = {}): ConnectOptions {
   const data = parse_url(url);
-  const connectOptions: any = {};
+  const connectOptions: ConnectOptions = { servers: [], db: "" };
   var server: any = {
     host: data.hostname!,
     port: data.port ? parseInt(data.port) : 27017,
