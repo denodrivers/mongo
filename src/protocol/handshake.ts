@@ -18,6 +18,7 @@ export interface HandshakeDocument extends Document {
   client: any;
   compression: string[];
   saslSupportedMechs?: string;
+  speculativeAuthenticate?: Document;
 }
 
 interface HandshakeResponse {

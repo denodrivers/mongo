@@ -8,7 +8,7 @@ import {
   ListDatabaseInfo,
 } from "./types.ts";
 import { parse } from "./utils/uri.ts";
-import { AuthContext, ScramAuthPlugin } from "./auth/mod.ts";
+import { AuthContext, ScramAuthPlugin, X509AuthPlugin } from "./auth/mod.ts";
 import { MongoError } from "./error.ts";
 
 const DENO_DRIVER_VERSION = "0.0.1";
@@ -56,6 +56,8 @@ export class MongoClient {
         authPlugin = new ScramAuthPlugin("sha256"); //TODO AJUST sha256
       } else if (mechanism === "SCRAM-SHA-1") {
         authPlugin = new ScramAuthPlugin("sha1");
+      } else if (mechanism === "MONGODB-X509") {
+        authPlugin = new X509AuthPlugin();
       } else {
         throw new MongoError(`Auth mechanism not implemented: ${mechanism}`);
       }
