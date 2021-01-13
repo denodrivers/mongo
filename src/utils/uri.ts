@@ -118,6 +118,9 @@ export function parse(url: string, optOverride: any = {}): ConnectOptions {
   if (data.search.tlsCAFile) {
     connectOptions.certFile = data.search.tlsCAFile;
   }
+  if (data.search.tlsCertificateKeyFile) {
+    connectOptions.keyFile = data.search.tlsCertificateKeyFile;
+  }
   if (data.search.safe) {
     connectOptions.safe = data.search.safe === "true";
   }

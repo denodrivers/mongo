@@ -17,6 +17,7 @@ export interface DenoConnectOptions {
   hostname: string;
   port: number;
   certFile?: string;
+  keyFile?: string;
 }
 
 export class MongoClient {
@@ -35,6 +36,9 @@ export class MongoClient {
     if (options.tls) {
       if (options.certFile) {
         denoConnectOps.certFile = options.certFile;
+      }
+      if (options.keyFile) {
+        denoConnectOps.keyFile = options.keyFile;
       }
       conn = await Deno.connectTls(denoConnectOps);
     } else {
