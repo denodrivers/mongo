@@ -1,9 +1,10 @@
-import { HI } from "../../src/auth/mod.ts";
-import { assertEquals } from "../test.deps.ts";
+import { HI } from "../../../src/auth/mod.ts";
+import { assertEquals } from "../../test.deps.ts";
 
 const salt = "rQ9ZY3MntBeuP3E1TDVC4w";
 const iter = 10000;
 const data = "1c33006ec1ffd90f9cadcbcc0e118200";
+
 Deno.test({
   name: "HI",
   fn() {

@@ -18,3 +18,8 @@ async function getClient(): Promise<MongoClient> {
   await client.connect(`mongodb://${hostname}:27017`);
   return client;
 }
+
+export async function cheanup() {
+  const db = (await getClient()).database("test");
+  await db.collection("mongo_test_users").drop();
+}

@@ -2,8 +2,8 @@ import {
   cleanUsername,
   clientFirstMessageBare,
   passwordDigest,
-} from "../../src/auth/mod.ts";
-import { assertEquals } from "../test.deps.ts";
+} from "../../../src/auth/mod.ts";
+import { assertEquals } from "../../test.deps.ts";
 
 interface PasswordValid {
   username: string;

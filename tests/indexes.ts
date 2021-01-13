@@ -13,7 +13,7 @@ testWithClient("createIndexes", async (client) => {
   assertEquals(
     res,
     {
-      createdCollectionAutomatically: false,
+      createdCollectionAutomatically: true,
       numIndexesBefore: 1,
       numIndexesAfter: 2,
       ok: 1,
