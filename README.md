@@ -5,7 +5,6 @@
 [![tag](https://img.shields.io/github/tag/manyuanrong/deno_mongo.svg)](https://github.com/manyuanrong/deno_mongo/releases)
 [![Build Status](https://github.com/manyuanrong/deno_mongo/workflows/ci/badge.svg?branch=master)](https://github.com/manyuanrong/deno_mongo/actions)
 [![license](https://img.shields.io/github/license/manyuanrong/deno_mongo.svg)](https://github.com/manyuanrong/deno_mongo)
-[![downloads](https://img.shields.io/github/downloads/manyuanrong/deno_mongo/total)](https://github.com/manyuanrong/deno_mongo)
 [![tag](https://img.shields.io/badge/deno-v1.5.2-green.svg)](https://github.com/denoland/deno)
 
 ## Links
@@ -17,7 +16,7 @@
 ## Examples
 
 ```ts
-import { MongoClient, Bson } from "https://deno.land/x/mongo@v0.20.1/mod.ts";
+import { MongoClient, Bson } from "https://deno.land/x/mongo@v0.21.0/mod.ts";
 
 const client = new MongoClient();
 await client.connect("mongodb://localhost:27017");
