@@ -13,6 +13,12 @@ import { MongoError } from "./error.ts";
 
 const DENO_DRIVER_VERSION = "0.0.1";
 
+export interface DenoConnectOptions {
+  hostname: string;
+  port: number;
+  certFile?: string;
+}
+
 export class MongoClient {
   #protocol?: WireProtocol;
   #conn?: Deno.Conn;
@@ -21,10 +27,20 @@ export class MongoClient {
     if (typeof options === "string") {
       options = parse(options);
     }
-    const conn = await Deno.connect({
+    let conn;
+    const denoConnectOps: DenoConnectOptions = {
       hostname: options.servers[0].host,
       port: options.servers[0].port,
-    });
+    };
+    if (options.tls) {
+      if (options.certFile) {
+        denoConnectOps.certFile = options.certFile;
+      }
+      conn = await Deno.connectTls(denoConnectOps);
+    } else {
+      conn = await Deno.connect(denoConnectOps);
+    }
+
     this.#conn = conn;
     this.#protocol = new WireProtocol(conn);
 
@@ -34,8 +50,8 @@ export class MongoClient {
         (options as ConnectOptions).credential,
         options as ConnectOptions,
       );
-      var mechanism = (options as ConnectOptions).credential!.mechanism;
-      var authPlugin;
+      const mechanism = (options as ConnectOptions).credential!.mechanism;
+      let authPlugin;
       if (mechanism === "SCRAM-SHA-256") {
         authPlugin = new ScramAuthPlugin("sha256"); //TODO AJUST sha256
       } else if (mechanism === "SCRAM-SHA-1") {
@@ -43,7 +59,7 @@ export class MongoClient {
       } else {
         throw new MongoError(`Auth mechanism not implemented: ${mechanism}`);
       }
-      var request = authPlugin.prepare(authContext);
+      const request = authPlugin.prepare(authContext);
       authContext.response = await this.#protocol.commandSingle(
         "admin",
         request,

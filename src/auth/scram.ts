@@ -22,11 +22,11 @@ export class ScramAuthPlugin extends AuthPlugin {
   cryptoMethod: CryptoMethod;
   constructor(cryptoMethod: CryptoMethod) {
     super();
-    this.cryptoMethod = cryptoMethod || "sha1";
+    this.cryptoMethod = cryptoMethod || "sha256";
   }
 
   prepare(authContext: AuthContext): Document {
-    const handshakeDoc = {
+    const handshakeDoc = <HandshakeDocument> {
       ismaster: true,
       client: driverMetadata,
       compression: authContext.options.compression,
@@ -114,7 +114,7 @@ export async function executeScram(
   const db = credentials.db!;
 
   const saslStartCmd = makeFirstMessage(cryptoMethod, credentials, nonce);
-  var result = await protocol.commandSingle(db, saslStartCmd);
+  const result = await protocol.commandSingle(db, saslStartCmd);
   return await continueScramConversation(cryptoMethod, result, authContext);
 }
 
@@ -144,7 +144,7 @@ export async function continueScramConversation(
     processedPassword = passwordDigest(username, password);
   }
 
-  var payload = fixPayload(dec.decode(response.payload.buffer));
+  const payload = fixPayload(dec.decode(response.payload.buffer));
   const dict = parsePayload(payload);
 
   const iterations = parseInt(dict.i, 10);
@@ -191,7 +191,7 @@ export async function continueScramConversation(
     payload: new Binary(enc.encode(clientFinal)),
   };
 
-  var result = await protocol.commandSingle(db, saslContinueCmd);
+  const result = await protocol.commandSingle(db, saslContinueCmd);
 
   const parsedResponse = parsePayload(
     fixPayload2(dec.decode(result.payload.buffer)),
@@ -213,9 +213,9 @@ export async function continueScramConversation(
 
 //this is a hack to fix codification in payload (in being and end of payload exists a codification problem, needs investigation ...)
 export function fixPayload(payload: string) {
-  var temp = payload.split("=");
+  const temp = payload.split("=");
   temp.shift();
-  var it = parseInt(temp.pop()!, 10);
+  const it = parseInt(temp.pop()!, 10);
   payload = "r=" + temp.join("=") + "=" + it;
   return payload;
 }
@@ -259,17 +259,9 @@ export function passwordDigest(username: string, password: string) {
 }
 
 // XOR two buffers
-export function xor(a: any, b: any) {
-  if (!(a instanceof Uint8Array)) {
-    a = enc.encode(a);
-  }
-
-  if (!(b instanceof Uint8Array)) {
-    b = enc.encode(b);
-  }
-
+export function xor(a: Uint8Array, b: Uint8Array) {
   const length = Math.max(a.length, b.length);
-  var res = new Uint8Array(length);
+  const res = new Uint8Array(length);
 
   for (let i = 0; i < length; i += 1) {
     res[i] = a[i] ^ b[i];
