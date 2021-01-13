@@ -2,7 +2,7 @@
 import { ConnectOptions, Credential } from "../types.ts";
 
 interface Parts {
-  auth?: { user: string; password: string };
+  auth?: { user: string; password?: string };
   hash?: any;
   hostname?: string;
   href?: string;
