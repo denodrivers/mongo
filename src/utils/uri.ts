@@ -120,12 +120,9 @@ export function parse(url: string, optOverride: any = {}): ConnectOptions {
   }
   if (data.search.tlsCertificateKeyFile) {
     connectOptions.keyFile = data.search.tlsCertificateKeyFile;
-    throw new Error(
-      "tlsCertificateKeyFile not implemented yet. Need Deno.connectTls with keyFile option.",
-    );
   }
   if (data.search.tlsCertificateKeyFilePassword) {
-    throw new Error("tlsCertificateKeyFilePassword not implemented yet.");
+    connectOptions.keyFilePassword = data.search.tlsCertificateKeyFilePassword;
   }
   if (data.search.safe) {
     connectOptions.safe = data.search.safe === "true";

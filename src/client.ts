@@ -17,7 +17,6 @@ export interface DenoConnectOptions {
   hostname: string;
   port: number;
   certFile?: string;
-  keyFile?: string;
 }
 
 export class MongoClient {
@@ -38,7 +37,14 @@ export class MongoClient {
         denoConnectOps.certFile = options.certFile;
       }
       if (options.keyFile) {
-        denoConnectOps.keyFile = options.keyFile;
+        if (options.keyFilePassword) {
+          throw new MongoError(
+            `Tls keyFilePassword not implemented in Deno driver`,
+          );
+          //TODO, need something like const key = decrypt(options.keyFile) ...
+        }
+        throw new MongoError(`Tls keyFile not implemented in Deno driver`);
+        //TODO, need Deno.connectTls with something like key or keyFile option.
       }
       conn = await Deno.connectTls(denoConnectOps);
     } else {
@@ -63,7 +69,9 @@ export class MongoClient {
       } else if (mechanism === "MONGODB-X509") {
         authPlugin = new X509AuthPlugin();
       } else {
-        throw new MongoError(`Auth mechanism not implemented: ${mechanism}`);
+        throw new MongoError(
+          `Auth mechanism not implemented in Deno driver: ${mechanism}`,
+        );
       }
       const request = authPlugin.prepare(authContext);
       authContext.response = await this.#protocol.commandSingle(

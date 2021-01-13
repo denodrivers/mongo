@@ -6,6 +6,7 @@ export interface ConnectOptions {
   compression?: string[];
   certFile?: string;
   keyFile?: string;
+  keyFilePassword?: string;
   tls?: boolean;
   safe?: boolean;
   credential?: Credential;
