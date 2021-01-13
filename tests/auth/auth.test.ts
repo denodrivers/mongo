@@ -4,8 +4,6 @@ import {
   passwordDigest,
 } from "../../src/auth/mod.ts";
 import { assertEquals } from "../test.deps.ts";
-import { Credential } from "../../src/types.ts";
-import { Binary } from "../../bson/mod.ts";
 
 interface PasswordValid {
   username: string;

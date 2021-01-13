@@ -13,6 +13,7 @@ import {
 } from "../types.ts";
 import { AggregateCursor } from "./commands/aggregate.ts";
 import { FindCursor } from "./commands/find.ts";
+import { ListIndexesCursor } from "./commands/listIndexes.ts";
 import { update } from "./commands/update.ts";
 
 export class Collection<T> {
@@ -171,13 +172,12 @@ export class Collection<T> {
     });
   }
 
-  // TODO: add test cases
   async createIndexes(options: CreateIndexOptions) {
     const res = await this.#protocol.commandSingle<{
       ok: number;
-      errmsg: string;
-      code: number;
-      codeName: string;
+      createdCollectionAutomatically: boolean;
+      numIndexesBefore: number;
+      numIndexesAfter: number;
     }>(this.#dbName, {
       createIndexes: this.name,
       ...options,
@@ -185,10 +185,13 @@ export class Collection<T> {
     return res;
   }
 
-  // TODO: add type definition
-  async listIndexes() {
-    return await this.#protocol.commandSingle(this.#dbName, {
-      listIndexes: this.name,
+  listIndexes() {
+    return new ListIndexesCursor<
+      { v: number; key: Document; name: string; ns: string }
+    >({
+      protocol: this.#protocol,
+      dbName: this.#dbName,
+      collectionName: this.name,
     });
   }
 }

@@ -1,5 +1,5 @@
-import { assertEquals } from "../test.deps.ts";
 import { HI } from "../../src/auth/mod.ts";
+import { assertEquals } from "../test.deps.ts";
 
 const salt = "rQ9ZY3MntBeuP3E1TDVC4w";
 const iter = 10000;
