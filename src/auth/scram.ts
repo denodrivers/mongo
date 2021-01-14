@@ -47,7 +47,7 @@ export class ScramAuthPlugin extends AuthPlugin {
     return request;
   }
 
-  async auth(authContext: AuthContext) {
+  async auth(authContext: AuthContext): Promise<Document> {
     const response = authContext.response;
     if (response && response.speculativeAuthenticate) {
       return await continueScramConversation(

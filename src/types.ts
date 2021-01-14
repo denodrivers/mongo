@@ -5,6 +5,8 @@ export type Document = Bson.Document;
 export interface ConnectOptions {
   compression?: string[];
   certFile?: string;
+  keyFile?: string;
+  keyFilePassword?: string;
   tls?: boolean;
   safe?: boolean;
   credential?: Credential;
@@ -341,7 +343,7 @@ export interface Credential {
   /**
    * Which authentication mechanism to use. If not provided, one will be negotiated with the server.
    */
-  mechanism?: "SCRAM-SHA-1" | "SCRAM-SHA-256";
+  mechanism?: "SCRAM-SHA-1" | "SCRAM-SHA-256" | "MONGODB-X509";
 }
 
 export interface IndexOptions {

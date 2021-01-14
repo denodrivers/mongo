@@ -8,7 +8,7 @@ import {
   ListDatabaseInfo,
 } from "./types.ts";
 import { parse } from "./utils/uri.ts";
-import { AuthContext, ScramAuthPlugin } from "./auth/mod.ts";
+import { AuthContext, ScramAuthPlugin, X509AuthPlugin } from "./auth/mod.ts";
 import { MongoError } from "./error.ts";
 
 const DENO_DRIVER_VERSION = "0.0.1";
@@ -36,6 +36,16 @@ export class MongoClient {
       if (options.certFile) {
         denoConnectOps.certFile = options.certFile;
       }
+      if (options.keyFile) {
+        if (options.keyFilePassword) {
+          throw new MongoError(
+            `Tls keyFilePassword not implemented in Deno driver`,
+          );
+          //TODO, need something like const key = decrypt(options.keyFile) ...
+        }
+        throw new MongoError(`Tls keyFile not implemented in Deno driver`);
+        //TODO, need Deno.connectTls with something like key or keyFile option.
+      }
       conn = await Deno.connectTls(denoConnectOps);
     } else {
       conn = await Deno.connect(denoConnectOps);
@@ -56,8 +66,12 @@ export class MongoClient {
         authPlugin = new ScramAuthPlugin("sha256"); //TODO AJUST sha256
       } else if (mechanism === "SCRAM-SHA-1") {
         authPlugin = new ScramAuthPlugin("sha1");
+      } else if (mechanism === "MONGODB-X509") {
+        authPlugin = new X509AuthPlugin();
       } else {
-        throw new MongoError(`Auth mechanism not implemented: ${mechanism}`);
+        throw new MongoError(
+          `Auth mechanism not implemented in Deno driver: ${mechanism}`,
+        );
       }
       const request = authPlugin.prepare(authContext);
       authContext.response = await this.#protocol.commandSingle(

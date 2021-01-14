@@ -2,7 +2,7 @@
 import { ConnectOptions, Credential } from "../types.ts";
 
 interface Parts {
-  auth?: { user: string; password: string };
+  auth?: { user: string; password?: string };
   hash?: any;
   hostname?: string;
   href?: string;
@@ -25,7 +25,7 @@ export function parse_url(url: string): Parts {
     "hash",
   ];
   const pattern =
-    /([^:/?#]+:)?(?:(?:\/\/)(?:([^/?#]*:[^@/]+)@)?([^/:?#]+)(?:(?::)(\d+))?)?(\/?[^?#]*)?(\?[^#]*)?(#[^\s]*)?/;
+    /([^:/?#]+:)?(?:(?:\/\/)(?:([^/?#]*:?[^@/]+)@)?([^/:?#]+)(?:(?::)(\d+))?)?(\/?[^?#]*)?(\?[^#]*)?(#[^\s]*)?/;
 
   function parse_simple(url: string): any {
     const parts: any = {};
@@ -117,6 +117,12 @@ export function parse(url: string, optOverride: any = {}): ConnectOptions {
   }
   if (data.search.tlsCAFile) {
     connectOptions.certFile = data.search.tlsCAFile;
+  }
+  if (data.search.tlsCertificateKeyFile) {
+    connectOptions.keyFile = data.search.tlsCertificateKeyFile;
+  }
+  if (data.search.tlsCertificateKeyFilePassword) {
+    connectOptions.keyFilePassword = data.search.tlsCertificateKeyFilePassword;
   }
   if (data.search.safe) {
     connectOptions.safe = data.search.safe === "true";
