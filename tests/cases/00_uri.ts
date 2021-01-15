@@ -140,13 +140,15 @@ export default function uriTests() {
     name:
       "should correctly parse mongodb://fred:foobar@localhost,server2.test:28101/baz",
     fn() {
-      const options = parse("mongodb://fred:foobar@localhost/baz");
+      const options = parse(
+        "mongodb://fred:foobar@localhost,server2.test:28101/baz",
+      );
       assertEquals(options.db, "baz");
-      assertEquals(options.servers.length, 1);
+      assertEquals(options.servers.length, 2);
       assertEquals(options.servers[0].host, "localhost");
       assertEquals(options.servers[0].port, 27017);
       assertEquals(options.servers[1].host, "server2.test");
-      assertEquals(options.servers[2].port, 28101);
+      assertEquals(options.servers[1].port, 28101);
       assertEquals(options.credential!.username, "fred");
       assertEquals(options.credential!.password, "foobar");
     },
