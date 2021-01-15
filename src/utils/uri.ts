@@ -33,10 +33,10 @@ export function parse_url(url: string): Parts {
     const parts: any = {};
     parts.href = url;
     const multiServerMatch = url.match(multipleServerPattern);
-    if ((multiServerMatch[3]).includes(",")) {
-      const serversName = multiServerMatch[3].split(",");
+    if ((multiServerMatch![3]).includes(",")) {
+      const serversName = multiServerMatch![3].split(",");
       const parts = parse_simple(
-        url.replace(multiServerMatch[3], serversName[0]),
+        url.replace(multiServerMatch![3], serversName[0]),
       );
       var subServer: any;
       for (var i = 1; i < serversName.length; i++) {
@@ -52,7 +52,7 @@ export function parse_url(url: string): Parts {
         ? decodeURIComponent(matches![l + 1])
         : matches![l + 1];
     }
-    parts["servers"] = [{ hostname: parts["hostname"], port: parts["port"] }];
+    parts["servers"] = [{ host: parts["hostname"], port: parts["port"] }];
     delete parts["hostname"];
     delete parts["port"];
     parts.path = parts.search
@@ -105,11 +105,11 @@ export function parse_url(url: string): Parts {
 
 export function parse(url: string, optOverride: any = {}): ConnectOptions {
   const data = parse_url(url);
-  const connectOptions: ConnectOptions = { servers: data.servers, db: "" };
+  const connectOptions: ConnectOptions = { servers: data.servers!, db: "" };
   for (var i = 0; i < connectOptions.servers.length; i++) {
-    if (connectOptions.servers[i].hostname.includes(".sock")) {
+    if (connectOptions.servers[i].host.includes(".sock")) {
       connectOptions.servers[i].domainSocket =
-        connectOptions.servers[i].hostname;
+        connectOptions.servers[i].host;
     }
   }
   connectOptions.db = (data.pathname && data.pathname.length > 1)
