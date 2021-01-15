@@ -2,6 +2,12 @@ import { Bson } from "../deps.ts";
 
 export type Document = Bson.Document;
 
+export interface Server {
+  host: string;
+  port: number;
+  domainSocket?: string;
+}
+
 export interface ConnectOptions {
   compression?: string[];
   certFile?: string;
@@ -11,11 +17,7 @@ export interface ConnectOptions {
   safe?: boolean;
   credential?: Credential;
   db: string;
-  servers: {
-    host: string;
-    port: number;
-    domainSocket?: string;
-  }[];
+  servers: Server[];
   [key: string]: any;
 }
 

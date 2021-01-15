@@ -1,14 +1,13 @@
 // mongodb://username:password@example.com:27017,example2.com:27017,...,example.comN:27017/database?key=value&keyN=valueN
-import { ConnectOptions, Credential } from "../types.ts";
+import { ConnectOptions, Credential, Server } from "../types.ts";
 
 interface Parts {
   auth?: { user: string; password?: string };
   hash?: any;
-  hostname?: string;
+  servers?: Server[];
   href?: string;
   path?: string;
   pathname?: string;
-  port?: string;
   protocol?: string;
   search?: any;
 }
@@ -27,9 +26,25 @@ export function parse_url(url: string): Parts {
   const pattern =
     /([^:/?#]+:)?(?:(?:\/\/)(?:([^/?#]*:?[^@/]+)@)?([^/:?#]+)(?:(?::)(\d+))?)?(\/?[^?#]*)?(\?[^#]*)?(#[^\s]*)?/;
 
+  const multipleServerPattern =
+    /([^:/?#]+:)?(?:(?:\/\/)(?:([^/?#]*:?[^@/]+)@)?((?:(?:[^/:?#]+)(?:(?::)(?:\d+))?)+))?/;
+
   function parse_simple(url: string): any {
     const parts: any = {};
     parts.href = url;
+    const multiServerMatch = url.match(multipleServerPattern);
+    if ((multiServerMatch[3]).includes(",")) {
+      const serversName = multiServerMatch[3].split(",");
+      const parts = parse_simple(
+        url.replace(multiServerMatch[3], serversName[0]),
+      );
+      var subServer: any;
+      for (var i = 1; i < serversName.length; i++) {
+        subServer = parse_simple(`temp://${serversName[i]}`);
+        parts["servers"].push(subServer["servers"][0]);
+      }
+      return parts;
+    }
     const matches = url.match(pattern);
     var l = fragments.length;
     while (l--) {
@@ -37,6 +52,9 @@ export function parse_url(url: string): Parts {
         ? decodeURIComponent(matches![l + 1])
         : matches![l + 1];
     }
+    parts["servers"] = [{ hostname: parts["hostname"], port: parts["port"] }];
+    delete parts["hostname"];
+    delete parts["port"];
     parts.path = parts.search
       ? (parts.pathname ? parts.pathname + parts.search : parts.search)
       : parts.pathname;
@@ -84,17 +102,16 @@ export function parse_url(url: string): Parts {
   }
   return parse(url);
 }
+
 export function parse(url: string, optOverride: any = {}): ConnectOptions {
   const data = parse_url(url);
-  const connectOptions: ConnectOptions = { servers: [], db: "" };
-  var server: any = {
-    host: data.hostname,
-    port: data.port ? parseInt(data.port) : 27017,
-  };
-  if (data.hostname!.includes(".sock")) {
-    server.domainSocket = data.hostname;
+  const connectOptions: ConnectOptions = { servers: data.servers, db: "" };
+  for (var i = 0; i < connectOptions.servers.length; i++) {
+    if (connectOptions.servers[i].hostname.includes(".sock")) {
+      connectOptions.servers[i].domainSocket =
+        connectOptions.servers[i].hostname;
+    }
   }
-  connectOptions.servers = [server];
   connectOptions.db = (data.pathname && data.pathname.length > 1)
     ? data.pathname.substring(1)
     : "admin";
