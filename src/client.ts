@@ -23,7 +23,10 @@ export class MongoClient {
   #protocol?: WireProtocol;
   #conn?: Deno.Conn;
 
-  async connect(options: ConnectOptions | string, serverIndex: number = 0) {
+  async connect(
+    options: ConnectOptions | string,
+    serverIndex: number = 0,
+  ): Database {
     try {
       if (typeof options === "string") {
         options = parse(options);
@@ -84,7 +87,6 @@ export class MongoClient {
       } else {
         await this.#protocol.connect();
       }
-      return this.database((options as ConnectOptions).db);
     } catch (e) {
       if (serverIndex < (options as ConnectOptions).servers.length - 1) {
         return await this.connect(options, serverIndex + 1);
@@ -92,6 +94,7 @@ export class MongoClient {
         throw new MongoError(`Connection failed: ${e.message || e}`);
       }
     }
+    return this.database((options as ConnectOptions).db);
   }
 
   async listDatabases(options?: {
