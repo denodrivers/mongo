@@ -33,10 +33,9 @@ export class MongoClient {
       }
       let conn;
       const denoConnectOps: DenoConnectOptions = {
-        hostname: options.servers[0].host,
-        port: options.servers[0].port,
+        hostname: options.servers[serverIndex].host,
+        port: options.servers[serverIndex].port,
       };
-      var serverIndex = 0;
       if (options.tls) {
         if (options.certFile) {
           denoConnectOps.certFile = options.certFile;
