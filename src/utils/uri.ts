@@ -109,6 +109,8 @@ export function parse(url: string, optOverride: any = {}): ConnectOptions {
   for (var i = 0; i < connectOptions.servers.length; i++) {
     if (connectOptions.servers[i].host.includes(".sock")) {
       connectOptions.servers[i].domainSocket = connectOptions.servers[i].host;
+      connectOptions.servers[i].port =
+        parseInt(connectOptions.servers[i].port) || 27017;
     }
   }
   connectOptions.db = (data.pathname && data.pathname.length > 1)
