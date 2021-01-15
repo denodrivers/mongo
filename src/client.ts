@@ -26,7 +26,7 @@ export class MongoClient {
   async connect(
     options: ConnectOptions | string,
     serverIndex: number = 0,
-  ): Database {
+  ): Promise<Database> {
     try {
       if (typeof options === "string") {
         options = parse(options);
