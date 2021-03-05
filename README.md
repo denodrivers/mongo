@@ -53,7 +53,7 @@ const insertIds = await users.insertMany([
 const user1 = await users.findOne({ _id: insertId });
 
 // find
-const all_users = await users.find({ username: { $ne: null } });
+const all_users = await users.find({ username: { $ne: null } }).toArray();
 
 // find by ObjectId
 const user1_id = await users.findOne({ _id: new Bson.ObjectId("SOME OBJECTID STRING") });
