@@ -190,6 +190,23 @@ export default function curdTests() {
     assertEquals(notFound, []);
   });
 
+  testWithClient("test multiple queries at the same time", async (client) => {
+    const db = client.database("test");
+    const users = db.collection("mongo_test_users");
+
+    const result = await Promise.all([
+      users.findOne({}, { projection: { username: 1 } }),
+      users.findOne({}, { projection: { username: 1 } }),
+      users.findOne({}, { projection: { username: 1 } }),
+    ]);
+
+    assertEquals(result, [
+      { _id: "aaaaaaaaaaaaaaaaaaaaaaaa", username: "user1" },
+      { _id: "aaaaaaaaaaaaaaaaaaaaaaaa", username: "user1" },
+      { _id: "aaaaaaaaaaaaaaaaaaaaaaaa", username: "user1" },
+    ]);
+  });
+
   testWithClient("testCount", async (client) => {
     const db = client.database("test");
     const users = db.collection("mongo_test_users");
@@ -237,16 +254,6 @@ export default function curdTests() {
     const user1 = await users.distinct("username");
     assertEquals(user1, ["USER2", "user1"]);
   });
-
-  // // TODO mongdb_rust official library has not implemented this feature
-  // // testWithClient("testCreateIndexes", async (client) => {
-  // //   const db = client.database("test");
-  // //   const collection = db.collection("mongo_indexes");
-  // //   const result = await collection.createIndexes([
-  // //     { keys: { created_at: 1 }, options: { expireAfterSeconds: 10000 } }
-  // //   ]);
-  // //   console.log(result);
-  // // });
 
   testWithClient("testDropConnection", async (client) => {
     const db = client.database("test");

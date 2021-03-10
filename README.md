@@ -5,7 +5,7 @@
 [![tag](https://img.shields.io/github/tag/manyuanrong/deno_mongo.svg)](https://github.com/manyuanrong/deno_mongo/releases)
 [![Build Status](https://github.com/manyuanrong/deno_mongo/workflows/ci/badge.svg?branch=master)](https://github.com/manyuanrong/deno_mongo/actions)
 [![license](https://img.shields.io/github/license/manyuanrong/deno_mongo.svg)](https://github.com/manyuanrong/deno_mongo)
-[![tag](https://img.shields.io/badge/deno-v1.5.2-green.svg)](https://github.com/denoland/deno)
+[![tag](https://img.shields.io/badge/deno-v1.8.1-green.svg)](https://github.com/denoland/deno)
 
 ## Links
 
@@ -16,7 +16,7 @@
 ## Examples
 
 ```ts
-import { MongoClient, Bson } from "https://deno.land/x/mongo@v0.21.0/mod.ts";
+import { Bson, MongoClient } from "https://deno.land/x/mongo@v0.22.0/mod.ts";
 
 const client = new MongoClient();
 await client.connect("mongodb://localhost:27017");
@@ -56,7 +56,9 @@ const user1 = await users.findOne({ _id: insertId });
 const all_users = await users.find({ username: { $ne: null } }).toArray();
 
 // find by ObjectId
-const user1_id = await users.findOne({ _id: new Bson.ObjectId("SOME OBJECTID STRING") });
+const user1_id = await users.findOne({
+  _id: new Bson.ObjectId("SOME OBJECTID STRING"),
+});
 
 // count
 const count = await users.count({ username: { $ne: null } });
@@ -70,13 +72,13 @@ const docs = await users.aggregate([
 // updateOne
 const { matchedCount, modifiedCount, upsertedId } = await users.updateOne(
   { username: { $ne: null } },
-  { $set: { username: "USERNAME" } }
+  { $set: { username: "USERNAME" } },
 );
 
 // updateMany
 const { matchedCount, modifiedCount, upsertedId } = await users.updateMany(
   { username: { $ne: null } },
-  { $set: { username: "USERNAME" } }
+  { $set: { username: "USERNAME" } },
 );
 
 // deleteOne

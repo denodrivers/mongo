@@ -6,14 +6,21 @@ import { parseHeader } from "./header.ts";
 import { deserializeMessage, Message, serializeMessage } from "./message.ts";
 
 type Socket = Deno.Reader & Deno.Writer;
+interface CommandTask {
+  requestId: number;
+  db: string;
+  body: Document;
+}
 
 let nextRequestId = 0;
 
 export class WireProtocol {
   #socket: Socket;
-  #pending = false;
-  #pendingOps: Map<number, Deferred<Message>> = new Map();
+  #isPendingResponse = false;
+  #isPendingRequest = false;
+  #pendingResponses: Map<number, Deferred<Message>> = new Map();
   #reader: BufReader;
+  #commandQueue: CommandTask[] = [];
 
   #connectionId: number = 0;
 
@@ -38,26 +45,18 @@ export class WireProtocol {
 
   async command<T = Document>(db: string, body: Document): Promise<T[]> {
     const requestId = nextRequestId++;
-    const chunks = serializeMessage({
+    const commandTask = {
       requestId,
-      responseTo: 0,
-      sections: [
-        {
-          document: {
-            ...body,
-            $db: db,
-          },
-        },
-      ],
-    });
+      db,
+      body,
+    };
 
-    for (const chunk of chunks) {
-      await Deno.writeAll(this.#socket, chunk);
-    }
+    this.#commandQueue.push(commandTask);
+    this.send();
 
-    this.#pendingOps.set(requestId, deferred());
+    this.#pendingResponses.set(requestId, deferred());
     this.receive();
-    const message = await this.#pendingOps.get(requestId);
+    const message = await this.#pendingResponses.get(requestId);
 
     let documents: T[] = [];
 
@@ -72,10 +71,35 @@ export class WireProtocol {
     return documents;
   }
 
+  private async send() {
+    if (this.#isPendingRequest) return;
+    this.#isPendingRequest = true;
+    while (this.#commandQueue.length > 0) {
+      const task = this.#commandQueue.shift()!;
+      const chunks = serializeMessage({
+        requestId: task.requestId,
+        responseTo: 0,
+        sections: [
+          {
+            document: {
+              ...task.body,
+              $db: task.db,
+            },
+          },
+        ],
+      });
+
+      for (const chunk of chunks) {
+        await Deno.writeAll(this.#socket, chunk);
+      }
+    }
+    this.#isPendingRequest = false;
+  }
+
   private async receive() {
-    if (this.#pending) return;
-    this.#pending = true;
-    while (this.#pendingOps.size > 0) {
+    if (this.#isPendingResponse) return;
+    this.#isPendingResponse = true;
+    while (this.#pendingResponses.size > 0) {
       const headerBuffer = await this.#reader.readFull(new Uint8Array(16));
       assert(headerBuffer);
       const header = parseHeader(headerBuffer!);
@@ -84,10 +108,10 @@ export class WireProtocol {
       );
       assert(bodyBuffer);
       const reply = deserializeMessage(header, bodyBuffer!);
-      const pendingMessage = this.#pendingOps.get(header.responseTo);
-      this.#pendingOps.delete(header.responseTo);
+      const pendingMessage = this.#pendingResponses.get(header.responseTo);
+      this.#pendingResponses.delete(header.responseTo);
       pendingMessage?.resolve(reply);
     }
-    this.#pending = false;
+    this.#isPendingResponse = false;
   }
 }
