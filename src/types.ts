@@ -36,6 +36,7 @@ export interface FindOptions {
   limit?: number;
   projection?: Document;
   sort?: Document;
+  noCursorTimeout?: boolean;
 }
 
 export interface ListDatabaseInfo {
