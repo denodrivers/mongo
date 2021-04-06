@@ -25,18 +25,18 @@ await client.connect("mongodb://localhost:27017");
 
 //Connecting to a Mongo Atlas Database
 await client.connect({
-  db: '<db_name>',
+  db: "<db_name>",
   tls: true,
   servers: [
     {
-      host: '<db_cluster_url>',
+      host: "<db_cluster_url>",
       port: 27017,
     },
   ],
   credential: {
-    username: '<username>',
-    password: '<password>',
-    db: '<db_name>',
+    username: "<username>",
+    password: "<password>",
+    db: "<db_name>",
     mechanism: "SCRAM-SHA-1",
   },
 });
