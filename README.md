@@ -19,7 +19,27 @@
 import { Bson, MongoClient } from "https://deno.land/x/mongo@v0.22.0/mod.ts";
 
 const client = new MongoClient();
+
+//Connecting to a Local Database
 await client.connect("mongodb://localhost:27017");
+
+//Connecting to a Mongo Atlas Database
+await client.connect({
+  db: "<db_name>",
+  tls: true,
+  servers: [
+    {
+      host: "<db_cluster_url>",
+      port: 27017,
+    },
+  ],
+  credential: {
+    username: "<username>",
+    password: "<password>",
+    db: "<db_name>",
+    mechanism: "SCRAM-SHA-1",
+  },
+});
 
 // Defining schema interface
 interface UserSchema {
