@@ -1,6 +1,7 @@
 import { Collection } from "./collection/mod.ts";
-import { CommandCursor, WireProtocol } from "./protocol/mod.ts";
+import { CommandCursor } from "./protocol/mod.ts";
 import { CreateUserOptions, Document } from "./types.ts";
+import { Cluster } from "./cluster.ts";
 
 interface ListCollectionsReponse {
   cursor: {
@@ -22,14 +23,14 @@ export interface ListCollectionsResult {
 }
 
 export class Database {
-  #protocol: WireProtocol;
+  #cluster: Cluster;
 
-  constructor(protocol: WireProtocol, readonly name: string) {
-    this.#protocol = protocol;
+  constructor(cluster: Cluster, readonly name: string) {
+    this.#cluster = cluster;
   }
 
   collection<T>(name: string): Collection<T> {
-    return new Collection(this.#protocol, this.name, name);
+    return new Collection(this.#cluster.protocol, this.name, name);
   }
 
   listCollections(options?: {
@@ -42,9 +43,9 @@ export class Database {
       options = {};
     }
     return new CommandCursor<ListCollectionsResult>(
-      this.#protocol,
+      this.#cluster.protocol,
       async () => {
-        const { cursor } = await this.#protocol.commandSingle<
+        const { cursor } = await this.#cluster.protocol.commandSingle<
           ListCollectionsReponse
         >(this.name, {
           listCollections: 1,
@@ -82,7 +83,7 @@ export class Database {
     password: string,
     options?: CreateUserOptions,
   ) {
-    await this.#protocol.commandSingle(this.name, {
+    await this.#cluster.protocol.commandSingle(this.name, {
       createUser: options?.username ?? username,
       pwd: options?.password ?? password,
       customData: options?.customData,
@@ -99,7 +100,7 @@ export class Database {
     writeConcern?: Document;
     comment?: Document;
   }) {
-    await this.#protocol.commandSingle(this.name, {
+    await this.#cluster.protocol.commandSingle(this.name, {
       dropUser: username,
       writeConcern: options?.writeConcern,
       comment: options?.comment,
