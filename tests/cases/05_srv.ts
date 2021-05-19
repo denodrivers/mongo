@@ -118,7 +118,8 @@ export default function srvTests() {
   });
 
   Deno.test({
-    name: "SRV: it correctly parses seedlist and options for options split in two strings",
+    name:
+      "SRV: it correctly parses seedlist and options for options split in two strings",
     async fn() {
       const result = await new Srv(
         mockResolver([
