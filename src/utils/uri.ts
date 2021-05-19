@@ -1,5 +1,6 @@
 // mongodb://username:password@example.com:27017,example2.com:27017,...,example.comN:27017/database?key=value&keyN=valueN
 import { ConnectOptions, Credential, Server } from "../types.ts";
+import { Srv } from "./srv.ts";
 
 interface Parts {
   auth?: { user: string; password?: string };
@@ -105,7 +106,68 @@ export function parse_url(url: string): Parts {
   return parse(url);
 }
 
-export function parse(url: string, optOverride: any = {}): ConnectOptions {
+export function isSrvUrl(url: string) {
+  return /^mongodb\+srv/.test(url);
+}
+
+export type SrvConnectOptions = Omit<ConnectOptions, "servers"> & {
+  srvServer?: string;
+};
+
+export function parseSrvUrl(url: string): SrvConnectOptions {
+  const data = parse_url(url);
+  const connectOptions: SrvConnectOptions = {
+    db: (data.pathname && data.pathname.length > 1)
+      ? data.pathname.substring(1)
+      : "admin",
+  };
+
+  if (data.auth) {
+    connectOptions.credential = <Credential> {
+      username: data.auth.user,
+      password: data.auth.password,
+      db: connectOptions.db,
+      mechanism: data.search.authMechanism || "SCRAM-SHA-256",
+    };
+  }
+  connectOptions.compression = data.search.compressors
+    ? data.search.compressors.split(",")
+    : [];
+  connectOptions.srvServer = data.servers?.[0].host;
+
+  if (data.search.appname) {
+    connectOptions.appname = data.search.appname;
+  }
+  if (data.search.tls) {
+    connectOptions.tls = data.search.tls === "true";
+  } else {
+    connectOptions.tls = true;
+  }
+  if (data.search.tlsCAFile) {
+    connectOptions.certFile = data.search.tlsCAFile;
+  }
+  if (data.search.tlsCertificateKeyFile) {
+    connectOptions.keyFile = data.search.tlsCertificateKeyFile;
+  }
+  if (data.search.tlsCertificateKeyFilePassword) {
+    connectOptions.keyFilePassword = data.search.tlsCertificateKeyFilePassword;
+  }
+  if (data.search.safe) {
+    connectOptions.safe = data.search.safe === "true";
+  }
+  if (data.search.retryWrites) {
+    connectOptions.retryWrites = data.search.retryWrites === "true";
+  }
+  return connectOptions;
+}
+
+export function parse(url: string): Promise<ConnectOptions> {
+  return isSrvUrl(url)
+    ? new Srv().resolveSrvUrl(url)
+    : Promise.resolve(parseNormalUrl(url));
+}
+
+function parseNormalUrl(url: string): ConnectOptions {
   const data = parse_url(url);
   const connectOptions: ConnectOptions = { servers: data.servers!, db: "" };
   for (var i = 0; i < connectOptions.servers.length; i++) {
@@ -146,5 +208,5 @@ export function parse(url: string, optOverride: any = {}): ConnectOptions {
   if (data.search.safe) {
     connectOptions.safe = data.search.safe === "true";
   }
-  return { ...connectOptions, ...optOverride } as ConnectOptions;
+  return connectOptions;
 }
