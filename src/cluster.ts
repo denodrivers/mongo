@@ -100,10 +100,10 @@ export class Cluster {
     const results = await Promise.all(this.#protocols.map((protocol) => {
       return protocol.commandSingle(
         "admin",
-        { hello: 1 },
+        { isMaster: 1 },
       );
     }));
-    const masterIndex = results.findIndex((result) => result.isWritablePrimary);
+    const masterIndex = results.findIndex((result) => result.isWritablePrimary || result.ismaster);
     if (masterIndex === -1) throw new Error(`Could not find a master node`);
     this.#masterIndex = masterIndex;
   }
