@@ -103,7 +103,9 @@ export class Cluster {
         { isMaster: 1 },
       );
     }));
-    const masterIndex = results.findIndex((result) => result.isWritablePrimary || result.ismaster);
+    const masterIndex = results.findIndex((result) =>
+      result.isWritablePrimary || result.ismaster
+    );
     if (masterIndex === -1) throw new Error(`Could not find a master node`);
     this.#masterIndex = masterIndex;
   }
