@@ -42,7 +42,9 @@ await client.connect({
 });
 
 //Or
-await client.connect("mongodb+srv://<username>:<password>@<db_cluster_url>/<db_name>?authMechanism=SCRAM-SHA-1")
+await client.connect(
+  "mongodb+srv://<username>:<password>@<db_cluster_url>/<db_name>?authMechanism=SCRAM-SHA-1",
+ )
 
 // Defining schema interface
 interface UserSchema {
