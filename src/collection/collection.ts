@@ -162,8 +162,8 @@ export class Collection<T> {
     return values;
   }
 
-  aggregate(pipeline: Document[], options?: any): AggregateCursor<T> {
-    return new AggregateCursor<T>({
+  aggregate<U = T>(pipeline: Document[], options?: any): AggregateCursor<U> {
+    return new AggregateCursor<U>({
       pipeline,
       protocol: this.#protocol,
       dbName: this.#dbName,
