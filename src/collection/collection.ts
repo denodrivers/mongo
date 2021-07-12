@@ -47,7 +47,7 @@ export class Collection<T> {
 
   /**
    * Find and modify a document in one, returning the matching document.
-   * 
+   *
    * @param query The query used to match documents
    * @param options Additional options for the operation (e.g. containing update
    * or remove parameters)
