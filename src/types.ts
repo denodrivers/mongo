@@ -195,53 +195,53 @@ export interface CollationOptions {
  */
 export interface FindAndModifyOptions<T> {
   /**
-     * Control the order in which documents are found.
-     * findAndModify only modifies the first document found, so controlling the
-     * sort order may ensure, that the right document is first
-     */
+   * Control the order in which documents are found.
+   * findAndModify only modifies the first document found, so controlling the
+   * sort order may ensure, that the right document is first
+   */
   sort?: Document;
   /**
-     * The update to execute on the found document.
-     *
-     * Either update or remove have to be specified
-     */
+   * The update to execute on the found document.
+   *
+   * Either update or remove have to be specified
+   */
   update?: Document;
   /**
-     * Remove the found document
-     */
+   * Remove the found document
+   */
   remove?: boolean;
   /**
-     * Return the new state after the update
-     */
+   * Return the new state after the update
+   */
   new?: boolean;
   /**
-     * the fields to return.
-     */
+   * the fields to return.
+   */
   fields?: Document;
   /**
-     * perform an upsert, i.e. update if a document matches, insert otherwise.
-     */
+   * perform an upsert, i.e. update if a document matches, insert otherwise.
+   */
   upsert?: boolean;
   /**
-     * do not validate the document during the operation
-     */
+   * do not validate the document during the operation
+   */
   bypassDocumentValidation?: boolean;
   /**
-     * The write concern to apply to the write operation
-     */
+   * The write concern to apply to the write operation
+   */
   writeConcern?: WriteConcern;
   /**
-     * The collation options to apply to string handling (e.g. during sort)
-     */
+   * The collation options to apply to string handling (e.g. during sort)
+   */
   collation?: CollationOptions;
   /**
-     * Filters determining which elements to modify in an array, when modifying
-     * array values
-     */
+   * Filters determining which elements to modify in an array, when modifying
+   * array values
+   */
   arrayFilters?: Document[];
   /**
-     * The maximum time of milliseconds the operation is allowed to take
-     */
+   * The maximum time of milliseconds the operation is allowed to take
+   */
   maxTimeMS?: number;
 }
 
