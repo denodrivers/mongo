@@ -36,7 +36,7 @@ export default function indexesTests() {
     );
   });
 
-  testWithClient("dropndexes", async (client) => {
+  testWithClient("dropIndexes", async (client) => {
     const db = client.database("test");
     const users = db.collection("mongo_test_users");
     const res = await users.dropIndexes({
