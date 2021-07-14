@@ -35,4 +35,20 @@ export default function indexesTests() {
       ],
     );
   });
+
+  testWithClient("dropndexes", async (client) => {
+    const db = client.database("test");
+    const users = db.collection("mongo_test_users");
+    const res = await users.dropIndexes({
+      indexes: "*",
+    });
+
+    assertEquals(
+      res,
+      {
+        nIndexesWas: 2,
+        ok: 1,
+      },
+    );
+  });
 }
