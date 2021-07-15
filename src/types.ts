@@ -497,3 +497,21 @@ export interface CreateIndexOptions {
   /** Optional. A user-provided comment to attach to this command. Once set */
   comment?: Document;
 }
+
+export interface DropIndexOptions {
+  /**
+   * Specifies the indexes to drop.
+   * To drop all but the _id index from the collection, specify "*".
+   * To drop a single index, specify either the index name, the index specification document (unless the index is a text index), or an array of the index name.
+   * To drop a text index, specify the index names instead of the index specification document.
+   * To drop multiple indexes (Available starting in MongoDB 4.2), specify an array of the index names.
+   * See https://docs.mongodb.com/manual/reference/command/dropIndexes/#mongodb-dbcommand-dbcmd.dropIndexes
+   */
+  index: string | IndexOptions | string[];
+
+  /** Optional. A document expressing the write concern. Omit to use the default write concern. */
+  writeConcern?: Document;
+
+  /** Optional. A user-provided comment to attach to this command. Once set */
+  comment?: Document;
+}

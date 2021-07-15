@@ -35,4 +35,29 @@ export default function indexesTests() {
       ],
     );
   });
+
+  testWithClient("dropIndexes", async (client) => {
+    const db = client.database("test");
+    const users = db.collection("mongo_test_users");
+
+    await users.createIndexes({
+      indexes: [{
+        name: "_name2",
+        key: { name: -1 },
+      }],
+    });
+
+    await users.dropIndexes({
+      index: "*",
+    });
+
+    const indexes = await users.listIndexes().toArray();
+
+    assertEquals(
+      indexes,
+      [
+        { v: 2, key: { _id: 1 }, name: "_id_", ns: "test.mongo_test_users" },
+      ],
+    );
+  });
 }

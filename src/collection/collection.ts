@@ -6,6 +6,7 @@ import {
   DeleteOptions,
   DistinctOptions,
   Document,
+  DropIndexOptions,
   DropOptions,
   FindOptions,
   InsertOptions,
@@ -182,6 +183,21 @@ export class Collection<T> {
       createIndexes: this.name,
       ...options,
     });
+    return res;
+  }
+
+  async dropIndexes(options: DropIndexOptions) {
+    const res = await this.#protocol.commandSingle<{
+      ok: number;
+      nIndexesWas: number;
+    }>(
+      this.#dbName,
+      {
+        dropIndexes: this.name,
+        ...options,
+      },
+    );
+
     return res;
   }
 
