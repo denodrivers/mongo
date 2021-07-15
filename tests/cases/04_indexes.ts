@@ -39,16 +39,21 @@ export default function indexesTests() {
   testWithClient("dropIndexes", async (client) => {
     const db = client.database("test");
     const users = db.collection("mongo_test_users");
-    const res = await users.dropIndexes({
-      indexes: "*",
+
+    await users.createIndexes({
+      indexes: [{
+        name: "_name2",
+        key: { name: -1 },
+      }],
     });
 
+    const indexes = await users.listIndexes().toArray();
+
     assertEquals(
-      res,
-      {
-        nIndexesWas: 2,
-        ok: 1,
-      },
+      indexes,
+      [
+        { v: 2, key: { _id: 1 }, name: "_id_", ns: "test.mongo_test_users" },
+      ],
     );
   });
 }
