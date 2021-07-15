@@ -47,6 +47,10 @@ export default function indexesTests() {
       }],
     });
 
+    await users.dropIndexes({
+      index: "*",
+    });
+
     const indexes = await users.listIndexes().toArray();
 
     assertEquals(
