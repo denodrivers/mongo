@@ -507,7 +507,7 @@ export interface DropIndexOptions {
    * To drop multiple indexes (Available starting in MongoDB 4.2), specify an array of the index names.
    * See https://docs.mongodb.com/manual/reference/command/dropIndexes/#mongodb-dbcommand-dbcmd.dropIndexes
    */
-  indexes: string | IndexOptions | string[];
+  index: string | IndexOptions | string[];
 
   /** Optional. A document expressing the write concern. Omit to use the default write concern. */
   writeConcern?: Document;
