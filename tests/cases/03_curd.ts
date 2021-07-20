@@ -128,11 +128,13 @@ export default function curdTests() {
 
   testWithClient("testFindAndModify-update", async (client) => {
     const db = client.database("test");
-    const users = db.collection<{username: string, counter: number}>("find_and_modify");
+    const users = db.collection<{ username: string; counter: number }>(
+      "find_and_modify",
+    );
     await users.insertOne({ username: "counter", counter: 5 });
     const updated = await users.findAndModify({ username: "counter" }, {
-      update: { $inc: { counter: 1 }}, 
-      new: true 
+      update: { $inc: { counter: 1 } },
+      new: true,
     });
 
     assert(updated !== undefined);
@@ -142,10 +144,12 @@ export default function curdTests() {
 
   testWithClient("testFindAndModify-delete", async (client) => {
     const db = client.database("test");
-    const users = db.collection<{username: string, counter: number}>("find_and_modify");
+    const users = db.collection<{ username: string; counter: number }>(
+      "find_and_modify",
+    );
     await users.insertOne({ username: "delete", counter: 10 });
     const updated = await users.findAndModify({ username: "delete" }, {
-      remove: true
+      remove: true,
     });
 
     assert(updated !== undefined);
