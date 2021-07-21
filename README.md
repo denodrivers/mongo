@@ -3,12 +3,13 @@
 > **deno_mongo** is a **MongoDB** database driver developed for deno
 
 [![tag](https://img.shields.io/github/tag/manyuanrong/deno_mongo.svg)](https://github.com/manyuanrong/deno_mongo/releases)
-[![Build Status](https://github.com/manyuanrong/deno_mongo/workflows/ci/badge.svg?branch=master)](https://github.com/manyuanrong/deno_mongo/actions)
+[![Build Status](https://github.com/manyuanrong/deno_mongo/workflows/ci/badge.svg?branch=main)](https://github.com/manyuanrong/deno_mongo/actions)
 [![license](https://img.shields.io/github/license/manyuanrong/deno_mongo.svg)](https://github.com/manyuanrong/deno_mongo)
 [![tag](https://img.shields.io/badge/deno-v1.8.1-green.svg)](https://github.com/denoland/deno)
 
 ## Links
 
+- [Docs](https://doc.deno.land/https/deno.land/x/mongo/mod.ts)
 - [Guides]() TODO
 - [Examples]() TODO
 - [Benchmarks]() TODO
@@ -16,7 +17,7 @@
 ## Examples
 
 ```ts
-import { Bson, MongoClient } from "https://deno.land/x/mongo@v0.23.1/mod.ts";
+import { Bson, MongoClient } from "https://deno.land/x/mongo@v0.24.0/mod.ts";
 
 const client = new MongoClient();
 
