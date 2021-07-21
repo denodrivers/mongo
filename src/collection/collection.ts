@@ -1,4 +1,5 @@
 import { Bson } from "../../deps.ts";
+import { MongoError } from "../error.ts";
 import { WireProtocol } from "../protocol/mod.ts";
 import {
   CountOptions,
@@ -8,6 +9,7 @@ import {
   Document,
   DropIndexOptions,
   DropOptions,
+  FindAndModifyOptions,
   FindOptions,
   InsertOptions,
   UpdateOptions,
@@ -42,6 +44,33 @@ export class Collection<T> {
   ): Promise<T | undefined> {
     const cursor = this.find(filter, options);
     return await cursor.next();
+  }
+
+  /**
+   * Find and modify a document in one, returning the matching document.
+   *
+   * @param query The query used to match documents
+   * @param options Additional options for the operation (e.g. containing update
+   * or remove parameters)
+   * @returns The document matched and modified
+   */
+  async findAndModify(
+    query?: Partial<T>,
+    options?: FindAndModifyOptions<T>,
+  ): Promise<T | undefined> {
+    const result = await this.#protocol.commandSingle<{
+      value: T;
+      ok: number;
+      lastErrorObject: any;
+    }>(this.#dbName, {
+      findAndModify: this.name,
+      query,
+      ...options,
+    });
+    if (result.ok === 0) {
+      throw new MongoError("Could not execute findAndModify operation");
+    }
+    return result.value;
   }
 
   async count(filter?: Document, options?: CountOptions): Promise<number> {

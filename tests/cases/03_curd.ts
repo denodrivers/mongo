@@ -126,6 +126,40 @@ export default function curdTests() {
     assertEquals(insertedIds.length, 2);
   });
 
+  testWithClient("testFindAndModify-update", async (client) => {
+    const db = client.database("test");
+    const users = db.collection<{ username: string; counter: number }>(
+      "find_and_modify",
+    );
+    await users.insertOne({ username: "counter", counter: 5 });
+    const updated = await users.findAndModify({ username: "counter" }, {
+      update: { $inc: { counter: 1 } },
+      new: true,
+    });
+
+    assert(updated !== undefined);
+    assertEquals(updated.counter, 6);
+    assertEquals(updated.username, "counter");
+  });
+
+  testWithClient("testFindAndModify-delete", async (client) => {
+    const db = client.database("test");
+    const users = db.collection<{ username: string; counter: number }>(
+      "find_and_modify",
+    );
+    await users.insertOne({ username: "delete", counter: 10 });
+    const updated = await users.findAndModify({ username: "delete" }, {
+      remove: true,
+    });
+
+    assert(updated !== undefined);
+    assertEquals(updated.counter, 10);
+    assertEquals(updated.username, "delete");
+
+    const tryFind = await users.findOne({ username: "delete" });
+    assertEquals(tryFind, undefined);
+  });
+
   testWithClient("test chain call for Find", async (client) => {
     const db = client.database("test");
     const users = db.collection<IUser>("mongo_test_users");

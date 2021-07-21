@@ -143,6 +143,108 @@ export interface UpdateOptions {
   // session?: ClientSession
 }
 
+/**
+ * interface for WriteConcern documents used by MongoDB
+ *
+ * @see https://docs.mongodb.com/manual/reference/write-concern/
+ */
+export interface WriteConcern {
+  /**
+     * The number of instances the write operation needs to be propagated to
+     * before proceeding.
+     *
+     * The string based values are:
+     *
+     * - majority: The calculated majority of nodes in a cluster has accepted the
+     *    the write
+     * - custom write name: Writes have been acknowledged by nodes tagged with the
+     *    custom write concern.
+     */
+  w: number | "majority" | string;
+  /**
+     * If true, the server only returns after the operation has been commited to
+     * disk
+     */
+  j: boolean;
+  /**
+     * An optional timeout value after which to stop the write operation
+     */
+  wtimeout?: number;
+}
+
+/**
+ * Options for controlling the collation of strings in a query
+ *
+ * @see https://docs.mongodb.com/manual/reference/collation/
+ */
+export interface CollationOptions {
+  locale: string;
+  caseLevel?: boolean;
+  caseFirst?: string;
+  strength?: number;
+  numericOrdering?: boolean;
+  alternate?: string;
+  maxVariable?: string;
+  backwards?: boolean;
+}
+
+/**
+ * Options for the findAndModify operation
+ *
+ * @see https://docs.mongodb.com/manual/reference/method/db.collection.findAndModify/
+ */
+export interface FindAndModifyOptions<T> {
+  /**
+   * Control the order in which documents are found.
+   * findAndModify only modifies the first document found, so controlling the
+   * sort order may ensure, that the right document is first
+   */
+  sort?: Document;
+  /**
+   * The update to execute on the found document.
+   *
+   * Either update or remove have to be specified
+   */
+  update?: Document;
+  /**
+   * Remove the found document
+   */
+  remove?: boolean;
+  /**
+   * Return the new state after the update
+   */
+  new?: boolean;
+  /**
+   * the fields to return.
+   */
+  fields?: Document;
+  /**
+   * perform an upsert, i.e. update if a document matches, insert otherwise.
+   */
+  upsert?: boolean;
+  /**
+   * do not validate the document during the operation
+   */
+  bypassDocumentValidation?: boolean;
+  /**
+   * The write concern to apply to the write operation
+   */
+  writeConcern?: WriteConcern;
+  /**
+   * The collation options to apply to string handling (e.g. during sort)
+   */
+  collation?: CollationOptions;
+  /**
+   * Filters determining which elements to modify in an array, when modifying
+   * array values
+   */
+  arrayFilters?: Document[];
+  /**
+   * The maximum time of milliseconds the operation is allowed to take
+   */
+  maxTimeMS?: number;
+}
+
 export interface DeleteOptions {
   /**
    * Optional. If true, then when a delete statement fails, return without performing the remaining delete statements.
