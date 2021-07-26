@@ -74,9 +74,9 @@ export default function authTests() {
   Deno.test({
     name: "cleanUsername",
     fn() {
-      const username: string = "first=12,last=34";
-      const expected: string = "first=3D12=2Clast=34";
-      const result: string = cleanUsername(username);
+      const username = "first=12,last=34";
+      const expected = "first=3D12=2Clast=34";
+      const result = cleanUsername(username);
       assertEquals(expected, result);
     },
   });

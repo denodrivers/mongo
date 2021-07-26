@@ -22,16 +22,13 @@ export class WireProtocol {
   #reader: BufReader;
   #commandQueue: CommandTask[] = [];
 
-  #connectionId: number = 0;
-
   constructor(socket: Socket) {
     this.#socket = socket;
     this.#reader = new BufReader(this.#socket);
   }
 
   async connect() {
-    const { connectionId } = await handshake(this);
-    this.#connectionId = connectionId;
+    const { connectionId: _connectionId } = await handshake(this);
   }
 
   async commandSingle<T = Document>(db: string, body: Document): Promise<T> {

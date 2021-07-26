@@ -193,7 +193,7 @@ export interface CollationOptions {
  *
  * @see https://docs.mongodb.com/manual/reference/method/db.collection.findAndModify/
  */
-export interface FindAndModifyOptions<T> {
+export interface FindAndModifyOptions {
   /**
    * Control the order in which documents are found.
    * findAndModify only modifies the first document found, so controlling the

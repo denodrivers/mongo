@@ -39,8 +39,8 @@ export function parse_url(url: string): Parts {
       const parts = parse_simple(
         url.replace(multiServerMatch![3], serversName[0]),
       );
-      var subServer: any;
-      for (var i = 1; i < serversName.length; i++) {
+      let subServer: any;
+      for (let i = 1; i < serversName.length; i++) {
         subServer = parse_simple(`temp://${serversName[i]}`);
         parts["servers"].push(subServer["servers"][0]);
       }
@@ -87,9 +87,9 @@ export function parse_url(url: string): Parts {
       "",
     ).split(/&amp;|&/);
     const l = params.length;
-    for (var i = 0; i < l; i++) {
+    for (let i = 0; i < l; i++) {
       if (params[i]) {
-        var index = params[i].indexOf("=");
+        let index = params[i].indexOf("=");
         if (index === -1) index = params[i].length;
         const key = params[i].substring(0, index);
         const val = params[i].substring(index + 1);
@@ -170,7 +170,7 @@ export function parse(url: string): Promise<ConnectOptions> {
 function parseNormalUrl(url: string): ConnectOptions {
   const data = parse_url(url);
   const connectOptions: ConnectOptions = { servers: data.servers!, db: "" };
-  for (var i = 0; i < connectOptions.servers.length; i++) {
+  for (let i = 0; i < connectOptions.servers.length; i++) {
     if (connectOptions.servers[i].host.includes(".sock")) {
       connectOptions.servers[i].domainSocket = connectOptions.servers[i].host;
     }

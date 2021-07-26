@@ -19,7 +19,7 @@ export class CommandCursor<T> {
   #collection?: string;
 
   #executor: () => Promise<CommandCursorOptions<T>>;
-  #excuted: boolean = false;
+  #executed = false;
 
   constructor(
     protocol: WireProtocol,
@@ -30,7 +30,7 @@ export class CommandCursor<T> {
   }
 
   private async execute() {
-    this.#excuted = true;
+    this.#executed = true;
     const options = await this.#executor();
     this.#batches = options.firstBatch;
     this.#id = BigInt(options.id);
@@ -44,7 +44,7 @@ export class CommandCursor<T> {
       return this.#batches.shift();
     }
 
-    if (this.#excuted === false) {
+    if (!this.#executed) {
       await this.execute();
       return this.#batches.shift();
     }

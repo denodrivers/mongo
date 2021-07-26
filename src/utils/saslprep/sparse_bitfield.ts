@@ -47,7 +47,7 @@ export class Bitfield {
     this._pageMask = this.pageSize - 1;
 
     if (opts.buffer) {
-      for (let i: number = 0; i < opts.buffer.length; i += this.pageSize) {
+      for (let i = 0; i < opts.buffer.length; i += this.pageSize) {
         this.pages.set(
           i / this.pageSize,
           opts.buffer.slice(i, i + this.pageSize),
@@ -113,7 +113,7 @@ export class Bitfield {
   toBuffer(): Uint8Array {
     const all: Uint8Array = new Uint8Array(this.pages.length * this.pageSize);
 
-    for (let i: number = 0; i < this.pages.length; i++) {
+    for (let i = 0; i < this.pages.length; i++) {
       const next: Page = this.pages.get(i, true);
 
       if (next) {

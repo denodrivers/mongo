@@ -160,8 +160,8 @@ export default function uriTests() {
   Deno.test({
     name:
       "should correctly parse mongodb+srv://someUser:somePassword@somesubdomain.somedomain.com/someDatabaseName?retryWrites=true&w=majority",
-    async fn() {
-      const options = await parseSrvUrl(
+    fn() {
+      const options = parseSrvUrl(
         "mongodb+srv://someUser:somePassword@somesubdomain.somedomain.com/someDatabaseName?retryWrites=true&w=majority",
       );
       assertEquals(options.db, "someDatabaseName");

@@ -1,4 +1,4 @@
-import { ConnectOptions, Credential, Document } from "../types.ts";
+import { Credential, Document } from "../types.ts";
 import { Binary } from "../../bson/mod.ts";
 import { saslprep } from "../utils/saslprep/mod.ts";
 import { AuthContext, AuthPlugin } from "./base.ts";

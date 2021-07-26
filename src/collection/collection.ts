@@ -56,7 +56,7 @@ export class Collection<T> {
    */
   async findAndModify(
     query?: Partial<T>,
-    options?: FindAndModifyOptions<T>,
+    options?: FindAndModifyOptions,
   ): Promise<T | undefined> {
     const result = await this.#protocol.commandSingle<{
       value: T;
