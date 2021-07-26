@@ -1,4 +1,4 @@
-import { assert, BufReader, Deferred, deferred } from "../../deps.ts";
+import { assert, BufReader, Deferred, deferred, writeAll } from "../../deps.ts";
 import { MongoError, MongoErrorInfo } from "../error.ts";
 import { Document } from "../types.ts";
 import { handshake } from "./handshake.ts";
@@ -87,7 +87,7 @@ export class WireProtocol {
       });
 
       for (const chunk of chunks) {
-        await Deno.writeAll(this.#socket, chunk);
+        await writeAll(this.#socket, chunk);
       }
     }
     this.#isPendingRequest = false;
