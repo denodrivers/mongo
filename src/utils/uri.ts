@@ -42,7 +42,7 @@ export function parse_url(url: string): Parts {
 
       for (const serverName of rest) {
         const subServer = parse_simple(`temp://${serverName}`);
-        parts.servers.push(subServer.servers[0])
+        parts.servers.push(subServer.servers[0]);
       }
 
       return parts;
@@ -98,7 +98,7 @@ export function parse_url(url: string): Parts {
         const val = param.substring(index + 1);
 
         if (Object.prototype.hasOwnProperty.call(obj, key)) {
-          if (!Array.isArray(obj[key])) obj[key] = [ obj[key] ];
+          if (!Array.isArray(obj[key])) obj[key] = [obj[key]];
           obj[key].push(val);
         } else {
           obj[key] = val || true;
@@ -179,7 +179,7 @@ function parseNormalUrl(url: string): ConnectOptions {
 
   for (const server of connectOptions.servers) {
     if (server.host.includes(".sock")) {
-      server.domainSocket = server.host;    
+      server.domainSocket = server.host;
     }
     server.port = server.port || 27017;
   }
