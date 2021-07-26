@@ -92,7 +92,7 @@ export class Collection<T> {
     return insertedIds[0];
   }
 
-  async insert(docs: Document | Document[], options?: InsertOptions) {
+  insert(docs: Document | Document[], options?: InsertOptions) {
     docs = Array.isArray(docs) ? docs : [docs];
     return this.insertMany(docs as Document[], options);
   }
@@ -171,7 +171,7 @@ export class Collection<T> {
 
   delete = this.deleteMany;
 
-  async deleteOne(filter: Document, options?: DeleteOptions) {
+  deleteOne(filter: Document, options?: DeleteOptions) {
     return this.delete(filter, { ...options, limit: 1 });
   }
 

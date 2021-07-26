@@ -82,7 +82,7 @@ export class CommandCursor<T> {
 
   async map<M>(callback: (item: T, index: number) => M): Promise<M[]> {
     let index = 0;
-    let result = [];
+    const result = [];
     for await (const item of this) {
       if (item) {
         const newItem = callback(item, index++);
@@ -92,7 +92,7 @@ export class CommandCursor<T> {
     return result;
   }
 
-  async toArray(): Promise<T[]> {
+  toArray(): Promise<T[]> {
     return this.map((item) => item);
   }
 }

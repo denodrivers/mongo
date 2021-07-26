@@ -41,7 +41,7 @@ function serializeSections(
     } else {
       const identifier = encoder.encode(section.identifier + "\0");
       let documentsLength = 0;
-      let docs = section.documents.map((doc) => {
+      const docs = section.documents.map((doc) => {
         const document = serializeBson(doc);
         documentsLength += document.byteLength;
         return document;
