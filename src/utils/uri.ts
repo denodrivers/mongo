@@ -93,7 +93,7 @@ export function parse_url(url: string): Parts {
         if (index === -1) index = params[i].length;
         const key = params[i].substring(0, index);
         const val = params[i].substring(index + 1);
-        if (obj.hasOwnProperty(key)) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
           if (!Array.isArray(obj[key])) obj[key] = [obj[key]];
           obj[key].push(val);
         } else {
