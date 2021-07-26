@@ -1,4 +1,4 @@
-import { assert, BufReader, Deferred, deferred } from "../../deps.ts";
+import { assert, BufReader, Deferred, deferred, writeAll } from "../../deps.ts";
 import { MongoError, MongoErrorInfo } from "../error.ts";
 import { Document } from "../types.ts";
 import { handshake } from "./handshake.ts";
@@ -22,16 +22,13 @@ export class WireProtocol {
   #reader: BufReader;
   #commandQueue: CommandTask[] = [];
 
-  #connectionId: number = 0;
-
   constructor(socket: Socket) {
     this.#socket = socket;
     this.#reader = new BufReader(this.#socket);
   }
 
   async connect() {
-    const { connectionId } = await handshake(this);
-    this.#connectionId = connectionId;
+    const { connectionId: _connectionId } = await handshake(this);
   }
 
   async commandSingle<T = Document>(db: string, body: Document): Promise<T> {
@@ -90,7 +87,7 @@ export class WireProtocol {
       });
 
       for (const chunk of chunks) {
-        await Deno.writeAll(this.#socket, chunk);
+        await writeAll(this.#socket, chunk);
       }
     }
     this.#isPendingRequest = false;

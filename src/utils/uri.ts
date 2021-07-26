@@ -31,21 +31,23 @@ export function parse_url(url: string): Parts {
     /([^:/?#]+:)?(?:(?:\/\/)(?:([^/?#]*:?[^@/]+)@)?((?:(?:[^/:?#]+)(?:(?::)(?:\d+))?)+))?/;
 
   function parse_simple(url: string): any {
-    const parts: any = {};
-    parts.href = url;
+    const parts: any = { servers: [], href: url };
     const multiServerMatch = url.match(multipleServerPattern);
-    if ((multiServerMatch![3]).includes(",")) {
-      const serversName = multiServerMatch![3].split(",");
+
+    if (multiServerMatch![3].includes(",")) {
+      const [first, ...rest] = multiServerMatch![3].split(",");
       const parts = parse_simple(
-        url.replace(multiServerMatch![3], serversName[0]),
+        url.replace(multiServerMatch![3], first),
       );
-      var subServer: any;
-      for (var i = 1; i < serversName.length; i++) {
-        subServer = parse_simple(`temp://${serversName[i]}`);
-        parts["servers"].push(subServer["servers"][0]);
+
+      for (const serverName of rest) {
+        const subServer = parse_simple(`temp://${serverName}`);
+        parts.servers.push(subServer.servers[0]);
       }
+
       return parts;
     }
+
     const matches = url.match(pattern);
     var l = fragments.length;
     while (l--) {
@@ -86,14 +88,16 @@ export function parse_url(url: string): Parts {
       new RegExp("\\" + identifier),
       "",
     ).split(/&amp;|&/);
-    const l = params.length;
-    for (var i = 0; i < l; i++) {
-      if (params[i]) {
-        var index = params[i].indexOf("=");
-        if (index === -1) index = params[i].length;
-        const key = params[i].substring(0, index);
-        const val = params[i].substring(index + 1);
-        if (obj.hasOwnProperty(key)) {
+
+    for (const param of params) {
+      if (params) {
+        let index = param.indexOf("=");
+        if (index === -1) index = param.length;
+
+        const key = param.substring(0, index);
+        const val = param.substring(index + 1);
+
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
           if (!Array.isArray(obj[key])) obj[key] = [obj[key]];
           obj[key].push(val);
         } else {
@@ -101,8 +105,10 @@ export function parse_url(url: string): Parts {
         }
       }
     }
+
     return obj;
   }
+
   return parse(url);
 }
 
@@ -170,12 +176,14 @@ export function parse(url: string): Promise<ConnectOptions> {
 function parseNormalUrl(url: string): ConnectOptions {
   const data = parse_url(url);
   const connectOptions: ConnectOptions = { servers: data.servers!, db: "" };
-  for (var i = 0; i < connectOptions.servers.length; i++) {
-    if (connectOptions.servers[i].host.includes(".sock")) {
-      connectOptions.servers[i].domainSocket = connectOptions.servers[i].host;
+
+  for (const server of connectOptions.servers) {
+    if (server.host.includes(".sock")) {
+      server.domainSocket = server.host;
     }
-    connectOptions.servers[i].port = connectOptions.servers[i].port || 27017;
+    server.port = server.port || 27017;
   }
+
   connectOptions.db = (data.pathname && data.pathname.length > 1)
     ? data.pathname.substring(1)
     : "admin";

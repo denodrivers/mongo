@@ -33,7 +33,7 @@ function concat(bufs: Uint8Array[]): Uint8Array {
   );
 
   const buf: Uint8Array = new Uint8Array(total);
-  let offset: number = 0;
+  let offset = 0;
 
   for (const b of bufs) {
     buf.set(b, offset);
@@ -90,10 +90,10 @@ export interface PagerOptions {
 export class Pager {
   readonly pageSize: number;
 
-  maxPages: number = 32768;
-  pages: Page[] = new Array(32768);
-  length: number = 0;
-  level: number = 0;
+  maxPages = 32768;
+  pages = new Array(32768);
+  length = 0;
+  level = 0;
 
   private updates: Page[] = [];
   private path: Uint16Array = new Uint16Array(4);
@@ -197,12 +197,12 @@ export class Pager {
   toBuffer(): Uint8Array {
     const list: Uint8Array[] = new Array(this.length);
     const empty: Uint8Array = new Uint8Array(this.pageSize);
-    let ptr: number = 0;
+    let ptr = 0;
 
     while (ptr < list.length) {
       const arr: Page[] = this._array(ptr, true);
 
-      for (let i: number = 0; i < 32768 && ptr < list.length; i++) {
+      for (let i = 0; i < 32768 && ptr < list.length; i++) {
         list[ptr++] = arr && arr[i] ? arr[i].buffer : empty;
       }
     }

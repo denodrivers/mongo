@@ -19,7 +19,7 @@ export class CommandCursor<T> {
   #collection?: string;
 
   #executor: () => Promise<CommandCursorOptions<T>>;
-  #excuted: boolean = false;
+  #executed = false;
 
   constructor(
     protocol: WireProtocol,
@@ -30,7 +30,7 @@ export class CommandCursor<T> {
   }
 
   private async execute() {
-    this.#excuted = true;
+    this.#executed = true;
     const options = await this.#executor();
     this.#batches = options.firstBatch;
     this.#id = BigInt(options.id);
@@ -44,7 +44,7 @@ export class CommandCursor<T> {
       return this.#batches.shift();
     }
 
-    if (this.#excuted === false) {
+    if (!this.#executed) {
       await this.execute();
       return this.#batches.shift();
     }
@@ -82,7 +82,7 @@ export class CommandCursor<T> {
 
   async map<M>(callback: (item: T, index: number) => M): Promise<M[]> {
     let index = 0;
-    let result = [];
+    const result = [];
     for await (const item of this) {
       if (item) {
         const newItem = callback(item, index++);
@@ -92,7 +92,7 @@ export class CommandCursor<T> {
     return result;
   }
 
-  async toArray(): Promise<T[]> {
+  toArray(): Promise<T[]> {
     return this.map((item) => item);
   }
 }

@@ -56,7 +56,7 @@ export class Collection<T> {
    */
   async findAndModify(
     query?: Partial<T>,
-    options?: FindAndModifyOptions<T>,
+    options?: FindAndModifyOptions,
   ): Promise<T | undefined> {
     const result = await this.#protocol.commandSingle<{
       value: T;
@@ -92,7 +92,7 @@ export class Collection<T> {
     return insertedIds[0];
   }
 
-  async insert(docs: Document | Document[], options?: InsertOptions) {
+  insert(docs: Document | Document[], options?: InsertOptions) {
     docs = Array.isArray(docs) ? docs : [docs];
     return this.insertMany(docs as Document[], options);
   }
@@ -171,7 +171,7 @@ export class Collection<T> {
 
   delete = this.deleteMany;
 
-  async deleteOne(filter: Document, options?: DeleteOptions) {
+  deleteOne(filter: Document, options?: DeleteOptions) {
     return this.delete(filter, { ...options, limit: 1 });
   }
 
