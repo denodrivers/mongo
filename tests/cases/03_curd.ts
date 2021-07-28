@@ -248,6 +248,20 @@ export default function curdTests() {
     assertEquals(count, 2);
   });
 
+  testWithClient("testCountDocuments", async (client) => {
+    const db = client.database("test");
+    const users = db.collection("mongo_test_users");
+    const count = await users.countDocuments({ username: "many" });
+    assertEquals(count, 2);
+  });
+
+  testWithClient("testEstimatedDocumentCount", async (client) => {
+    const db = client.database("test");
+    const users = db.collection("mongo_test_users");
+    const count = await users.estimatedDocumentCount();
+    assertEquals(count, 4);
+  });
+
   testWithClient("testAggregation", async (client) => {
     const db = client.database("test");
     const users = db.collection("mongo_test_users");

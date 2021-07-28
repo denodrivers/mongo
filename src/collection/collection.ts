@@ -73,6 +73,9 @@ export class Collection<T> {
     return result.value;
   }
 
+  /**
+   * @deprecated Use `countDocuments` or `estimatedDocumentCount` instead
+   */
   async count(filter?: Document, options?: CountOptions): Promise<number> {
     const res = await this.#protocol.commandSingle(this.#dbName, {
       count: this.name,
@@ -85,6 +88,43 @@ export class Collection<T> {
     } else {
       return 0;
     }
+  }
+
+  async countDocuments(
+    filter?: Document,
+    options?: CountOptions,
+  ): Promise<number> {
+    const pipeline: Document[] = [{ $match: filter }];
+
+    if (typeof options?.skip === "number") {
+      pipeline.push({ $skip: options.skip });
+      delete options.skip;
+    }
+
+    if (typeof options?.limit === "number") {
+      pipeline.push({ $limit: options.limit });
+      delete options.limit;
+    }
+
+    pipeline.push({ $group: { _id: 1, n: { $sum: 1 } } });
+
+    const result = await this.aggregate<{ n: number }>(
+      pipeline,
+      options,
+    ).next();
+    if (result) return result.n;
+    return 0;
+  }
+
+  async estimatedDocumentCount(): Promise<number> {
+    const pipeline = [
+      { $collStats: { count: {} } },
+      { $group: { _id: 1, n: { $sum: "$count" } } },
+    ];
+
+    const result = await this.aggregate<{ n: number }>(pipeline).next();
+    if (result) return result.n;
+    return 0;
   }
 
   async insertOne(doc: Document, options?: InsertOptions) {
