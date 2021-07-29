@@ -7,6 +7,7 @@ import { assert } from "../deps.ts";
 
 export class MongoClient {
   #cluster?: Cluster;
+  #defaultDbName = "admin";
 
   async connect(
     options: ConnectOptions | string,
@@ -15,6 +16,8 @@ export class MongoClient {
       const parsedOptions = typeof options === "string"
         ? await parse(options)
         : options;
+
+      this.#defaultDbName = parsedOptions.db;
       const cluster = new Cluster(parsedOptions);
       await cluster.connect();
       await cluster.authenticate();
@@ -49,7 +52,7 @@ export class MongoClient {
     return await this.#cluster.protocol.commandSingle(db, body);
   }
 
-  database(name: string): Database {
+  database(name = this.#defaultDbName): Database {
     assert(this.#cluster);
     return new Database(this.#cluster, name);
   }
