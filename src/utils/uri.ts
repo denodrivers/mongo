@@ -123,10 +123,10 @@ export type SrvConnectOptions = Omit<ConnectOptions, "servers"> & {
 export function parseSrvUrl(url: string): SrvConnectOptions {
   const data = parse_url(url);
   const connectOptions: SrvConnectOptions = {
-    db: new URLSearchParams(data.search).get("authSource") ?? 
+    db: new URLSearchParams(data.search).get("authSource") ??
       ((data.pathname && data.pathname.length > 1)
-      ? data.pathname.substring(1)
-      : "admin"),
+        ? data.pathname.substring(1)
+        : "admin"),
   };
 
   if (data.auth) {
@@ -185,10 +185,10 @@ function parseNormalUrl(url: string): ConnectOptions {
     server.port = server.port || 27017;
   }
 
-  connectOptions.db = new URLSearchParams(data.search).get("authSource") ?? 
+  connectOptions.db = new URLSearchParams(data.search).get("authSource") ??
     (data.pathname && (data.pathname.length > 1)
-    ? data.pathname.substring(1)
-    : "admin");
+      ? data.pathname.substring(1)
+      : "admin");
   if (data.auth) {
     connectOptions.credential = <Credential> {
       username: data.auth.user,
