@@ -54,7 +54,7 @@ interface UserSchema {
   password: string;
 }
 
-const db = client.database("test");
+const db = await client.database("test");
 const users = db.collection<UserSchema>("users");
 
 // insert
