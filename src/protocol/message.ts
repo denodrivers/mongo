@@ -76,10 +76,10 @@ export function serializeMessage(message: Message): Uint8Array[] {
   view.setInt32(0, message.flags ?? 0, true);
 
   let pos = 4;
-  sections.forEach((section) => {
+  for (const section of sections) {
     buffer.set(section, pos);
     pos += section.byteLength;
-  });
+  }
 
   const header = serializeHeader({
     messageLength: 16 + buffer.byteLength,

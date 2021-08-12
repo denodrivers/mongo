@@ -95,11 +95,11 @@ export class Srv {
       valid: {},
       illegal: [],
     };
-    optionsUri.split("&").forEach((option: string) => {
+    for (const option of optionsUri.split("&")) {
       const [key, value] = option.split("=");
       if (isAllowedOption(key) && !!value) options.valid[key] = value;
       else options.illegal.push(option);
-    });
+    }
 
     if (options.illegal.length !== 0) {
       throw new SRVError(

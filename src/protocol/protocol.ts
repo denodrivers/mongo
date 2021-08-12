@@ -57,13 +57,13 @@ export class WireProtocol {
 
     let documents: T[] = [];
 
-    message?.sections.forEach((section) => {
+    for (const section of message?.sections!) {
       if ("document" in section) {
         documents.push(section.document as T);
       } else {
         documents = documents.concat(section.documents as T[]);
       }
-    });
+    }
 
     return documents;
   }
