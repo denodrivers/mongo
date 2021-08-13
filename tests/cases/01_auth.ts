@@ -16,7 +16,7 @@ interface PasswordValid {
   digest: string;
 }
 
-const passwordValdis: PasswordValid[] = [
+const passwordValids: PasswordValid[] = [
   {
     username: "user",
     password: "pencil",
@@ -30,7 +30,7 @@ const passwordValdis: PasswordValid[] = [
 ];
 
 export default function authTests() {
-  passwordValdis.forEach(({ username, password, digest }) => {
+  for (const { username, password, digest } of passwordValids) {
     Deno.test({
       name: `passwordDigest:${username}:${password}`,
       fn() {
@@ -38,7 +38,7 @@ export default function authTests() {
         assertEquals(digestRes, digest);
       },
     });
-  });
+  }
 
   Deno.test({
     name: "clientFirstMessageBare",

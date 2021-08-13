@@ -124,12 +124,12 @@ export class Cluster {
   }
 
   close() {
-    this.#connections.forEach((connection) => {
+    for (const conn of this.#connections) {
       try {
-        Deno.close(connection.rid);
+        Deno.close(conn.rid);
       } catch (error) {
         console.error(`Error closing connection: ${error}`);
       }
-    });
+    }
   }
 }
