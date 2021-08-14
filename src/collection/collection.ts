@@ -94,7 +94,10 @@ export class Collection<T> {
     filter?: Document,
     options?: CountOptions,
   ): Promise<number> {
-    const pipeline: Document[] = [{ $match: filter }];
+    const pipeline: Document[] = [];
+    if (filter) {
+      pipeline.push({ $match: filter });
+    }
 
     if (typeof options?.skip === "number") {
       pipeline.push({ $skip: options.skip });
