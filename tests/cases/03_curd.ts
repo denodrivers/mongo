@@ -251,6 +251,9 @@ export default function curdTests() {
   testWithClient("testCountDocuments", async (client) => {
     const db = client.database("test");
     const users = db.collection("mongo_test_users");
+    const countAll = await users.countDocuments();
+    assertEquals(countAll, 4);
+
     const count = await users.countDocuments({ username: "many" });
     assertEquals(count, 2);
   });
