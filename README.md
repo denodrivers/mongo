@@ -17,7 +17,7 @@
 ## Examples
 
 ```ts
-import { Bson, MongoClient } from "https://deno.land/x/mongo@v0.24.0/mod.ts";
+import { Bson, MongoClient } from "https://deno.land/x/mongo@v0.25.0/mod.ts";
 
 const client = new MongoClient();
 
