@@ -5,12 +5,6 @@ import { MongoError } from "./error.ts";
 import { assert } from "../deps.ts";
 import { Server } from "./types.ts";
 
-export interface DenoConnectOptions {
-  hostname: string;
-  port: number;
-  certFile?: string;
-}
-
 export class Cluster {
   #options: ConnectOptions;
   #connections: Deno.Conn[];
@@ -31,29 +25,28 @@ export class Cluster {
     );
   }
 
-  async connectToServer(server: Server, options: ConnectOptions) {
-    const denoConnectOps: DenoConnectOptions = {
+  connectToServer(server: Server, options: ConnectOptions) {
+    const denoConnectOps: Deno.ConnectTlsOptions = {
       hostname: server.host,
       port: server.port,
     };
-    if (options.tls) {
-      if (options.certFile) {
-        denoConnectOps.certFile = options.certFile;
+
+    if (!options.tls) return Deno.connect(denoConnectOps);
+
+    if (options.certFile) denoConnectOps.certFile = options.certFile;
+
+    if (options.keyFile) {
+      //TODO: need something like const key = decrypt(options.keyFile) ...
+      if (options.keyFilePassword) {
+        throw new MongoError(
+          "Tls keyFilePassword not implemented in Deno driver",
+        );
       }
-      if (options.keyFile) {
-        if (options.keyFilePassword) {
-          throw new MongoError(
-            `Tls keyFilePassword not implemented in Deno driver`,
-          );
-          //TODO, need something like const key = decrypt(options.keyFile) ...
-        }
-        throw new MongoError(`Tls keyFile not implemented in Deno driver`);
-        //TODO, need Deno.connectTls with something like key or keyFile option.
-      }
-      return await Deno.connectTls(denoConnectOps);
-    } else {
-      return await Deno.connect(denoConnectOps);
+      throw new MongoError("Tls keyFile not implemented in Deno driver");
+      //TODO: need Deno.connectTls with something like key or keyFile option.
     }
+
+    return Deno.connectTls(denoConnectOps);
   }
 
   async authenticate() {
