@@ -96,7 +96,7 @@ export default function authTests() {
       );
       assertEquals(
         saltedPassword,
-        [
+        Uint8Array.from([
           72,
           84,
           156,
@@ -117,7 +117,7 @@ export default function authTests() {
           110,
           78,
           230,
-        ],
+        ]),
       );
     },
   });
