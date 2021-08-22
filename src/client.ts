@@ -29,15 +29,12 @@ export class MongoClient {
     return this.database((options as ConnectOptions).db);
   }
 
-  async listDatabases(options?: {
+  async listDatabases(options: {
     filter?: Document;
     nameOnly?: boolean;
     authorizedCollections?: boolean;
     comment?: Document;
-  }): Promise<ListDatabaseInfo[]> {
-    if (!options) {
-      options = {};
-    }
+  } = {}): Promise<ListDatabaseInfo[]> {
     assert(this.#cluster);
     const { databases } = await this.#cluster.protocol.commandSingle("admin", {
       listDatabases: 1,
