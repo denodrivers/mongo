@@ -70,7 +70,7 @@ export class Database {
     });
     const names: string[] = [];
     for await (const item of cursor) {
-      names.push(item!.name);
+      names.push(item.name);
     }
     return names;
   }
