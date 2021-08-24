@@ -2,6 +2,8 @@ import { Bson } from "../../deps.ts";
 import { MongoError } from "../error.ts";
 import { WireProtocol } from "../protocol/mod.ts";
 import {
+  AggregateOptions,
+  AggregatePipeline,
   CountOptions,
   CreateIndexOptions,
   DeleteOptions,
@@ -103,13 +105,13 @@ export class Collection<T> {
     filter?: FilterDocument<T, QueryOperators>,
     options?: CountOptions,
   ): Promise<number> {
-    const pipeline: Document[] = [];
+    const pipeline: AggregatePipeline<any>[] = [];
     if (filter) {
       pipeline.push({ $match: filter });
     }
 
     if (typeof options?.skip === "number") {
-      pipeline.push({ $skip: options.skip });
+      pipeline.push({ $skip: options.limit });
       delete options.skip;
     }
 
@@ -122,7 +124,7 @@ export class Collection<T> {
 
     const result = await this.aggregate<{ n: number }>(
       pipeline,
-      options,
+      options as AggregateOptions,
     ).next();
     if (result) return result.n;
     return 0;
@@ -258,7 +260,10 @@ export class Collection<T> {
     return values;
   }
 
-  aggregate<U = T>(pipeline: Document[], options?: any): AggregateCursor<U> {
+  aggregate<U = T>(
+    pipeline: AggregatePipeline<U>[],
+    options?: AggregateOptions,
+  ): AggregateCursor<U> {
     return new AggregateCursor<U>({
       pipeline,
       protocol: this.#protocol,

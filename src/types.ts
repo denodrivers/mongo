@@ -725,19 +725,23 @@ export type AggregateOperators =
   | "$unset"
   | "$unwind";
 
+type OperatorAnyValue = string | number | boolean | null;
+
 export type FilterDocument<T extends Document, O extends string> =
   & Document
   & {
     [Operator in O]?:
-      | Array<keyof T | T>
+      | Array<keyof T | FilterDocument<T, O> | OperatorAnyValue>
       | FilterDocument<T, O>
-      | string
-      | number
-      | boolean
-      | null;
+      | OperatorAnyValue;
   }
   & {
-    [Key in keyof T]?: T[Key] extends Record<string, unknown>
-      ? FilterDocument<T[Key], O>
+    [Key in keyof T]?: T[Key] extends Document ? FilterDocument<T[Key], O>
       : T[Key] | FilterDocument<T, O>;
+  };
+
+export type AggregatePipeline<T extends Document> =
+  & FilterDocument<T, Exclude<AggregateOperators, "$match">>
+  & {
+    ["$match"]?: FilterDocument<T, QueryOperators>;
   };
