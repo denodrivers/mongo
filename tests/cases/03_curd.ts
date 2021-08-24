@@ -45,7 +45,7 @@ export default function curdTests() {
     const db = client.database("test");
     const users = db.collection<IUser>("mongo_test_users");
     const { upsertedId } = await users.updateOne(
-      { _id: "aaaaaaaaaaaaaaaaaaaaaaaa" },
+      { _id: { $oid: "aaaaaaaaaaaaaaaaaaaaaaaa" } },
       {
         username: "user1",
         password: "pass1",

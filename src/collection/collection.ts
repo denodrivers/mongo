@@ -9,9 +9,12 @@ import {
   Document,
   DropIndexOptions,
   DropOptions,
+  FilterDocument,
   FindAndModifyOptions,
   FindOptions,
   InsertOptions,
+  QueryOperators,
+  UpdateOperators,
   UpdateOptions,
 } from "../types.ts";
 import { AggregateCursor } from "./commands/aggregate.ts";
@@ -28,7 +31,10 @@ export class Collection<T> {
     this.#dbName = dbName;
   }
 
-  find(filter?: Document, options?: FindOptions): FindCursor<T> {
+  find(
+    filter?: FilterDocument<T, QueryOperators>,
+    options?: FindOptions<T>,
+  ): FindCursor<T> {
     return new FindCursor<T>({
       filter,
       protocol: this.#protocol,
@@ -39,8 +45,8 @@ export class Collection<T> {
   }
 
   async findOne(
-    filter?: Document,
-    options?: FindOptions,
+    filter?: FilterDocument<T, QueryOperators>,
+    options?: FindOptions<T>,
   ): Promise<T | undefined> {
     const cursor = this.find(filter, options);
     return await cursor.next();
@@ -55,8 +61,8 @@ export class Collection<T> {
    * @returns The document matched and modified
    */
   async findAndModify(
-    query?: Partial<T>,
-    options?: FindAndModifyOptions,
+    filter?: FilterDocument<T, QueryOperators>,
+    options?: FindAndModifyOptions<T>,
   ): Promise<T | undefined> {
     const result = await this.#protocol.commandSingle<{
       value: T;
@@ -64,7 +70,7 @@ export class Collection<T> {
       lastErrorObject: any;
     }>(this.#dbName, {
       findAndModify: this.name,
-      query,
+      query: filter,
       ...options,
     });
     if (result.ok === 0) {
@@ -76,7 +82,10 @@ export class Collection<T> {
   /**
    * @deprecated Use `countDocuments` or `estimatedDocumentCount` instead
    */
-  async count(filter?: Document, options?: CountOptions): Promise<number> {
+  async count(
+    filter?: FilterDocument<T, QueryOperators>,
+    options?: CountOptions,
+  ): Promise<number> {
     const res = await this.#protocol.commandSingle(this.#dbName, {
       count: this.name,
       query: filter,
@@ -91,7 +100,7 @@ export class Collection<T> {
   }
 
   async countDocuments(
-    filter?: Document,
+    filter?: FilterDocument<T, QueryOperators>,
     options?: CountOptions,
   ): Promise<number> {
     const pipeline: Document[] = [];
@@ -169,7 +178,11 @@ export class Collection<T> {
     };
   }
 
-  async updateOne(filter: Document, update: Document, options?: UpdateOptions) {
+  async updateOne(
+    filter: FilterDocument<T, QueryOperators>,
+    update: FilterDocument<T, UpdateOperators>,
+    options?: UpdateOptions,
+  ) {
     const {
       upsertedIds = [],
       upsertedCount,
@@ -187,14 +200,21 @@ export class Collection<T> {
     };
   }
 
-  async updateMany(filter: Document, doc: Document, options?: UpdateOptions) {
+  async updateMany(
+    filter: FilterDocument<T, QueryOperators>,
+    doc: FilterDocument<T, UpdateOperators>,
+    options?: UpdateOptions,
+  ) {
     return await update(this.#protocol, this.#dbName, this.name, filter, doc, {
       ...options,
       multi: options?.multi ?? true,
     });
   }
 
-  async deleteMany(filter: Document, options?: DeleteOptions): Promise<number> {
+  async deleteMany(
+    filter: FilterDocument<T, QueryOperators>,
+    options?: DeleteOptions,
+  ): Promise<number> {
     const res = await this.#protocol.commandSingle(this.#dbName, {
       delete: this.name,
       deletes: [
@@ -214,7 +234,10 @@ export class Collection<T> {
 
   delete = this.deleteMany;
 
-  deleteOne(filter: Document, options?: DeleteOptions) {
+  deleteOne(
+    filter: FilterDocument<T, QueryOperators>,
+    options?: DeleteOptions,
+  ) {
     return this.delete(filter, { ...options, limit: 1 });
   }
 

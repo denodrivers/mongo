@@ -31,11 +31,11 @@ export interface CountOptions {
   collation?: Document;
 }
 
-export interface FindOptions {
+export interface FindOptions<T = Document> {
   findOne?: boolean;
   skip?: number;
   limit?: number;
-  projection?: Document;
+  projection?: Record<keyof T | string, 1 | 0>;
   sort?: Document;
   noCursorTimeout?: boolean;
 }
@@ -193,7 +193,7 @@ export interface CollationOptions {
  *
  * @see https://docs.mongodb.com/manual/reference/method/db.collection.findAndModify/
  */
-export interface FindAndModifyOptions {
+export interface FindAndModifyOptions<T = Document> {
   /**
    * Control the order in which documents are found.
    * findAndModify only modifies the first document found, so controlling the
@@ -205,7 +205,7 @@ export interface FindAndModifyOptions {
    *
    * Either update or remove have to be specified
    */
-  update?: Document;
+  update?: FilterDocument<T, UpdateOperators>;
   /**
    * Remove the found document
    */
@@ -617,3 +617,127 @@ export interface DropIndexOptions {
   /** Optional. A user-provided comment to attach to this command. Once set */
   comment?: Document;
 }
+
+/**
+ * Operators for use in the search query.
+ *
+ * @see https://docs.mongodb.com/manual/reference/operator/query/
+ */
+export type QueryOperators =
+  | "$eq"
+  | "$gt"
+  | "$gte"
+  | "$in"
+  | "$lt"
+  | "$ne"
+  | "$nin"
+  | "$and"
+  | "$not"
+  | "$nor"
+  | "$or"
+  | "$exists"
+  | "$type"
+  | "$expr"
+  | "$jsonSchema"
+  | "$mod"
+  | "$regex"
+  | "$text"
+  | "$where"
+  | "$geoIntersects"
+  | "$geoWithin"
+  | "$near"
+  | "$nearSphere"
+  | "$all"
+  | "$eleMatch"
+  | "$size"
+  | "$bitsAllClear"
+  | "$bitsAllSet"
+  | "$bitsAnyClear"
+  | "$bitsAnyClear"
+  | "$elemMatch"
+  | "$meta"
+  | "$slice"
+  | "$comment"
+  | "$rand";
+
+/**
+ * Operators for use in the update query.
+ *
+ * @see https://docs.mongodb.com/manual/reference/operator/update/
+ */
+export type UpdateOperators =
+  | "$currentDate"
+  | "$inc"
+  | "$min"
+  | "$max"
+  | "$mul"
+  | "$rename"
+  | "$set"
+  | "$setOnInsert"
+  | "$unset"
+  | "$addToSet"
+  | "$pop"
+  | "$pull"
+  | "$push"
+  | "$pushAll"
+  | "$each"
+  | "$position"
+  | `$slice`
+  | `$sort`
+  | "$bit";
+
+/**
+ * Operators for use in the aggregation query.
+ *
+ * @see https://docs.mongodb.com/manual/reference/operator/aggregation-pipeline/
+ */
+export type AggregateOperators =
+  | "$addFields"
+  | "$bucket"
+  | "$bucketAuto"
+  | "$collStats"
+  | "$count"
+  | "$currentOp"
+  | "$facet"
+  | "$geoNear"
+  | "$graphLookup"
+  | "$group"
+  | "$indexStats"
+  | "$limit"
+  | "$listLocalSessions"
+  | "$listSessions"
+  | "$lookup"
+  | "$match"
+  | "$merge"
+  | "$out"
+  | "$planCacheStats"
+  | "$project"
+  | "$redact"
+  | "$replaceRoot"
+  | "$replaceWith"
+  | "$sample"
+  | "$search"
+  | "$set"
+  | "$setWindowFields"
+  | "$skip"
+  | "$sort"
+  | "$sortByCount"
+  | "$unset"
+  | "$unwind";
+
+export type FilterDocument<T extends Document, O extends string> =
+  & Document
+  & {
+    [Operator in O]?:
+      | Array<keyof T | T>
+      | FilterDocument<T, O>
+      | string
+      | number
+      | boolean
+      | null;
+  }
+  & {
+    [Key in keyof T]?: T[Key] extends Record<string, unknown>
+      ? FilterDocument<T[Key], O>
+      : T[Key] | FilterDocument<T, O>;
+  };
