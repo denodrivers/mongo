@@ -4,7 +4,7 @@ import { assert, assertEquals, assertThrowsAsync } from "../test.deps.ts";
 interface IUser {
   username: string;
   password: string;
-  _id: { $oid: string };
+  _id: string;
   uid?: number;
   date?: Date;
 }
@@ -45,7 +45,7 @@ export default function curdTests() {
     const db = client.database("test");
     const users = db.collection<IUser>("mongo_test_users");
     const { upsertedId } = await users.updateOne(
-      { _id: { $oid: "aaaaaaaaaaaaaaaaaaaaaaaa" } },
+      { _id: "aaaaaaaaaaaaaaaaaaaaaaaa" },
       {
         username: "user1",
         password: "pass1",
