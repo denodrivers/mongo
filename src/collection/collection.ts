@@ -14,6 +14,7 @@ import {
   FilterDocument,
   FindAndModifyOptions,
   FindOptions,
+  InsertDocument,
   InsertOptions,
   QueryOperators,
   UpdateOperators,
@@ -141,23 +142,26 @@ export class Collection<T> {
     return 0;
   }
 
-  async insertOne(doc: Document, options?: InsertOptions) {
+  async insertOne(doc: InsertDocument<T>, options?: InsertOptions) {
     const { insertedIds } = await this.insertMany([doc], options);
     return insertedIds[0];
   }
 
-  insert(docs: Document | Document[], options?: InsertOptions) {
+  insert(
+    docs: InsertDocument<T> | InsertDocument<T>[],
+    options?: InsertOptions,
+  ) {
     docs = Array.isArray(docs) ? docs : [docs];
-    return this.insertMany(docs as Document[], options);
+    return this.insertMany(docs, options);
   }
 
   async insertMany(
-    docs: Document[],
+    docs: InsertDocument<T>[],
     options?: InsertOptions,
   ): Promise<{ insertedIds: Document[]; insertedCount: number }> {
     const insertedIds = docs.map((doc) => {
       if (!doc._id) {
-        doc._id = new Bson.ObjectID();
+        (doc as any)._id = new Bson.ObjectID();
       }
       return doc._id;
     });

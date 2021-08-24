@@ -745,3 +745,5 @@ export type AggregatePipeline<T extends Document> =
   & {
     ["$match"]?: FilterDocument<T, QueryOperators>;
   };
+
+export type InsertDocument<T extends Document> = Document & Partial<T>;
