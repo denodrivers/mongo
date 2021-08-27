@@ -6,14 +6,12 @@ export interface MongoErrorInfo {
 }
 
 export abstract class MongoError extends Error {
-
   constructor(info: MongoErrorInfo | string) {
     super(`MongoError: ${JSON.stringify(info)}`);
   }
 }
 
 export class MongoDriverError extends MongoError {
-
   constructor(info: string) {
     super(info);
   }

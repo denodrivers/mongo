@@ -26,7 +26,7 @@ export class ScramAuthPlugin extends AuthPlugin {
   }
 
   prepare(authContext: AuthContext): Document {
-    const handshakeDoc = <HandshakeDocument>{
+    const handshakeDoc = <HandshakeDocument> {
       ismaster: true,
       client: driverMetadata,
       compression: authContext.options.compression,
