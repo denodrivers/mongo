@@ -26,7 +26,7 @@ export class MongoServerError extends MongoError implements MongoErrorInfo {
   codeName: string;
 
   constructor(info: MongoErrorInfo) {
-    super(info)
+    super(info);
 
     this.ok = info.ok;
     this.errmsg = info.errmsg;

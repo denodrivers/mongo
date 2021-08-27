@@ -1,5 +1,5 @@
 import { assert, BufReader, Deferred, deferred, writeAll } from "../../deps.ts";
-import { MongoServerError, MongoErrorInfo } from "../error.ts";
+import { MongoErrorInfo, MongoServerError } from "../error.ts";
 import { Document } from "../types.ts";
 import { handshake } from "./handshake.ts";
 import { parseHeader } from "./header.ts";

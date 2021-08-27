@@ -108,7 +108,9 @@ export async function executeScram(
     throw new MongoDriverError("AuthContext must provide credentials.");
   }
   if (!authContext.nonce) {
-    throw new MongoDriverError("AuthContext must contain a valid nonce property");
+    throw new MongoDriverError(
+      "AuthContext must contain a valid nonce property",
+    );
   }
   const nonce = authContext.nonce;
   const db = credentials.db!;
