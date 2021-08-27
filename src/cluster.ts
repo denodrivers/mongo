@@ -1,7 +1,7 @@
 import { WireProtocol } from "./protocol/mod.ts";
 import { ConnectOptions } from "./types.ts";
 import { AuthContext, ScramAuthPlugin, X509AuthPlugin } from "./auth/mod.ts";
-import { MongoError } from "./error.ts";
+import { MongoDriverError } from "./error.ts";
 import { assert } from "../deps.ts";
 import { Server } from "./types.ts";
 
@@ -38,11 +38,11 @@ export class Cluster {
     if (options.keyFile) {
       //TODO: need something like const key = decrypt(options.keyFile) ...
       if (options.keyFilePassword) {
-        throw new MongoError(
+        throw new MongoDriverError(
           "Tls keyFilePassword not implemented in Deno driver",
         );
       }
-      throw new MongoError("Tls keyFile not implemented in Deno driver");
+      throw new MongoDriverError("Tls keyFile not implemented in Deno driver");
       //TODO: need Deno.connectTls with something like key or keyFile option.
     }
 
@@ -73,7 +73,7 @@ export class Cluster {
       } else if (mechanism === "MONGODB-X509") {
         authPlugin = new X509AuthPlugin();
       } else {
-        throw new MongoError(
+        throw new MongoDriverError(
           `Auth mechanism not implemented in Deno driver: ${mechanism}`,
         );
       }

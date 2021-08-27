@@ -1,5 +1,5 @@
 import { Bson } from "../../deps.ts";
-import { MongoError } from "../error.ts";
+import { MongoDriverError } from "../error.ts";
 import { WireProtocol } from "../protocol/mod.ts";
 import {
   CountOptions,
@@ -68,7 +68,7 @@ export class Collection<T> {
       ...options,
     });
     if (result.ok === 0) {
-      throw new MongoError("Could not execute findAndModify operation");
+      throw new MongoDriverError("Could not execute findAndModify operation");
     }
     return result.value;
   }

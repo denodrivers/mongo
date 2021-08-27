@@ -3,7 +3,7 @@ import { Binary } from "../../bson/mod.ts";
 import { saslprep } from "../utils/saslprep/mod.ts";
 import { AuthContext, AuthPlugin } from "./base.ts";
 import { HandshakeDocument } from "../protocol/handshake.ts";
-import { MongoError } from "../error.ts";
+import { MongoDriverError } from "../error.ts";
 import {
   b64,
   createHash,
@@ -26,7 +26,7 @@ export class ScramAuthPlugin extends AuthPlugin {
   }
 
   prepare(authContext: AuthContext): Document {
-    const handshakeDoc = <HandshakeDocument> {
+    const handshakeDoc = <HandshakeDocument>{
       ismaster: true,
       client: driverMetadata,
       compression: authContext.options.compression,
@@ -105,10 +105,10 @@ export async function executeScram(
 ) {
   const { protocol, credentials } = authContext;
   if (!credentials) {
-    throw new MongoError("AuthContext must provide credentials.");
+    throw new MongoDriverError("AuthContext must provide credentials.");
   }
   if (!authContext.nonce) {
-    throw new MongoError("AuthContext must contain a valid nonce property");
+    throw new MongoDriverError("AuthContext must contain a valid nonce property");
   }
   const nonce = authContext.nonce;
   const db = credentials.db!;
@@ -126,10 +126,10 @@ export async function continueScramConversation(
   const protocol = authContext.protocol;
   const credentials = authContext.credentials;
   if (!credentials) {
-    throw new MongoError("AuthContext must provide credentials.");
+    throw new MongoDriverError("AuthContext must provide credentials.");
   }
   if (!authContext.nonce) {
-    throw new MongoError("Unable to continue SCRAM without valid nonce");
+    throw new MongoDriverError("Unable to continue SCRAM without valid nonce");
   }
   const nonce = authContext.nonce;
 
@@ -149,7 +149,7 @@ export async function continueScramConversation(
 
   const iterations = parseInt(dict.i, 10);
   if (iterations && iterations < 4096) {
-    throw new MongoError(
+    throw new MongoDriverError(
       `Server returned an invalid iteration count ${iterations}`,
     );
   }
@@ -157,7 +157,7 @@ export async function continueScramConversation(
   const salt = dict.s;
   const rnonce = dict.r;
   if (rnonce.startsWith("nonce")) {
-    throw new MongoError(`Server returned an invalid nonce: ${rnonce}`);
+    throw new MongoDriverError(`Server returned an invalid nonce: ${rnonce}`);
   }
 
   // Set up start of proof
@@ -197,7 +197,7 @@ export async function continueScramConversation(
     fixPayload2(dec.decode(result.payload.buffer)),
   );
   if (!compareDigest(b64.decode(parsedResponse.v), serverSignature)) {
-    // throw new MongoError("Server returned an invalid signature");
+    // throw new MongoDriverError("Server returned an invalid signature");
   }
   if (result.done) {
     return result;
@@ -242,15 +242,15 @@ export function parsePayload(payload: string) {
 
 export function passwordDigest(username: string, password: string) {
   if (typeof username !== "string") {
-    throw new MongoError("username must be a string");
+    throw new MongoDriverError("username must be a string");
   }
 
   if (typeof password !== "string") {
-    throw new MongoError("password must be a string");
+    throw new MongoDriverError("password must be a string");
   }
 
   if (password.length === 0) {
-    throw new MongoError("password cannot be empty");
+    throw new MongoDriverError("password cannot be empty");
   }
 
   const md5 = createHash("md5");
