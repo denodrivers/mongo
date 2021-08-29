@@ -1,5 +1,5 @@
 import { assert, BufReader, Deferred, deferred, writeAll } from "../../deps.ts";
-import { MongoError, MongoErrorInfo } from "../error.ts";
+import { MongoErrorInfo, MongoServerError } from "../error.ts";
 import { Document } from "../types.ts";
 import { handshake } from "./handshake.ts";
 import { parseHeader } from "./header.ts";
@@ -35,7 +35,7 @@ export class WireProtocol {
     const [doc] = await this.command<MongoErrorInfo | T>(db, body);
     const maybeError = doc as MongoErrorInfo;
     if (maybeError.ok === 0) {
-      throw new MongoError(maybeError);
+      throw new MongoServerError(maybeError);
     }
     return doc as T;
   }

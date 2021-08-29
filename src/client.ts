@@ -1,7 +1,7 @@
 import { Database } from "./database.ts";
 import { ConnectOptions, Document, ListDatabaseInfo } from "./types.ts";
 import { parse } from "./utils/uri.ts";
-import { MongoError } from "./error.ts";
+import { MongoDriverError } from "./error.ts";
 import { Cluster } from "./cluster.ts";
 import { assert } from "../deps.ts";
 
@@ -24,7 +24,7 @@ export class MongoClient {
       await cluster.updateMaster();
       this.#cluster = cluster;
     } catch (e) {
-      throw new MongoError(`Connection failed: ${e.message || e}`);
+      throw new MongoDriverError(`Connection failed: ${e.message || e}`);
     }
     return this.database((options as ConnectOptions).db);
   }
