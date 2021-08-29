@@ -9,5 +9,5 @@ export function deserializeBson(buffer: Uint8Array): Bson.Document {
 }
 
 export function ObjectId(oid: string): Bson.ObjectId {
-  return new Bson.ObjectID(oid);
+  return new Bson.ObjectId(oid);
 }

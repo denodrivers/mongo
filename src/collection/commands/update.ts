@@ -8,7 +8,7 @@ interface UpdateResponse {
   n: number;
   upserted?: {
     index: number;
-    _id: Bson.ObjectID;
+    _id: Bson.ObjectId;
   }[];
 }
 
