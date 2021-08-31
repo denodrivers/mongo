@@ -966,7 +966,6 @@ declare class ObjectId {
   /* Excluded from this release type: toExtendedJSON */
   /* Excluded from this release type: fromExtendedJSON */
 }
-export { ObjectId as ObjectID };
 export { ObjectId };
 
 /** @public */

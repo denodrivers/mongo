@@ -146,7 +146,7 @@ export class Collection<T> {
   ): Promise<{ insertedIds: Document[]; insertedCount: number }> {
     const insertedIds = docs.map((doc) => {
       if (!doc._id) {
-        doc._id = new Bson.ObjectID();
+        doc._id = new Bson.ObjectId();
       }
       return doc._id;
     });
