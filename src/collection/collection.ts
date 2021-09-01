@@ -159,7 +159,7 @@ export class Collection<T> {
     options?: InsertOptions,
   ): Promise<
     {
-      insertedIds: (Bson.ObjectID | Required<InsertDocument<T>>["_id"])[];
+      insertedIds: (Bson.ObjectId | Required<InsertDocument<T>>["_id"])[];
       insertedCount: number;
     }
   > {
