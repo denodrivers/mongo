@@ -31,11 +31,11 @@ export interface CountOptions {
   collation?: Document;
 }
 
-export interface FindOptions<T = Document> {
+export interface FindOptions {
   findOne?: boolean;
   skip?: number;
   limit?: number;
-  projection?: Record<keyof T | string, 1 | 0>;
+  projection?: Document;
   sort?: Document;
   noCursorTimeout?: boolean;
 }
@@ -205,7 +205,7 @@ export interface FindAndModifyOptions<T = Document> {
    *
    * Either update or remove have to be specified
    */
-  update?: FilterDocument<T, UpdateOperators>;
+  update?: UpdateFilter<T>;
   /**
    * Remove the found document
    */
@@ -618,80 +618,105 @@ export interface DropIndexOptions {
   comment?: Document;
 }
 
+type BitwiseType = Bson.Binary | Array<number> | number;
+
+type IntegerType = number | Bson.Int32 | Bson.Long;
+
+type NumericType = IntegerType | Bson.Decimal128 | Bson.Double;
+
+interface RootFilterOperators<T> extends Document {
+  $and?: Filter<T>[];
+  $nor?: Filter<T>[];
+  $or?: Filter<T>[];
+  $text?: {
+    $search: string;
+    $language?: string;
+    $caseSensitive?: boolean;
+    $diacriticSensitive?: boolean;
+  };
+  $where?: string;
+  $comment?: string | Document;
+}
+
 /**
  * Operators for use in the search query.
  *
  * @see https://docs.mongodb.com/manual/reference/operator/query/
  */
-export type QueryOperators =
-  | "$eq"
-  | "$gt"
-  | "$gte"
-  | "$in"
-  | "$lt"
-  | "$ne"
-  | "$nin"
-  | "$and"
-  | "$not"
-  | "$nor"
-  | "$or"
-  | "$exists"
-  | "$type"
-  | "$expr"
-  | "$jsonSchema"
-  | "$mod"
-  | "$regex"
-  | "$text"
-  | "$where"
-  | "$geoIntersects"
-  | "$geoWithin"
-  | "$near"
-  | "$nearSphere"
-  | "$all"
-  | "$eleMatch"
-  | "$size"
-  | "$bitsAllClear"
-  | "$bitsAllSet"
-  | "$bitsAnyClear"
-  | "$bitsAnyClear"
-  | "$elemMatch"
-  | "$meta"
-  | "$slice"
-  | "$comment"
-  | "$rand";
+interface FilterOperators<TValue> extends Document {
+  $eq?: TValue;
+  $gt?: TValue;
+  $gte?: TValue;
+  $in?: Array<TValue>;
+  $lt?: TValue;
+  $lte?: TValue;
+  $ne?: TValue;
+  $nin?: Array<TValue>;
+  $not?: FilterOperators<TValue>;
+  $exists?: boolean;
+  $expr?: Document;
+  $jsonSchema?: Document;
+  $mod?: TValue extends number ? [number, number] : never;
+  $regex?: string | RegExp | Bson.BSONRegExp;
+  $geoIntersects?: { $geometry: Document };
+  $geoWithin?: Document;
+  $near?: Document;
+  $nearSphere?: TValue;
+  $all?: Array<any>;
+  $size?: TValue extends Array<any> ? number : never;
+  $bitsAllClear?: BitwiseType;
+  $bitsAllSet?: BitwiseType;
+  $bitsAnyClear?: BitwiseType;
+  $elemMatch?: Document;
+  $rand?: Record<string, never>;
+}
 
 /**
  * Operators for use in the update query.
  *
  * @see https://docs.mongodb.com/manual/reference/operator/update/
  */
-export type UpdateOperators =
-  | "$currentDate"
-  | "$inc"
-  | "$min"
-  | "$max"
-  | "$mul"
-  | "$rename"
-  | "$set"
-  | "$setOnInsert"
-  | "$unset"
-  | "$addToSet"
-  | "$pop"
-  | "$pull"
-  | "$push"
-  | "$pushAll"
-  | "$each"
-  | "$position"
-  | `$slice`
-  | `$sort`
-  | "$bit";
+interface UpdateOperators<T> extends Document {
+  $currentDate?: DocumentOperator<
+    T,
+    Bson.Timestamp | Date,
+    true | { $type: "date" | "timestamp" }
+  >;
+  $inc?: DocumentOperator<T, NumericType | undefined>;
+  $min?: DocumentOperator<T>;
+  $max?: DocumentOperator<T>;
+  $mul?: DocumentOperator<T, NumericType | undefined>;
+  $rename?: DocumentOperator<Omit<T, "_id">, string>;
+  $set?: DocumentOperator<T>;
+  $setOnInsert?: DocumentOperator<T>;
+  $unset?: DocumentOperator<T, any, "" | true | 1>;
+  $pop?: DocumentOperator<T, Array<any>, (1 | -1)>;
+  $pull?: {
+    [Key in KeysOfType<T, Array<any>>]?:
+      | T[Key]
+      | FilterOperators<T[Key]>;
+  };
+  $push?: {
+    [Key in KeysOfType<T, Array<any>>]?: {
+      $each?: T[Key];
+      $slice?: number;
+      $position?: number;
+      $sort?: 1 | -1;
+    };
+  };
+  $bit?: DocumentOperator<
+    T,
+    NumericType | undefined,
+    { and: IntegerType } | { or: IntegerType } | { xor: IntegerType }
+  >;
+}
 
 /**
  * Operators for use in the aggregation query.
  *
  * @see https://docs.mongodb.com/manual/reference/operator/aggregation-pipeline/
  */
-export type AggregateOperators =
+type AggregateOperators =
   | "$addFields"
   | "$bucket"
   | "$bucketAuto"
@@ -725,25 +750,45 @@ export type AggregateOperators =
   | "$unset"
   | "$unwind";
 
-type OperatorAnyValue = string | number | boolean | null;
+type DocumentOperator<T, OnlyType = any, Value = OnlyType> = IsAny<
+  OnlyType,
+  (Partial<T> & Document),
+  {
+    [key in KeysOfType<T, OnlyType>]?: Value;
+  }
+>;
 
-export type FilterDocument<T extends Document, O extends string> =
+type NotImplementedOperators<Operators extends string, Value = any> = {
+  [Key in Operators]?: Value;
+};
+
+export type Filter<T> =
+  & NotImplementedOperators<"$type">
+  & RootFilterOperators<T>
+  & {
+    [Key in keyof T]?: T[Key] | FilterOperators<T[Key]>;
+  };
+
+export type UpdateFilter<T> =
+  & NotImplementedOperators<"$pullAll" | "$addToSet">
+  & UpdateOperators<T>
+  & Partial<T>;
+
+export type AggregatePipeline<T> =
+  & NotImplementedOperators<AggregateOperators>
   & Document
   & {
-    [Operator in O]?:
-      | Array<keyof T | FilterDocument<T, O> | OperatorAnyValue>
-      | FilterDocument<T, O>
-      | OperatorAnyValue;
-  }
-  & {
-    [Key in keyof T]?: T[Key] extends Document ? FilterDocument<T[Key], O>
-      : T[Key] | FilterDocument<T, O>;
+    ["$match"]?: Filter<T>;
   };
 
-export type AggregatePipeline<T extends Document> =
-  & FilterDocument<T, Exclude<AggregateOperators, "$match">>
+type IsAny<T, Y, N> = 0 extends (1 & T) ? Y : N;
+
+export type InsertDocument<TDocument extends { _id?: any }> =
+  & Omit<TDocument, "_id">
   & {
-    ["$match"]?: FilterDocument<T, QueryOperators>;
+    _id?: TDocument["_id"] | Bson.ObjectId;
   };
 
-export type InsertDocument<T extends Document> = Document & Partial<T>;
+type KeysOfType<T, Type> = {
+  [Key in keyof T]: NonNullable<T[Key]> extends Type ? Key : never;
+}[keyof T];

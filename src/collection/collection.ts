@@ -11,13 +11,12 @@ import {
   Document,
   DropIndexOptions,
   DropOptions,
-  FilterDocument,
+  Filter,
   FindAndModifyOptions,
   FindOptions,
   InsertDocument,
   InsertOptions,
-  QueryOperators,
-  UpdateOperators,
+  UpdateFilter,
   UpdateOptions,
 } from "../types.ts";
 import { AggregateCursor } from "./commands/aggregate.ts";
@@ -35,8 +34,8 @@ export class Collection<T> {
   }
 
   find(
-    filter?: FilterDocument<T, QueryOperators>,
-    options?: FindOptions<T>,
+    filter?: Filter<T>,
+    options?: FindOptions,
   ): FindCursor<T> {
     return new FindCursor<T>({
       filter,
@@ -48,8 +47,8 @@ export class Collection<T> {
   }
 
   async findOne(
-    filter?: FilterDocument<T, QueryOperators>,
-    options?: FindOptions<T>,
+    filter?: Filter<T>,
+    options?: FindOptions,
   ): Promise<T | undefined> {
     const cursor = this.find(filter, options);
     return await cursor.next();
@@ -64,7 +63,7 @@ export class Collection<T> {
    * @returns The document matched and modified
    */
   async findAndModify(
-    filter?: FilterDocument<T, QueryOperators>,
+    filter?: Filter<T>,
     options?: FindAndModifyOptions<T>,
   ): Promise<T | undefined> {
     const result = await this.#protocol.commandSingle<{
@@ -86,7 +85,7 @@ export class Collection<T> {
    * @deprecated Use `countDocuments` or `estimatedDocumentCount` instead
    */
   async count(
-    filter?: FilterDocument<T, QueryOperators>,
+    filter?: Filter<T>,
     options?: CountOptions,
   ): Promise<number> {
     const res = await this.#protocol.commandSingle(this.#dbName, {
@@ -103,10 +102,10 @@ export class Collection<T> {
   }
 
   async countDocuments(
-    filter?: FilterDocument<T, QueryOperators>,
+    filter?: Filter<T>,
     options?: CountOptions,
   ): Promise<number> {
-    const pipeline: AggregatePipeline<any>[] = [];
+    const pipeline: AggregatePipeline<T>[] = [];
     if (filter) {
       pipeline.push({ $match: filter });
     }
@@ -158,13 +157,20 @@ export class Collection<T> {
   async insertMany(
     docs: InsertDocument<T>[],
     options?: InsertOptions,
-  ): Promise<{ insertedIds: Document[]; insertedCount: number }> {
+  ): Promise<
+    {
+      insertedIds: (Bson.ObjectID | Required<InsertDocument<T>>["_id"])[];
+      insertedCount: number;
+    }
+  > {
     const insertedIds = docs.map((doc) => {
       if (!doc._id) {
-        (doc as any)._id = new Bson.ObjectID();
+        doc._id = new Bson.ObjectId();
       }
+
       return doc._id;
     });
+
     const res = await this.#protocol.commandSingle(this.#dbName, {
       insert: this.name,
       documents: docs,
@@ -185,8 +191,8 @@ export class Collection<T> {
   }
 
   async updateOne(
-    filter: FilterDocument<T, QueryOperators>,
-    update: FilterDocument<T, UpdateOperators>,
+    filter: Filter<T>,
+    update: UpdateFilter<T>,
     options?: UpdateOptions,
   ) {
     const {
@@ -207,8 +213,8 @@ export class Collection<T> {
   }
 
   async updateMany(
-    filter: FilterDocument<T, QueryOperators>,
-    doc: FilterDocument<T, UpdateOperators>,
+    filter: Filter<T>,
+    doc: UpdateFilter<T>,
     options?: UpdateOptions,
   ) {
     return await update(this.#protocol, this.#dbName, this.name, filter, doc, {
@@ -218,7 +224,7 @@ export class Collection<T> {
   }
 
   async deleteMany(
-    filter: FilterDocument<T, QueryOperators>,
+    filter: Filter<T>,
     options?: DeleteOptions,
   ): Promise<number> {
     const res = await this.#protocol.commandSingle(this.#dbName, {
@@ -241,7 +247,7 @@ export class Collection<T> {
   delete = this.deleteMany;
 
   deleteOne(
-    filter: FilterDocument<T, QueryOperators>,
+    filter: Filter<T>,
     options?: DeleteOptions,
   ) {
     return this.delete(filter, { ...options, limit: 1 });
@@ -254,7 +260,7 @@ export class Collection<T> {
     });
   }
 
-  async distinct(key: string, query?: Document, options?: DistinctOptions) {
+  async distinct(key: string, query?: Filter<T>, options?: DistinctOptions) {
     const { values } = await this.#protocol.commandSingle(this.#dbName, {
       distinct: this.name,
       key,
