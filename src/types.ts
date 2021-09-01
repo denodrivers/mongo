@@ -682,10 +682,10 @@ interface UpdateOperators<T> extends Document {
     Bson.Timestamp | Date,
     true | { $type: "date" | "timestamp" }
   >;
-  $inc?: DocumentOperator<T, NumericType | undefined>;
+  $inc?: DocumentOperator<T, NumericType>;
   $min?: DocumentOperator<T>;
   $max?: DocumentOperator<T>;
-  $mul?: DocumentOperator<T, NumericType | undefined>;
+  $mul?: DocumentOperator<T, NumericType>;
   $rename?: DocumentOperator<Omit<T, "_id">, string>;
   $set?: DocumentOperator<T>;
   $setOnInsert?: DocumentOperator<T>;
@@ -693,8 +693,11 @@ interface UpdateOperators<T> extends Document {
   $pop?: DocumentOperator<T, Array<any>, (1 | -1)>;
   $pull?: {
     [Key in KeysOfType<T, Array<any>>]?:
-      | T[Key]
-      | FilterOperators<T[Key]>;
+      | Flatten<T[Key]>
+      | FilterOperators<Flatten<T[Key]>>;
+  };
+  $pullAll?: {
+    [Key in KeysOfType<T, Array<any>>]?: T[Key];
   };
   $push?: {
     [Key in KeysOfType<T, Array<any>>]?: {
@@ -706,7 +709,7 @@ interface UpdateOperators<T> extends Document {
   };
   $bit?: DocumentOperator<
     T,
-    NumericType | undefined,
+    NumericType,
     { and: IntegerType } | { or: IntegerType } | { xor: IntegerType }
   >;
 }
@@ -770,7 +773,7 @@ export type Filter<T> =
   };
 
 export type UpdateFilter<T> =
-  & NotImplementedOperators<"$pullAll" | "$addToSet">
+  & NotImplementedOperators<"$addToSet">
   & UpdateOperators<T>
   & Partial<T>;
 
@@ -780,6 +783,8 @@ export type AggregatePipeline<T> =
   & {
     ["$match"]?: Filter<T>;
   };
+
+type Flatten<T> = T extends Array<infer Item> ? Item : T;
 
 type IsAny<T, Y, N> = 0 extends (1 & T) ? Y : N;
 
