@@ -29,8 +29,8 @@ export class Database {
     this.#cluster = cluster;
   }
 
-  collection<T>(name: string): Collection<T> {
-    return new Collection(this.#cluster.protocol, this.name, name);
+  collection<T = Document>(name: string): Collection<T> {
+    return new Collection<T>(this.#cluster.protocol, this.name, name);
   }
 
   listCollections(options: {

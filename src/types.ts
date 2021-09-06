@@ -193,7 +193,7 @@ export interface CollationOptions {
  *
  * @see https://docs.mongodb.com/manual/reference/method/db.collection.findAndModify/
  */
-export interface FindAndModifyOptions {
+export interface FindAndModifyOptions<T = Document> {
   /**
    * Control the order in which documents are found.
    * findAndModify only modifies the first document found, so controlling the
@@ -205,7 +205,7 @@ export interface FindAndModifyOptions {
    *
    * Either update or remove have to be specified
    */
-  update?: Document;
+  update?: UpdateFilter<T>;
   /**
    * Remove the found document
    */
@@ -617,3 +617,183 @@ export interface DropIndexOptions {
   /** Optional. A user-provided comment to attach to this command. Once set */
   comment?: Document;
 }
+
+type BitwiseType = Bson.Binary | Array<number> | number;
+
+type IntegerType = number | Bson.Int32 | Bson.Long;
+
+type NumericType = IntegerType | Bson.Decimal128 | Bson.Double;
+
+interface RootFilterOperators<T> extends Document {
+  $and?: Filter<T>[];
+  $nor?: Filter<T>[];
+  $or?: Filter<T>[];
+  $text?: {
+    $search: string;
+    $language?: string;
+    $caseSensitive?: boolean;
+    $diacriticSensitive?: boolean;
+  };
+  $where?: string;
+  $comment?: string | Document;
+}
+
+/**
+ * Operators for use in the search query.
+ *
+ * @see https://docs.mongodb.com/manual/reference/operator/query/
+ */
+interface FilterOperators<TValue> extends Document {
+  $eq?: TValue;
+  $gt?: TValue;
+  $gte?: TValue;
+  $in?: Array<TValue>;
+  $lt?: TValue;
+  $lte?: TValue;
+  $ne?: TValue;
+  $nin?: Array<TValue>;
+  $not?: FilterOperators<TValue>;
+  $exists?: boolean;
+  $expr?: Document;
+  $jsonSchema?: Document;
+  $mod?: TValue extends number ? [number, number] : never;
+  $regex?: string | RegExp | Bson.BSONRegExp;
+  $geoIntersects?: { $geometry: Document };
+  $geoWithin?: Document;
+  $near?: Document;
+  $nearSphere?: TValue;
+  $all?: Array<any>;
+  $size?: TValue extends Array<any> ? number : never;
+  $bitsAllClear?: BitwiseType;
+  $bitsAllSet?: BitwiseType;
+  $bitsAnyClear?: BitwiseType;
+  $elemMatch?: Document;
+  $rand?: Record<string, never>;
+}
+
+/**
+ * Operators for use in the update query.
+ *
+ * @see https://docs.mongodb.com/manual/reference/operator/update/
+ */
+interface UpdateOperators<T> extends Document {
+  $currentDate?: DocumentOperator<
+    T,
+    Bson.Timestamp | Date,
+    true | { $type: "date" | "timestamp" }
+  >;
+  $inc?: DocumentOperator<T, NumericType>;
+  $min?: DocumentOperator<T>;
+  $max?: DocumentOperator<T>;
+  $mul?: DocumentOperator<T, NumericType>;
+  $rename?: DocumentOperator<Omit<T, "_id">, string>;
+  $set?: DocumentOperator<T>;
+  $setOnInsert?: DocumentOperator<T>;
+  $unset?: DocumentOperator<T, any, "" | true | 1>;
+  $pop?: DocumentOperator<T, Array<any>, (1 | -1)>;
+  $pull?: {
+    [Key in KeysOfType<T, Array<any>>]?:
+      | Flatten<T[Key]>
+      | FilterOperators<Flatten<T[Key]>>;
+  };
+  $pullAll?: {
+    [Key in KeysOfType<T, Array<any>>]?: T[Key];
+  };
+  $push?: {
+    [Key in KeysOfType<T, Array<any>>]?: {
+      $each?: T[Key];
+      $slice?: number;
+      $position?: number;
+      $sort?: 1 | -1;
+    };
+  };
+  $bit?: DocumentOperator<
+    T,
+    NumericType,
+    { and: IntegerType } | { or: IntegerType } | { xor: IntegerType }
+  >;
+}
+
+/**
+ * Operators for use in the aggregation query.
+ *
+ * @see https://docs.mongodb.com/manual/reference/operator/aggregation-pipeline/
+ */
+type AggregateOperators =
+  | "$addFields"
+  | "$bucket"
+  | "$bucketAuto"
+  | "$collStats"
+  | "$count"
+  | "$currentOp"
+  | "$facet"
+  | "$geoNear"
+  | "$graphLookup"
+  | "$group"
+  | "$indexStats"
+  | "$limit"
+  | "$listLocalSessions"
+  | "$listSessions"
+  | "$lookup"
+  | "$match"
+  | "$merge"
+  | "$out"
+  | "$planCacheStats"
+  | "$project"
+  | "$redact"
+  | "$replaceRoot"
+  | "$replaceWith"
+  | "$sample"
+  | "$search"
+  | "$set"
+  | "$setWindowFields"
+  | "$skip"
+  | "$sort"
+  | "$sortByCount"
+  | "$unset"
+  | "$unwind";
+
+type DocumentOperator<T, OnlyType = any, Value = OnlyType> = IsAny<
+  OnlyType,
+  (Partial<T> & Document),
+  {
+    [key in KeysOfType<T, OnlyType>]?: Value;
+  }
+>;
+
+type NotImplementedOperators<Operators extends string, Value = any> = {
+  [Key in Operators]?: Value;
+};
+
+export type Filter<T> =
+  & NotImplementedOperators<"$type">
+  & RootFilterOperators<T>
+  & {
+    [Key in keyof T]?: T[Key] | FilterOperators<T[Key]>;
+  };
+
+export type UpdateFilter<T> =
+  & NotImplementedOperators<"$addToSet">
+  & UpdateOperators<T>
+  & Partial<T>;
+
+export type AggregatePipeline<T> =
+  & NotImplementedOperators<AggregateOperators>
+  & Document
+  & {
+    ["$match"]?: Filter<T>;
+  };
+
+type Flatten<T> = T extends Array<infer Item> ? Item : T;
+
+type IsAny<T, Y, N> = 0 extends (1 & T) ? Y : N;
+
+export type InsertDocument<TDocument extends { _id?: any }> =
+  & Omit<TDocument, "_id">
+  & {
+    _id?: TDocument["_id"] | Bson.ObjectId;
+  };
+
+type KeysOfType<T, Type> = {
+  [Key in keyof T]: NonNullable<T[Key]> extends Type ? Key : never;
+}[keyof T];
