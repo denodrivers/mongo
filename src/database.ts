@@ -47,7 +47,6 @@ export class Database {
         >(this.name, {
           listCollections: 1,
           ...options,
-          batchSize: 1,
         });
         return {
           id: cursor.id,
