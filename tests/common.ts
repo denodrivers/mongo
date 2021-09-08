@@ -13,6 +13,23 @@ export function testWithClient(
   });
 }
 
+export function compareVersion(
+  client: MongoClient,
+  version: number[],
+  skipPatch = true,
+) {
+  const [thisMajor, thisMinor, thisPatch] = client.buildInfo?.versionArray!;
+  const [major, minor, patch] = version;
+
+  return compareNumber(thisMajor, major) ||
+    compareNumber(thisMinor, minor) ||
+    (skipPatch ? 0 : compareNumber(thisPatch, patch));
+}
+
+function compareNumber(a: number, b: number) {
+  return a === b ? 0 : a > b ? 1 : -1;
+}
+
 async function getClient(): Promise<MongoClient> {
   const client = new MongoClient();
   await client.connect(`mongodb://${hostname}:27017`);

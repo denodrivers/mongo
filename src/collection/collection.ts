@@ -313,7 +313,7 @@ export class Collection<T> {
 
   listIndexes() {
     return new ListIndexesCursor<
-      { v: number; key: Document; name: string; ns: string }
+      { v: number; key: Document; name: string; ns?: string }
     >({
       protocol: this.#protocol,
       dbName: this.#dbName,

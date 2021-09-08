@@ -1,4 +1,4 @@
-import { testWithClient } from "../common.ts";
+import { compareVersion, testWithClient } from "../common.ts";
 import { assertEquals } from "../test.deps.ts";
 
 export default function indexesTests() {
@@ -27,12 +27,19 @@ export default function indexesTests() {
     const users = db.collection("mongo_test_users");
     const cursor = users.listIndexes();
     const indexes = await cursor.toArray();
-    assertEquals(
-      indexes,
-      [
+
+    const expected = compareVersion(client, [4, 2]) > 0
+      ? [
+        { v: 2, key: { _id: 1 }, name: "_id_" },
+        { v: 2, key: { name: 1 }, name: "_name" },
+      ]
+      : [
         { v: 2, key: { _id: 1 }, name: "_id_", ns: "test.mongo_test_users" },
         { v: 2, key: { name: 1 }, name: "_name", ns: "test.mongo_test_users" },
-      ],
+      ];
+    assertEquals(
+      indexes,
+      expected,
     );
   });
 
@@ -52,12 +59,20 @@ export default function indexesTests() {
     });
 
     const indexes = await users.listIndexes().toArray();
-
+    const expected = compareVersion(client, [4, 2]) > 0
+      ? [
+        { v: 2, key: { _id: 1 }, name: "_id_" },
+      ]
+      : [
+        { v: 2, key: { _id: 1 }, name: "_id_", ns: "test.mongo_test_users" },
+      ];
     assertEquals(
       indexes,
-      [
-        { v: 2, key: { _id: 1 }, name: "_id_", ns: "test.mongo_test_users" },
-      ],
+      expected,
+    );
+    assertEquals(
+      indexes,
+      expected,
     );
   });
 }
