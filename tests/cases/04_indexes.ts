@@ -1,5 +1,5 @@
-import { compareVersion, testWithClient } from "../common.ts";
-import { assertEquals } from "../test.deps.ts";
+import { testWithClient } from "../common.ts";
+import { assertEquals, semver } from "../test.deps.ts";
 
 export default function indexesTests() {
   testWithClient("createIndexes", async (client) => {
@@ -28,7 +28,7 @@ export default function indexesTests() {
     const cursor = users.listIndexes();
     const indexes = await cursor.toArray();
 
-    const expected = compareVersion(client, [4, 2]) > 0
+    const expected = semver.gte(client.buildInfo!.version, "4.4.0")
       ? [
         { v: 2, key: { _id: 1 }, name: "_id_" },
         { v: 2, key: { name: 1 }, name: "_name" },
@@ -59,7 +59,7 @@ export default function indexesTests() {
     });
 
     const indexes = await users.listIndexes().toArray();
-    const expected = compareVersion(client, [4, 2]) > 0
+    const expected = semver.gte(client.buildInfo!.version, "4.4.0")
       ? [
         { v: 2, key: { _id: 1 }, name: "_id_" },
       ]
