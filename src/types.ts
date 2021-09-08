@@ -617,3 +617,73 @@ export interface DropIndexOptions {
   /** Optional. A user-provided comment to attach to this command. Once set */
   comment?: Document;
 }
+
+/** The document returned by the buildInfo command. */
+export interface BuildInfo {
+  /**
+   * A string that conveys version information about the `mongod` instance.
+   * If you need to present version information to a human, this field is preferable to `versionArray`.
+   *
+   * This string will take the format `<major>.<minor>.<patch>` in the case of a release,
+   * but development builds may contain additional information.
+   */
+  version: string;
+
+  /** The commit identifier that identifies the state of the code used to build the mongod. */
+  gitVersion: string;
+
+  /**
+   * @deprecated since 3.2
+   * `buildInfo.sysInfo` no longer contains useful information.
+   */
+  sysInfo: string;
+
+  loaderFlags: string;
+
+  compilerFlags: string;
+
+  /**
+   * The memory allocator that mongod uses. By default this is tcmalloc.
+   */
+  allocator: string;
+
+  /**
+   * An array that conveys version information about the mongod instance.
+   * See version for a more readable version of this string.
+   */
+  versionArray: number[];
+
+  /**
+   * An embedded document describing the version of the TLS/SSL library that mongod
+   * was built with and is currently using.
+   */
+  openssl: Document;
+
+  /**
+   * A string that reports the JavaScript engine used in the mongod instance.
+   * By default, this is mozjs after version 3.2, and previously V8.
+   */
+  javascriptEngine: string;
+
+  /**
+   * A number that reflects the target processor architecture of the mongod binary.
+   */
+  bits: number;
+
+  /**
+   * A boolean. true when built with debugging options.
+   */
+  debug: boolean;
+
+  /**
+   * A number that reports the Maximum BSON Document Size.
+   */
+  maxBsonObjectSize: number;
+
+  /**
+   * A list of storage engines available to the mongod server.
+   */
+  storageEngines: string[];
+
+  ok: number;
+}
