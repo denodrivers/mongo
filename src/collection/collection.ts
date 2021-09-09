@@ -146,6 +146,9 @@ export class Collection<T> {
     return insertedIds[0];
   }
 
+  /**
+   * @deprecated Use `insertOne, insertMany` or `bulkWrite` instead.
+   */
   insert(
     docs: InsertDocument<T> | InsertDocument<T>[],
     options?: InsertOptions,
