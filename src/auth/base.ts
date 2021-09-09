@@ -31,6 +31,6 @@ export class AuthContext {
     this.protocol = protocol;
     this.credentials = credentials;
     this.options = options;
-    this.nonce = window.crypto.getRandomValues(new Uint8Array(24));
+    this.nonce = globalThis.crypto.getRandomValues(new Uint8Array(24));
   }
 }
