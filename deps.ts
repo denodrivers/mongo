@@ -1,5 +1,5 @@
 export * as Bson from "./bson/mod.ts";
-export { ObjectId } from "./bson/mod.ts";
+export * from "./bson/mod.ts";
 export type { Document } from "./bson/mod.ts";
 export { createHash } from "https://deno.land/std@0.105.0/hash/mod.ts";
 // Switch back to std when std@0.107 lands

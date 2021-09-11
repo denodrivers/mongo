@@ -1,4 +1,4 @@
-import { assert, ObjectId } from "../../deps.ts";
+import { assert, Binary, Bson, ObjectId } from "../../deps.ts";
 import { Collection } from "../collection/collection.ts";
 import { FindCursor } from "../collection/commands/find.ts";
 import { Database } from "../database.ts";
@@ -102,15 +102,27 @@ export class GridFSBucket {
    *
    * Returns a Stream.
    */
-  openDownloadStream<Type>(id: FileId): ReadableStream<Type> {
-    return new ReadableStream();
+  openDownloadStream(id: FileId) {
+    return new ReadableStream<Uint8Array>({
+      start: async (controller) => {
+        const collection = this.#chunksCollection.find({ files_id: id });
+        await collection.forEach((value) =>
+          controller.enqueue(value?.data.buffer)
+        );
+        controller.close();
+      },
+    });
   }
 
   /**
    * Downloads the contents of the stored file specified by @id and writes
    * the contents to the @destination Stream.
    */
-  downloadToStream(id: FileId, destination: ReadableStream): void {
+  async downloadToStream(
+    id: FileId,
+    destination: WritableStream<Uint8Array>,
+  ) {
+    this.openDownloadStream(id).pipeTo(destination);
   }
 
   /**

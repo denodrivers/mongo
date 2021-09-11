@@ -1,4 +1,4 @@
-import { ObjectId } from "../../deps.ts";
+import { Binary, ObjectId } from "../../deps.ts";
 import { Document, ReadPreference } from "../types.ts";
 import { ReadConcern, WriteConcern } from "../types/readWriteConcern.ts";
 
@@ -8,7 +8,7 @@ export interface Chunk {
   _id: ObjectId;
   files_id: ObjectId;
   n: number;
-  data: Blob | Uint8Array;
+  data: Binary;
 }
 
 export interface File {
