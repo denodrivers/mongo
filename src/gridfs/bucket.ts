@@ -31,8 +31,8 @@ export class GridFSBucket {
   openUploadStream(
     filename: string,
     options?: GridFSUploadOptions,
-  ): ReadableStream {
-    return new ReadableStream();
+  ): WritableStream {
+    return new WritableStream();
   }
 
   /**
@@ -45,8 +45,8 @@ export class GridFSBucket {
     id: FileId,
     filename: string,
     options?: GridFSUploadOptions,
-  ): ReadableStream {
-    return new ReadableStream();
+  ): WritableStream {
+    return new WritableStream();
   }
 
   /**
@@ -64,7 +64,7 @@ export class GridFSBucket {
    */
   uploadFromStream(
     filename: string,
-    source: ReadableStream,
+    source: WritableStream,
     options?: GridFSUploadOptions,
   ): ObjectId {
     return ObjectId.generate();
@@ -83,7 +83,7 @@ export class GridFSBucket {
   uploadFromStreamWithId(
     id: FileId,
     filename: string,
-    source: ReadableStream,
+    source: WritableStream,
     options: GridFSUploadOptions,
   ): void {
   }
@@ -93,15 +93,15 @@ export class GridFSBucket {
    *
    * Returns a Stream.
    */
-  openDownloadStream<Type>(id: FileId): WritableStream<Type> {
-    return new WritableStream();
+  openDownloadStream<Type>(id: FileId): ReadableStream<Type> {
+    return new ReadableStream();
   }
 
   /**
    * Downloads the contents of the stored file specified by @id and writes
    * the contents to the @destination Stream.
    */
-  downloadToStream(id: FileId, destination: WritableStream): void {
+  downloadToStream(id: FileId, destination: ReadableStream): void {
   }
 
   /**
