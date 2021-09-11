@@ -1,7 +1,8 @@
-import { assert, Document, ObjectId } from "../../deps.ts";
+import { assert, ObjectId } from "../../deps.ts";
 import { Collection } from "../collection/collection.ts";
 import { FindCursor } from "../collection/commands/find.ts";
 import { Database } from "../database.ts";
+import { Filter } from "../types.ts";
 import {
   Chunk,
   File,
@@ -125,10 +126,10 @@ export class GridFSBucket {
   /**
    * Find and return the files collection documents that match @filter.
    */
-  find<T extends any>(
-    filter: Document,
+  find(
+    filter: Filter<File>,
     options?: GridFSFindOptions,
-  ): FindCursor<T> {
-    throw new Error("Function not implemented.");
+  ): FindCursor<File> {
+    return this.#fileCollection.find(filter ?? {}, options ?? {});
   }
 }
