@@ -1,7 +1,10 @@
-import { Document, ObjectId } from "../../deps.ts";
+import { assert, Document, ObjectId } from "../../deps.ts";
+import { Collection } from "../collection/collection.ts";
 import { FindCursor } from "../collection/commands/find.ts";
 import { Database } from "../database.ts";
 import {
+  Chunk,
+  File,
   FileId,
   GridFSBucketOptions,
   GridFSFindOptions,
@@ -9,6 +12,9 @@ import {
 } from "../types/gridfs.ts";
 
 export class GridFSBucket {
+  #chunksCollection: Collection<Chunk>;
+  #fileCollection: Collection<File>;
+
   /**
    * Create a new GridFSBucket object on @db with the given @options.
    */
@@ -16,6 +22,8 @@ export class GridFSBucket {
     db: Database,
     options: GridFSBucketOptions = { bucketName: "fs" },
   ) {
+    this.#chunksCollection = db.collection(options.bucketName + ".chunks");
+    this.#fileCollection = db.collection(options.bucketName + ".files");
   }
 
   /**
@@ -108,7 +116,10 @@ export class GridFSBucket {
    * Given a @id, delete this stored file’s files collection document and
    * associated chunks from a GridFS bucket.
    */
-  delete(id: FileId): void {
+  async delete(id: FileId) {
+    await this.#fileCollection.deleteOne({ _id: id });
+    const response = await this.#chunksCollection.deleteMany({ files_id: id });
+    assert(response, `File not found for id ${id}`);
   }
 
   /**
