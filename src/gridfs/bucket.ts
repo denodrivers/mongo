@@ -1,0 +1,123 @@
+import { Document, ObjectId } from "../../deps.ts";
+import { FindCursor } from "../collection/commands/find.ts";
+import { Database } from "../database.ts";
+import {
+  FileId,
+  GridFSBucketOptions,
+  GridFSFindOptions,
+  GridFSUploadOptions,
+} from "../types/gridfs.ts";
+
+export class GridFSBucket {
+  /**
+   * Create a new GridFSBucket object on @db with the given @options.
+   */
+  constructor(
+    db: Database,
+    options: GridFSBucketOptions = { bucketName: "fs" },
+  ) {
+  }
+
+  /**
+   * Opens a Stream that the application can write the contents of the file to.
+   * The driver generates the file id.
+   *
+   * Returns a Stream to which the application will write the contents.
+   *
+   * Note: this method is provided for backward compatibility. In languages
+   * that use generic type parameters, this method may be omitted since
+   * the TFileId type might not be an ObjectId.
+   */
+  openUploadStream(
+    filename: string,
+    options?: GridFSUploadOptions,
+  ): ReadableStream {
+    return new ReadableStream();
+  }
+
+  /**
+   * Opens a Stream that the application can write the contents of the file to.
+   * The application provides a custom file id.
+   *
+   * Returns a Stream to which the application will write the contents.
+   */
+  openUploadStreamWithId(
+    id: FileId,
+    filename: string,
+    options?: GridFSUploadOptions,
+  ): ReadableStream {
+    return new ReadableStream();
+  }
+
+  /**
+   * Uploads a user file to a GridFS bucket. The driver generates the file id.
+   *
+   * Reads the contents of the user file from the @source Stream and uploads it
+   * as chunks in the chunks collection. After all the chunks have been uploaded,
+   * it creates a files collection document for @filename in the files collection.
+   *
+   * Returns the id of the uploaded file.
+   *
+   * Note: this method is provided for backward compatibility. In languages
+   * that use generic type parameters, this method may be omitted since
+   * the TFileId type might not be an ObjectId.
+   */
+  uploadFromStream(
+    filename: string,
+    source: ReadableStream,
+    options?: GridFSUploadOptions,
+  ): ObjectId {
+    return ObjectId.generate();
+  }
+
+  /**
+   * Uploads a user file to a GridFS bucket. The application supplies a custom file id.
+   *
+   * Reads the contents of the user file from the @source Stream and uploads it
+   * as chunks in the chunks collection. After all the chunks have been uploaded,
+   * it creates a files collection document for @filename in the files collection.
+   *
+   * Note: there is no need to return the id of the uploaded file because the application
+   * already supplied it as a parameter.
+   */
+  uploadFromStreamWithId(
+    id: FileId,
+    filename: string,
+    source: ReadableStream,
+    options: GridFSUploadOptions,
+  ): void {
+  }
+
+  /** Opens a Stream from which the application can read the contents of the stored file
+   * specified by @id.
+   *
+   * Returns a Stream.
+   */
+  openDownloadStream<Type>(id: FileId): WritableStream<Type> {
+    return new WritableStream();
+  }
+
+  /**
+   * Downloads the contents of the stored file specified by @id and writes
+   * the contents to the @destination Stream.
+   */
+  downloadToStream(id: FileId, destination: WritableStream): void {
+  }
+
+  /**
+   * Given a @id, delete this stored file’s files collection document and
+   * associated chunks from a GridFS bucket.
+   */
+  delete(id: FileId): void {
+  }
+
+  /**
+   * Find and return the files collection documents that match @filter.
+   */
+  find<T extends any>(
+    filter: Document,
+    options?: GridFSFindOptions,
+  ): FindCursor<T> {
+    throw new Error("Function not implemented.");
+  }
+}

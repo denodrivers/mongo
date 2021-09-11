@@ -1,4 +1,5 @@
 import { Bson } from "../deps.ts";
+import { WriteConcern } from "./types/readWriteConcern.ts";
 
 export type Document = Bson.Document;
 
@@ -141,35 +142,6 @@ export interface UpdateOptions {
    * optional session to use for this operation
    */
   // session?: ClientSession
-}
-
-/**
- * interface for WriteConcern documents used by MongoDB
- *
- * @see https://docs.mongodb.com/manual/reference/write-concern/
- */
-export interface WriteConcern {
-  /**
-     * The number of instances the write operation needs to be propagated to
-     * before proceeding.
-     *
-     * The string based values are:
-     *
-     * - majority: The calculated majority of nodes in a cluster has accepted the
-     *    the write
-     * - custom write name: Writes have been acknowledged by nodes tagged with the
-     *    custom write concern.
-     */
-  w: number | "majority" | string;
-  /**
-     * If true, the server only returns after the operation has been commited to
-     * disk
-     */
-  j: boolean;
-  /**
-     * An optional timeout value after which to stop the write operation
-     */
-  wtimeout?: number;
 }
 
 /**
@@ -343,7 +315,7 @@ export interface AggregateOptions {
   bypassDocumentValidation?: boolean;
   /**
    * @default false
-   *Return document results as raw BSON buffers.
+   * Return document results as raw BSON buffers.
    */
   raw?: boolean;
   /**
@@ -866,4 +838,12 @@ export interface BuildInfo {
   storageEngines: string[];
 
   ok: number;
+}
+
+export const enum ReadPreference {
+  Primary = "primary",
+  PrimaryPreferred = "primaryPreferred",
+  Secondary = "secondary",
+  SecondaryPreferred = "secondaryPreferred",
+  Nearest = "nearest",
 }
