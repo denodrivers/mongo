@@ -3,6 +3,23 @@ import { Document, ReadPreference } from "../types.ts";
 import { ReadConcern, WriteConcern } from "../types/readWriteConcern.ts";
 
 export type FileId = ObjectId;
+
+export interface Chunk {
+  _id: ObjectId;
+  files_id: ObjectId;
+  n: number;
+  data: Blob | Uint8Array;
+}
+
+export interface File {
+  _id: ObjectId;
+  length: number;
+  chunkSize: number;
+  uploadDate: Date;
+  filename: string;
+  metadata: Document;
+}
+
 export interface GridFSBucketOptions {
   /**
    * The bucket name. Defaults to 'fs'.
