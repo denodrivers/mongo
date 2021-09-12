@@ -14,6 +14,8 @@ export default function cleanup() {
         .drop().catch((e) => e);
       await new GridFSBucket(db, { bucketName: "metadata" })
         .drop().catch((e) => e);
+      await new GridFSBucket(db, { bucketName: "delete" })
+        .drop().catch((e) => e);
     } catch {
     }
   });
