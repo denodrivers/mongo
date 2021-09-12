@@ -20,8 +20,8 @@ export function createUploadStream(
   let chunksInserted = 0;
   let fileSizeBytes = 0;
   return new WritableStream<Uint8Array>({
-    write: (chunk: Uint8Array) => {
-      const test = () => {
+    write: async (chunk: Uint8Array) => {
+      const loop = async () => {
         const int8 = new Uint8Array(chunk);
         const spaceRemaining = chunkSizeBytesCombined - bufferPosition;
         if (chunk.byteLength < spaceRemaining) {
@@ -33,7 +33,7 @@ export function createUploadStream(
           const sliced = int8.slice(0, spaceRemaining);
           uploadBuffer.set(sliced, bufferPosition);
 
-          chunksCollection.insertOne({
+          await chunksCollection.insertOne({
             files_id: id,
             n: chunksInserted,
             data: new Binary(uploadBuffer),
@@ -42,10 +42,10 @@ export function createUploadStream(
           bufferPosition = 0;
           fileSizeBytes += sliced.byteLength;
           ++chunksInserted;
-          test();
+          await loop();
         }
       };
-      test();
+      await loop();
     },
     close: async () => {
       // Write the last bytes that are left in the buffer
