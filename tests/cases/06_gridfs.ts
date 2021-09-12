@@ -1,5 +1,9 @@
 import { GridFSBucket } from "../../mod.ts";
-import { testWithClient } from "../common.ts";
+import {
+  assertArrayBufferEquals,
+  assertArrayBufferNotEquals,
+  testWithClient,
+} from "../common.ts";
 import { assert, assertEquals } from "../test.deps.ts";
 
 export default function gridfsTests() {
@@ -40,6 +44,31 @@ export default function gridfsTests() {
     const actual = await new Response(bucket.openDownloadStream(getId))
       .arrayBuffer();
 
-    assertEquals(actual, await expected.arrayBuffer());
+    assertArrayBufferEquals(actual, await expected.arrayBuffer());
   });
+
+  testWithClient(
+    "GridFS: Echo large Image (compare with different Image)",
+    async (client) => {
+      const bucket = new GridFSBucket(client.database("gridfs"), {
+        bucketName: "deno_logo",
+      });
+
+      const upstream = bucket.openUploadStream("deno_logo.png");
+
+      await (await fetch("https://deno.land/images/deno_logo.png")).body!
+        .pipeTo(
+          upstream,
+        );
+
+      const getId =
+        (await bucket.find({ filename: "deno_logo.png" }).toArray())[0]._id;
+
+      const expected = await fetch("https://deno.land/images/deno_logo_4.gif");
+      const actual = await new Response(bucket.openDownloadStream(getId))
+        .arrayBuffer();
+
+      assertArrayBufferNotEquals(actual, await expected.arrayBuffer());
+    },
+  );
 }
