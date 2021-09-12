@@ -17,14 +17,14 @@ export interface File {
   chunkSize: number;
   uploadDate: Date;
   filename: string;
-  metadata: Document;
+  metadata?: Document;
 }
 
 export interface GridFSBucketOptions {
   /**
    * The bucket name. Defaults to 'fs'.
    */
-  bucketName: string;
+  bucketName?: string;
 
   /**
    * The chunk size in bytes. Defaults to 255 KiB.

@@ -1,8 +1,8 @@
-import { assert, Binary, Bson, ObjectId } from "../../deps.ts";
+import { assert, ObjectId } from "../../deps.ts";
 import { Collection } from "../collection/collection.ts";
 import { FindCursor } from "../collection/commands/find.ts";
 import { Database } from "../database.ts";
-import { Filter } from "../types.ts";
+import { Document, Filter } from "../types.ts";
 import {
   Chunk,
   File,
@@ -11,20 +11,32 @@ import {
   GridFSFindOptions,
   GridFSUploadOptions,
 } from "../types/gridfs.ts";
+import { checkIndexes, createChunksIndex, createFileIndex } from "./indexes.ts";
+import { createUploadStream } from "./upload.ts";
 
 export class GridFSBucket {
   #chunksCollection: Collection<Chunk>;
-  #fileCollection: Collection<File>;
+  #filesCollection: Collection<File>;
+  #chunkSizeBytes: number;
+  #checkedIndexes: boolean = false;
+
+  private readonly getBucketData = () => ({
+    filesCollection: this.#filesCollection,
+    chunksCollection: this.#chunksCollection,
+    chunkSizeBytes: this.#chunkSizeBytes,
+  });
 
   /**
    * Create a new GridFSBucket object on @db with the given @options.
    */
   constructor(
     db: Database,
-    options: GridFSBucketOptions = { bucketName: "fs" },
+    options: GridFSBucketOptions = {},
   ) {
-    this.#chunksCollection = db.collection(options.bucketName + ".chunks");
-    this.#fileCollection = db.collection(options.bucketName + ".files");
+    const newLocal = options.bucketName ?? "fs";
+    this.#chunksCollection = db.collection(`${newLocal}.chunks`);
+    this.#filesCollection = db.collection(`${newLocal}.files`);
+    this.#chunkSizeBytes = options.chunkSizeBytes ?? 255 * 1024;
   }
 
   /**
@@ -40,8 +52,12 @@ export class GridFSBucket {
   openUploadStream(
     filename: string,
     options?: GridFSUploadOptions,
-  ): WritableStream {
-    return new WritableStream();
+  ) {
+    return this.openUploadStreamWithId(
+      new ObjectId(),
+      filename,
+      options,
+    );
   }
 
   /**
@@ -54,8 +70,15 @@ export class GridFSBucket {
     id: FileId,
     filename: string,
     options?: GridFSUploadOptions,
-  ): WritableStream {
-    return new WritableStream();
+  ) {
+    if (!this.#checkedIndexes) {
+      checkIndexes(
+        this.#filesCollection,
+        this.#chunksCollection,
+        (value) => this.#checkedIndexes = value,
+      );
+    }
+    return createUploadStream(this.getBucketData(), filename, id, options);
   }
 
   /**
@@ -73,10 +96,12 @@ export class GridFSBucket {
    */
   uploadFromStream(
     filename: string,
-    source: WritableStream,
+    source: ReadableStream,
     options?: GridFSUploadOptions,
   ): ObjectId {
-    return ObjectId.generate();
+    const objectid = ObjectId.generate();
+    source.pipeTo(this.openUploadStreamWithId(objectid, filename, options));
+    return objectid;
   }
 
   /**
@@ -92,9 +117,10 @@ export class GridFSBucket {
   uploadFromStreamWithId(
     id: FileId,
     filename: string,
-    source: WritableStream,
+    source: ReadableStream,
     options: GridFSUploadOptions,
   ): void {
+    source.pipeTo(this.openUploadStreamWithId(id, filename, options));
   }
 
   /** Opens a Stream from which the application can read the contents of the stored file
@@ -130,7 +156,7 @@ export class GridFSBucket {
    * associated chunks from a GridFS bucket.
    */
   async delete(id: FileId) {
-    await this.#fileCollection.deleteOne({ _id: id });
+    await this.#filesCollection.deleteOne({ _id: id });
     const response = await this.#chunksCollection.deleteMany({ files_id: id });
     assert(response, `File not found for id ${id}`);
   }
@@ -140,8 +166,8 @@ export class GridFSBucket {
    */
   find(
     filter: Filter<File>,
-    options?: GridFSFindOptions,
+    options: GridFSFindOptions = {},
   ): FindCursor<File> {
-    return this.#fileCollection.find(filter ?? {}, options ?? {});
+    return this.#filesCollection.find(filter ?? {}, options);
   }
 }
