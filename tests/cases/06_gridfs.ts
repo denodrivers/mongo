@@ -31,7 +31,10 @@ export default function gridfsTests() {
       bucketName: "deno_logo",
     });
 
-    const upstream = bucket.openUploadStream("deno_logo.png");
+    // Set an impractically low chunkSize to test chunking algorithm
+    const upstream = bucket.openUploadStream("deno_logo.png", {
+      chunkSizeBytes: 255 * 8,
+    });
 
     await (await fetch("https://deno.land/images/deno_logo.png")).body!.pipeTo(
       upstream,
