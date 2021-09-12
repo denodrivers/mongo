@@ -170,4 +170,13 @@ export class GridFSBucket {
   ): FindCursor<File> {
     return this.#filesCollection.find(filter ?? {}, options);
   }
+
+  /**
+   * Drops the files and chunks collections associated with
+   * this bucket.
+   */
+  async drop() {
+    await this.#filesCollection.drop();
+    await this.#chunksCollection.drop();
+  }
 }
