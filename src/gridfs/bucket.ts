@@ -2,7 +2,7 @@ import { assert, ObjectId } from "../../deps.ts";
 import { Collection } from "../collection/collection.ts";
 import { FindCursor } from "../collection/commands/find.ts";
 import { Database } from "../database.ts";
-import { Document, Filter } from "../types.ts";
+import { Filter } from "../types.ts";
 import {
   Chunk,
   File,
@@ -11,7 +11,7 @@ import {
   GridFSFindOptions,
   GridFSUploadOptions,
 } from "../types/gridfs.ts";
-import { checkIndexes, createChunksIndex, createFileIndex } from "./indexes.ts";
+import { checkIndexes } from "./indexes.ts";
 import { createUploadStream } from "./upload.ts";
 
 export class GridFSBucket {
@@ -71,13 +71,7 @@ export class GridFSBucket {
     filename: string,
     options?: GridFSUploadOptions,
   ) {
-    if (!this.#checkedIndexes) {
-      checkIndexes(
-        this.#filesCollection,
-        this.#chunksCollection,
-        (value) => this.#checkedIndexes = value,
-      );
-    }
+    if (!this.#checkedIndexes) this.#checkIndexes();
     return createUploadStream(this.getBucketData(), filename, id, options);
   }
 
@@ -129,6 +123,8 @@ export class GridFSBucket {
    * Returns a Stream.
    */
   openDownloadStream(id: FileId) {
+    if (!this.#checkedIndexes) this.#checkIndexes();
+
     return new ReadableStream<Uint8Array>({
       start: async (controller) => {
         const collection = this.#chunksCollection.find({ files_id: id });
@@ -179,4 +175,11 @@ export class GridFSBucket {
     await this.#filesCollection.drop();
     await this.#chunksCollection.drop();
   }
+
+  #checkIndexes = () =>
+    checkIndexes(
+      this.#filesCollection,
+      this.#chunksCollection,
+      (value) => this.#checkedIndexes = value,
+    );
 }
