@@ -1,6 +1,6 @@
-import { } from "../../mod.ts";
+import {} from "../../mod.ts";
 
 onmessage = (_e) => {
-    postMessage("done");
-    close();
-}
+  self.postMessage("done");
+  self.close();
+};
