@@ -21,32 +21,29 @@ export function createUploadStream(
   let fileSizeBytes = 0;
   return new WritableStream<Uint8Array>({
     write: async (chunk: Uint8Array) => {
-      const loop = async (chunk: Uint8Array) => {
-        const int8 = new Uint8Array(chunk);
-        const spaceRemaining = chunkSizeBytesCombined - bufferPosition;
-        if (chunk.byteLength < spaceRemaining) {
-          uploadBuffer.set(int8, bufferPosition);
-          bufferPosition += chunk.byteLength;
-          fileSizeBytes += chunk.byteLength;
-          return;
-        } else {
-          const sliced = int8.slice(0, spaceRemaining);
-          const remnant = int8.slice(spaceRemaining);
-          uploadBuffer.set(sliced, bufferPosition);
-
-          await chunksCollection.insertOne({
-            files_id: id,
-            n: chunksInserted,
-            data: new Binary(uploadBuffer),
-          });
-
-          bufferPosition = 0;
-          fileSizeBytes += sliced.byteLength;
-          ++chunksInserted;
-          await loop(remnant);
+      let remaining = chunk
+      while (remaining.byteLength) {
+        const availableBuffer = chunkSizeBytesCombined - bufferPosition
+        if (remaining.byteLength < availableBuffer) {
+          uploadBuffer.set(remaining, bufferPosition)
+          bufferPosition += remaining.byteLength;
+          fileSizeBytes += remaining.byteLength;
+          break;
         }
-      };
-      await loop(chunk);
+        const sliced = remaining.slice(0, availableBuffer);
+        remaining = remaining.slice(availableBuffer)
+        uploadBuffer.set(sliced, bufferPosition);
+
+        await chunksCollection.insertOne({
+          files_id: id,
+          n: chunksInserted,
+          data: new Binary(uploadBuffer),
+        });
+
+        bufferPosition = 0
+        fileSizeBytes += sliced.byteLength;
+        ++chunksInserted;
+      }
     },
     close: async () => {
       // Write the last bytes that are left in the buffer
