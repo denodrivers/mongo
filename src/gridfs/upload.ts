@@ -21,17 +21,17 @@ export function createUploadStream(
   let fileSizeBytes = 0;
   return new WritableStream<Uint8Array>({
     write: async (chunk: Uint8Array) => {
-      let remaining = chunk
+      let remaining = chunk;
       while (remaining.byteLength) {
-        const availableBuffer = chunkSizeBytesCombined - bufferPosition
+        const availableBuffer = chunkSizeBytesCombined - bufferPosition;
         if (remaining.byteLength < availableBuffer) {
-          uploadBuffer.set(remaining, bufferPosition)
+          uploadBuffer.set(remaining, bufferPosition);
           bufferPosition += remaining.byteLength;
           fileSizeBytes += remaining.byteLength;
           break;
         }
         const sliced = remaining.slice(0, availableBuffer);
-        remaining = remaining.slice(availableBuffer)
+        remaining = remaining.slice(availableBuffer);
         uploadBuffer.set(sliced, bufferPosition);
 
         await chunksCollection.insertOne({
@@ -40,7 +40,7 @@ export function createUploadStream(
           data: new Binary(uploadBuffer),
         });
 
-        bufferPosition = 0
+        bufferPosition = 0;
         fileSizeBytes += sliced.byteLength;
         ++chunksInserted;
       }
