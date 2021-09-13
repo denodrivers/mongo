@@ -4,6 +4,7 @@ import connectTests from "./cases/02_connect.ts";
 import curdTests from "./cases/03_curd.ts";
 import indexesTests from "./cases/04_indexes.ts";
 import srvTests from "./cases/05_srv.ts";
+import workerTests from "./cases/06_worker.ts";
 
 import cleanup from "./cases/99_cleanup.ts";
 
@@ -13,5 +14,6 @@ connectTests();
 curdTests();
 indexesTests();
 srvTests();
+workerTests();
 
 cleanup();
