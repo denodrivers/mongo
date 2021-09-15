@@ -25,7 +25,6 @@ export abstract class MongoError extends Error {
  */
 export class MongoDriverError extends MongoError {
   /**
-   *
    * @param info A string containing the error's message.
    */
   constructor(info: string) {
@@ -44,7 +43,6 @@ export class MongoServerError extends MongoError implements MongoErrorInfo {
   codeName: string;
 
   /**
-   *
    * @param info An object representing the server's error response.
    */
   constructor(info: MongoErrorInfo) {

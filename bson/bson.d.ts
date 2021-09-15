@@ -27,36 +27,36 @@ export declare class Binary {
   sub_type: number;
   position: number;
   /**
-     * @param buffer - a buffer object containing the binary data.
-     * @param subType - the option binary type.
-     */
+   * @param buffer - a buffer object containing the binary data.
+   * @param subType - the option binary type.
+   */
   constructor(buffer?: string | BinarySequence, subType?: number);
   /**
-     * Updates this binary with byte_value.
-     *
-     * @param byteValue - a single byte we wish to write.
-     */
+   * Updates this binary with byte_value.
+   *
+   * @param byteValue - a single byte we wish to write.
+   */
   put(byteValue: string | number | Uint8Array | Buffer | number[]): void;
   /**
-     * Writes a buffer or string to the binary.
-     *
-     * @param sequence - a string or buffer to be written to the Binary BSON object.
-     * @param offset - specify the binary of where to write the content.
-     */
+   * Writes a buffer or string to the binary.
+   *
+   * @param sequence - a string or buffer to be written to the Binary BSON object.
+   * @param offset - specify the binary of where to write the content.
+   */
   write(sequence: string | BinarySequence, offset: number): void;
   /**
-     * Reads **length** bytes starting at **position**.
-     *
-     * @param position - read from the given position in the Binary.
-     * @param length - the number of bytes to read.
-     */
+   * Reads **length** bytes starting at **position**.
+   *
+   * @param position - read from the given position in the Binary.
+   * @param length - the number of bytes to read.
+   */
   read(position: number, length: number): BinarySequence;
   /**
-     * Returns the value of this binary as a string.
-     * @param asRaw - Will skip converting to a string
-     * @remarks
-     * This is handy when calling this function conditionally for some key value pairs and not others
-     */
+   * Returns the value of this binary as a string.
+   * @param asRaw - Will skip converting to a string
+   * @remarks
+   * This is handy when calling this function conditionally for some key value pairs and not others
+   */
   value(asRaw?: boolean): string | BinarySequence;
   /** the length of the binary sequence */
   length(): number;
@@ -156,9 +156,9 @@ export declare class BSONRegExp {
   pattern: string;
   options: string;
   /**
-     * @param pattern - The regular expression pattern to match
-     * @param options - The regular expression options
-     */
+   * @param pattern - The regular expression pattern to match
+   * @param options - The regular expression options
+   */
   constructor(pattern: string, options?: string);
   static parseOptions(options?: string): string;
   /* Excluded from this release type: toExtendedJSON */
@@ -187,8 +187,8 @@ export declare class BSONSymbol {
   _bsontype: "Symbol";
   value: string;
   /**
-     * @param value - the string representing the symbol.
-     */
+   * @param value - the string representing the symbol.
+   */
   constructor(value: string);
   /** Access the wrapped string value. */
   valueOf(): string;
@@ -231,9 +231,9 @@ export declare class Code {
   code: string | Function;
   scope?: Document;
   /**
-     * @param code - a string or function.
-     * @param scope - an optional scope for the function.
-     */
+   * @param code - a string or function.
+   * @param scope - an optional scope for the function.
+   */
   constructor(code: string | Function, scope?: Document);
   /* Excluded from this release type: toJSON */
   /* Excluded from this release type: toExtendedJSON */
@@ -257,10 +257,10 @@ export declare class DBRef {
   db?: string;
   fields: Document;
   /**
-     * @param collection - the collection name.
-     * @param oid - the reference ObjectId.
-     * @param db - optional db name, if omitted the reference is local to the current db.
-     */
+   * @param collection - the collection name.
+   * @param oid - the reference ObjectId.
+   * @param db - optional db name, if omitted the reference is local to the current db.
+   */
   constructor(
     collection: string,
     oid: ObjectId,
@@ -291,10 +291,10 @@ export declare class Decimal128 {
   /** @param bytes - a buffer containing the raw Decimal128 bytes in little endian order */
   constructor(bytes: Buffer);
   /**
-     * Create a Decimal128 instance from a string representation
-     *
-     * @param representation - a numeric string representation.
-     */
+   * Create a Decimal128 instance from a string representation
+   *
+   * @param representation - a numeric string representation.
+   */
   static fromString(representation: string): Decimal128;
   /** Create a string representation of the raw Decimal128 value */
   toString(): string;
@@ -327,10 +327,10 @@ export declare interface DeserializeOptions {
   /** cache evaluated functions for reuse. */
   cacheFunctions?: boolean;
   /**
-     * use a crc32 code for caching, otherwise use the string of the function.
-     * @deprecated this option to use the crc32 function never worked as intended
-     * due to the fact that the crc32 function itself was never implemented.
-     * */
+   * use a crc32 code for caching, otherwise use the string of the function.
+   * @deprecated this option to use the crc32 function never worked as intended
+   * due to the fact that the crc32 function itself was never implemented.
+   */
   cacheFunctionsCrc32?: boolean;
   /** when deserializing a Long will fit it into a Number if it's smaller than 53 bits */
   promoteLongs?: boolean;
@@ -383,16 +383,16 @@ export declare class Double {
   _bsontype: "Double";
   value: number;
   /**
-     * Create a Double type
-     *
-     * @param value - the number we want to represent as a double.
-     */
+   * Create a Double type
+   *
+   * @param value - the number we want to represent as a double.
+   */
   constructor(value: number);
   /**
-     * Access the number value.
-     *
-     * @returns returns the wrapped double number.
-     */
+   * Access the number value.
+   *
+   * @returns returns the wrapped double number.
+   */
   valueOf(): number;
   /* Excluded from this release type: toJSON */
   /* Excluded from this release type: toExtendedJSON */
@@ -415,27 +415,27 @@ export declare namespace EJSON {
     /** Enable Extended JSON's `relaxed` mode, which attempts to return native JS types where possible, rather than BSON types */
     relaxed?: boolean;
     /**
-         * Disable Extended JSON's `relaxed` mode, which attempts to return BSON types where possible, rather than native JS types
-         * @deprecated Please use the relaxed property instead
-         */
+     * Disable Extended JSON's `relaxed` mode, which attempts to return BSON types where possible, rather than native JS types
+     * @deprecated Please use the relaxed property instead
+     */
     strict?: boolean;
   }
   /**
-     * Parse an Extended JSON string, constructing the JavaScript value or object described by that
-     * string.
-     *
-     * @example
-     * ```js
-     * const { EJSON } = require('bson');
-     * const text = '{ "int32": { "$numberInt": "10" } }';
-     *
-     * // prints { int32: { [String: '10'] _bsontype: 'Int32', value: '10' } }
-     * console.log(EJSON.parse(text, { relaxed: false }));
-     *
-     * // prints { int32: 10 }
-     * console.log(EJSON.parse(text));
-     * ```
-     */
+   * Parse an Extended JSON string, constructing the JavaScript value or object described by that
+   * string.
+   *
+   * @example
+   * ```js
+   * const { EJSON } = require('bson');
+   * const text = '{ "int32": { "$numberInt": "10" } }';
+   *
+   * // prints { int32: { [String: '10'] _bsontype: 'Int32', value: '10' } }
+   * console.log(EJSON.parse(text, { relaxed: false }));
+   *
+   * // prints { int32: 10 }
+   * console.log(EJSON.parse(text));
+   * ```
+   */
   export function parse(
     text: string,
     options?: EJSON.Options,
@@ -446,49 +446,49 @@ export declare namespace EJSON {
     | Array<JSONPrimitive | Document>
     | JSONPrimitive;
   /**
-     * Converts a BSON document to an Extended JSON string, optionally replacing values if a replacer
-     * function is specified or optionally including only the specified properties if a replacer array
-     * is specified.
-     *
-     * @param value - The value to convert to extended JSON
-     * @param replacer - A function that alters the behavior of the stringification process, or an array of String and Number objects that serve as a whitelist for selecting/filtering the properties of the value object to be included in the JSON string. If this value is null or not provided, all properties of the object are included in the resulting JSON string
-     * @param space - A String or Number object that's used to insert white space into the output JSON string for readability purposes.
-     * @param options - Optional settings
-     *
-     * @example
-     * ```js
-     * const { EJSON } = require('bson');
-     * const Int32 = require('mongodb').Int32;
-     * const doc = { int32: new Int32(10) };
-     *
-     * // prints '{"int32":{"$numberInt":"10"}}'
-     * console.log(EJSON.stringify(doc, { relaxed: false }));
-     *
-     * // prints '{"int32":10}'
-     * console.log(EJSON.stringify(doc));
-     * ```
-     */
+   * Converts a BSON document to an Extended JSON string, optionally replacing values if a replacer
+   * function is specified or optionally including only the specified properties if a replacer array
+   * is specified.
+   *
+   * @param value - The value to convert to extended JSON
+   * @param replacer - A function that alters the behavior of the stringification process, or an array of String and Number objects that serve as a whitelist for selecting/filtering the properties of the value object to be included in the JSON string. If this value is null or not provided, all properties of the object are included in the resulting JSON string
+   * @param space - A String or Number object that's used to insert white space into the output JSON string for readability purposes.
+   * @param options - Optional settings
+   *
+   * @example
+   * ```js
+   * const { EJSON } = require('bson');
+   * const Int32 = require('mongodb').Int32;
+   * const doc = { int32: new Int32(10) };
+   *
+   * // prints '{"int32":{"$numberInt":"10"}}'
+   * console.log(EJSON.stringify(doc, { relaxed: false }));
+   *
+   * // prints '{"int32":10}'
+   * console.log(EJSON.stringify(doc));
+   * ```
+   */
   export function stringify(value: SerializableTypes): string;
   export function stringify(
     value: SerializableTypes,
     options?: EJSON.Options,
   ): string;
   /**
-     * Serializes an object to an Extended JSON string, and reparse it as a JavaScript object.
-     *
-     * @param value - The object to serialize
-     * @param options - Optional settings passed to the `stringify` function
-     */
+   * Serializes an object to an Extended JSON string, and reparse it as a JavaScript object.
+   *
+   * @param value - The object to serialize
+   * @param options - Optional settings passed to the `stringify` function
+   */
   export function serialize(
     value: SerializableTypes,
     options?: EJSON.Options,
   ): Document;
   /**
-     * Deserializes an Extended JSON object into a plain JavaScript object with native/BSON types
-     *
-     * @param ejson - The Extended JSON object to deserialize
-     * @param options - Optional settings passed to the parse method
-     */
+   * Deserializes an Extended JSON object into a plain JavaScript object with native/BSON types
+   *
+   * @param ejson - The Extended JSON object to deserialize
+   * @param options - Optional settings passed to the parse method
+   */
   export function deserialize(
     ejson: Document,
     options?: EJSON.Options,
@@ -506,16 +506,16 @@ export declare class Int32 {
   _bsontype: "Int32";
   value: number;
   /**
-     * Create an Int32 type
-     *
-     * @param value - the number we want to represent as an int32.
-     */
+   * Create an Int32 type
+   *
+   * @param value - the number we want to represent as an int32.
+   */
   constructor(value: number | string);
   /**
-     * Access the number value.
-     *
-     * @returns returns the wrapped int32 number.
-     */
+   * Access the number value.
+   *
+   * @returns returns the wrapped int32 number.
+   */
   valueOf(): number;
   /* Excluded from this release type: toJSON */
   /* Excluded from this release type: toExtendedJSON */
@@ -556,24 +556,24 @@ export declare class Long {
   /** An indicator used to reliably determine if an object is a Long or not. */
   __isLong__: true;
   /**
-     * The high 32 bits as a signed value.
-     */
+   * The high 32 bits as a signed value.
+   */
   high: number;
   /**
-     * The low 32 bits as a signed value.
-     */
+   * The low 32 bits as a signed value.
+   */
   low: number;
   /**
-     * Whether unsigned or not.
-     */
+   * Whether unsigned or not.
+   */
   unsigned: boolean;
   /**
-     * Constructs a 64 bit two's-complement integer, given its low and high 32 bit values as *signed* integers.
-     *  See the from* functions below for more convenient ways of constructing Longs.
-     * @param low - The low (signed) 32 bits of the long
-     * @param high - The high (signed) 32 bits of the long
-     * @param unsigned - Whether unsigned or not, defaults to signed
-     */
+   * Constructs a 64 bit two's-complement integer, given its low and high 32 bit values as *signed* integers.
+   *  See the from* functions below for more convenient ways of constructing Longs.
+   * @param low - The low (signed) 32 bits of the long
+   * @param high - The high (signed) 32 bits of the long
+   * @param unsigned - Whether unsigned or not, defaults to signed
+   */
   constructor(low?: number, high?: number, unsigned?: boolean);
   static TWO_PWR_24: Long;
   /** Maximum unsigned value. */
@@ -593,73 +593,73 @@ export declare class Long {
   /** Minimum signed value. */
   static MIN_VALUE: Long;
   /**
-     * Returns a Long representing the 64 bit integer that comes by concatenating the given low and high bits.
-     * Each is assumed to use 32 bits.
-     * @param lowBits - The low 32 bits
-     * @param highBits - The high 32 bits
-     * @param unsigned - Whether unsigned or not, defaults to signed
-     * @returns The corresponding Long value
-     */
+   * Returns a Long representing the 64 bit integer that comes by concatenating the given low and high bits.
+   * Each is assumed to use 32 bits.
+   * @param lowBits - The low 32 bits
+   * @param highBits - The high 32 bits
+   * @param unsigned - Whether unsigned or not, defaults to signed
+   * @returns The corresponding Long value
+   */
   static fromBits(lowBits: number, highBits: number, unsigned?: boolean): Long;
   /**
-     * Returns a Long representing the given 32 bit integer value.
-     * @param value - The 32 bit integer in question
-     * @param unsigned - Whether unsigned or not, defaults to signed
-     * @returns The corresponding Long value
-     */
+   * Returns a Long representing the given 32 bit integer value.
+   * @param value - The 32 bit integer in question
+   * @param unsigned - Whether unsigned or not, defaults to signed
+   * @returns The corresponding Long value
+   */
   static fromInt(value: number, unsigned?: boolean): Long;
   /**
-     * Returns a Long representing the given value, provided that it is a finite number. Otherwise, zero is returned.
-     * @param value - The number in question
-     * @param unsigned - Whether unsigned or not, defaults to signed
-     * @returns The corresponding Long value
-     */
+   * Returns a Long representing the given value, provided that it is a finite number. Otherwise, zero is returned.
+   * @param value - The number in question
+   * @param unsigned - Whether unsigned or not, defaults to signed
+   * @returns The corresponding Long value
+   */
   static fromNumber(value: number, unsigned?: boolean): Long;
   /**
-     * Returns a Long representing the given value, provided that it is a finite number. Otherwise, zero is returned.
-     * @param value - The number in question
-     * @param unsigned - Whether unsigned or not, defaults to signed
-     * @returns The corresponding Long value
-     */
+   * Returns a Long representing the given value, provided that it is a finite number. Otherwise, zero is returned.
+   * @param value - The number in question
+   * @param unsigned - Whether unsigned or not, defaults to signed
+   * @returns The corresponding Long value
+   */
   static fromBigInt(value: bigint, unsigned?: boolean): Long;
   /**
-     * Returns a Long representation of the given string, written using the specified radix.
-     * @param str - The textual representation of the Long
-     * @param unsigned - Whether unsigned or not, defaults to signed
-     * @param radix - The radix in which the text is written (2-36), defaults to 10
-     * @returns The corresponding Long value
-     */
+   * Returns a Long representation of the given string, written using the specified radix.
+   * @param str - The textual representation of the Long
+   * @param unsigned - Whether unsigned or not, defaults to signed
+   * @param radix - The radix in which the text is written (2-36), defaults to 10
+   * @returns The corresponding Long value
+   */
   static fromString(str: string, unsigned?: boolean, radix?: number): Long;
   /**
-     * Creates a Long from its byte representation.
-     * @param bytes - Byte representation
-     * @param unsigned - Whether unsigned or not, defaults to signed
-     * @param le - Whether little or big endian, defaults to big endian
-     * @returns The corresponding Long value
-     */
+   * Creates a Long from its byte representation.
+   * @param bytes - Byte representation
+   * @param unsigned - Whether unsigned or not, defaults to signed
+   * @param le - Whether little or big endian, defaults to big endian
+   * @returns The corresponding Long value
+   */
   static fromBytes(bytes: number[], unsigned?: boolean, le?: boolean): Long;
   /**
-     * Creates a Long from its little endian byte representation.
-     * @param bytes - Little endian byte representation
-     * @param unsigned - Whether unsigned or not, defaults to signed
-     * @returns The corresponding Long value
-     */
+   * Creates a Long from its little endian byte representation.
+   * @param bytes - Little endian byte representation
+   * @param unsigned - Whether unsigned or not, defaults to signed
+   * @returns The corresponding Long value
+   */
   static fromBytesLE(bytes: number[], unsigned?: boolean): Long;
   /**
-     * Creates a Long from its big endian byte representation.
-     * @param bytes - Big endian byte representation
-     * @param unsigned - Whether unsigned or not, defaults to signed
-     * @returns The corresponding Long value
-     */
+   * Creates a Long from its big endian byte representation.
+   * @param bytes - Big endian byte representation
+   * @param unsigned - Whether unsigned or not, defaults to signed
+   * @returns The corresponding Long value
+   */
   static fromBytesBE(bytes: number[], unsigned?: boolean): Long;
   /**
-     * Tests if the specified object is a Long.
-     */
+   * Tests if the specified object is a Long.
+   */
   static isLong(value: unknown): value is Long;
   /**
-     * Converts the specified value to a Long.
-     * @param unsigned - Whether unsigned or not, defaults to signed
-     */
+   * Converts the specified value to a Long.
+   * @param unsigned - Whether unsigned or not, defaults to signed
+   */
   static fromValue(
     val: number | string | {
       low: number;
@@ -671,28 +671,28 @@ export declare class Long {
   /** Returns the sum of this and the specified Long. */
   add(addend: string | number | Long | Timestamp): Long;
   /**
-     * Returns the sum of this and the specified Long.
-     * @returns Sum
-     */
+   * Returns the sum of this and the specified Long.
+   * @returns Sum
+   */
   and(other: string | number | Long | Timestamp): Long;
   /**
-     * Compares this Long's value with the specified's.
-     * @returns 0 if they are the same, 1 if the this is greater and -1 if the given one is greater
-     */
+   * Compares this Long's value with the specified's.
+   * @returns 0 if they are the same, 1 if the this is greater and -1 if the given one is greater
+   */
   compare(other: string | number | Long | Timestamp): 0 | 1 | -1;
   /** This is an alias of {@link Long.compare} */
   comp: (other: string | number | Long | Timestamp) => 0 | 1 | -1;
   /**
-     * Returns this Long divided by the specified. The result is signed if this Long is signed or unsigned if this Long is unsigned.
-     * @returns Quotient
-     */
+   * Returns this Long divided by the specified. The result is signed if this Long is signed or unsigned if this Long is unsigned.
+   * @returns Quotient
+   */
   divide(divisor: string | number | Long | Timestamp): Long;
   /**This is an alias of {@link Long.divide} */
   div: (divisor: string | number | Long | Timestamp) => Long;
   /**
-     * Tests if this Long's value equals the specified's.
-     * @param other - Other value
-     */
+   * Tests if this Long's value equals the specified's.
+   * @param other - Other value
+   */
   equals(other: string | number | Long | Timestamp): boolean;
   /** This is an alias of {@link Long.equals} */
   eq: (other: string | number | Long | Timestamp) => boolean;
@@ -741,10 +741,10 @@ export declare class Long {
   /** This is an alias of {@link Long.modulo} */
   rem: (divisor: string | number | Long | Timestamp) => Long;
   /**
-     * Returns the product of this and the specified Long.
-     * @param multiplier - Multiplier
-     * @returns Product
-     */
+   * Returns the product of this and the specified Long.
+   * @param multiplier - Multiplier
+   * @returns Product
+   */
   multiply(multiplier: string | number | Long | Timestamp): Long;
   /** This is an alias of {@link Long.multiply} */
   mul: (multiplier: string | number | Long | Timestamp) => Long;
@@ -761,40 +761,40 @@ export declare class Long {
   /** This is an alias of {@link Long.notEquals} */
   ne: (other: string | number | Long | Timestamp) => boolean;
   /**
-     * Returns the bitwise OR of this Long and the specified.
-     */
+   * Returns the bitwise OR of this Long and the specified.
+   */
   or(other: number | string | Long): Long;
   /**
-     * Returns this Long with bits shifted to the left by the given amount.
-     * @param numBits - Number of bits
-     * @returns Shifted Long
-     */
+   * Returns this Long with bits shifted to the left by the given amount.
+   * @param numBits - Number of bits
+   * @returns Shifted Long
+   */
   shiftLeft(numBits: number | Long): Long;
   /** This is an alias of {@link Long.shiftLeft} */
   shl: (numBits: number | Long) => Long;
   /**
-     * Returns this Long with bits arithmetically shifted to the right by the given amount.
-     * @param numBits - Number of bits
-     * @returns Shifted Long
-     */
+   * Returns this Long with bits arithmetically shifted to the right by the given amount.
+   * @param numBits - Number of bits
+   * @returns Shifted Long
+   */
   shiftRight(numBits: number | Long): Long;
   /** This is an alias of {@link Long.shiftRight} */
   shr: (numBits: number | Long) => Long;
   /**
-     * Returns this Long with bits logically shifted to the right by the given amount.
-     * @param numBits - Number of bits
-     * @returns Shifted Long
-     */
+   * Returns this Long with bits logically shifted to the right by the given amount.
+   * @param numBits - Number of bits
+   * @returns Shifted Long
+   */
   shiftRightUnsigned(numBits: Long | number): Long;
   /** This is an alias of {@link Long.shiftRightUnsigned} */
   shr_u: (numBits: Long | number) => Long;
   /** This is an alias of {@link Long.shiftRightUnsigned} */
   shru: (numBits: Long | number) => Long;
   /**
-     * Returns the difference of this and the specified Long.
-     * @param subtrahend - Subtrahend
-     * @returns Difference
-     */
+   * Returns the difference of this and the specified Long.
+   * @param subtrahend - Subtrahend
+   * @returns Difference
+   */
   subtract(subtrahend: string | number | Long | Timestamp): Long;
   /** This is an alias of {@link Long.subtract} */
   sub: (subtrahend: string | number | Long | Timestamp) => Long;
@@ -805,30 +805,30 @@ export declare class Long {
   /** Converts the Long to a BigInt (arbitrary precision). */
   toBigInt(): bigint;
   /**
-     * Converts this Long to its byte representation.
-     * @param le - Whether little or big endian, defaults to big endian
-     * @returns Byte representation
-     */
+   * Converts this Long to its byte representation.
+   * @param le - Whether little or big endian, defaults to big endian
+   * @returns Byte representation
+   */
   toBytes(le?: boolean): number[];
   /**
-     * Converts this Long to its little endian byte representation.
-     * @returns Little endian byte representation
-     */
+   * Converts this Long to its little endian byte representation.
+   * @returns Little endian byte representation
+   */
   toBytesLE(): number[];
   /**
-     * Converts this Long to its big endian byte representation.
-     * @returns Big endian byte representation
-     */
+   * Converts this Long to its big endian byte representation.
+   * @returns Big endian byte representation
+   */
   toBytesBE(): number[];
   /**
-     * Converts this Long to signed.
-     */
+   * Converts this Long to signed.
+   */
   toSigned(): Long;
   /**
-     * Converts the Long to a string written in the specified radix.
-     * @param radix - Radix (2-36), defaults to 10
-     * @throws RangeError If `radix` is out of range
-     */
+   * Converts the Long to a string written in the specified radix.
+   * @param radix - Radix (2-36), defaults to 10
+   * @throws RangeError If `radix` is out of range
+   */
   toString(radix?: number): string;
   /** Converts this Long to unsigned. */
   toUnsigned(): Long;
@@ -906,60 +906,60 @@ declare class ObjectId {
   /* Excluded from this release type: [kId] */
   /* Excluded from this release type: __id */
   /**
-     * Create an ObjectId type
-     *
-     * @param id - Can be a 24 character hex string, 12 byte binary Buffer, or a number.
-     */
+   * Create an ObjectId type
+   *
+   * @param id - Can be a 24 character hex string, 12 byte binary Buffer, or a number.
+   */
   constructor(id?: string | Buffer | number | ObjectIdLike | ObjectId);
   /**
-     * The ObjectId bytes
-     * @readonly
-     */
+   * The ObjectId bytes
+   * @readonly
+   */
   get id(): Buffer;
   set id(value: Buffer);
   /**
-     * The generation time of this ObjectId instance
-     * @deprecated Please use getTimestamp / createFromTime which returns an int32 epoch
-     */
+   * The generation time of this ObjectId instance
+   * @deprecated Please use getTimestamp / createFromTime which returns an int32 epoch
+   */
   get generationTime(): number;
   set generationTime(value: number);
   /** Returns the ObjectId id as a 24 character hex string representation */
   toHexString(): string;
   /* Excluded from this release type: getInc */
   /**
-     * Generate a 12 byte id buffer used in ObjectId's
-     *
-     * @param time - pass in a second based timestamp.
-     */
+   * Generate a 12 byte id buffer used in ObjectId's
+   *
+   * @param time - pass in a second based timestamp.
+   */
   static generate(time?: number): Buffer;
   /* Excluded from this release type: toString */
   /* Excluded from this release type: toJSON */
   /**
-     * Compares the equality of this ObjectId with `otherID`.
-     *
-     * @param otherId - ObjectId instance to compare against.
-     */
+   * Compares the equality of this ObjectId with `otherID`.
+   *
+   * @param otherId - ObjectId instance to compare against.
+   */
   equals(otherId: string | ObjectId | ObjectIdLike): boolean;
   /** Returns the generation date (accurate up to the second) that this ID was generated. */
   getTimestamp(): Date;
   /* Excluded from this release type: createPk */
   /**
-     * Creates an ObjectId from a second based number, with the rest of the ObjectId zeroed out. Used for comparisons or sorting the ObjectId.
-     *
-     * @param time - an integer number representing a number of seconds.
-     */
+   * Creates an ObjectId from a second based number, with the rest of the ObjectId zeroed out. Used for comparisons or sorting the ObjectId.
+   *
+   * @param time - an integer number representing a number of seconds.
+   */
   static createFromTime(time: number): ObjectId;
   /**
-     * Creates an ObjectId from a hex string representation of an ObjectId.
-     *
-     * @param hexString - create a ObjectId from a passed in 24 character hexstring.
-     */
+   * Creates an ObjectId from a hex string representation of an ObjectId.
+   *
+   * @param hexString - create a ObjectId from a passed in 24 character hexstring.
+   */
   static createFromHexString(hexString: string): ObjectId;
   /**
-     * Checks if a value is a valid bson ObjectId
-     *
-     * @param id - ObjectId instance to validate.
-     */
+   * Checks if a value is a valid bson ObjectId
+   *
+   * @param id - ObjectId instance to validate.
+   */
   static isValid(
     id: number | string | ObjectId | Buffer | ObjectIdLike,
   ): boolean;
@@ -1033,13 +1033,13 @@ export declare class Timestamp extends LongWithoutOverridesClass {
   _bsontype: "Timestamp";
   static readonly MAX_VALUE: Long;
   /**
-     * @param low - A 64-bit Long representing the Timestamp.
-     */
+   * @param low - A 64-bit Long representing the Timestamp.
+   */
   constructor(low: Long);
   /**
-     * @param low - the low (signed) 32 bits of the Timestamp.
-     * @param high - the high (signed) 32 bits of the Timestamp.
-     */
+   * @param low - the low (signed) 32 bits of the Timestamp.
+   * @param high - the high (signed) 32 bits of the Timestamp.
+   */
   constructor(low: number, high: number);
   toJSON(): {
     $timestamp: string;
@@ -1049,18 +1049,18 @@ export declare class Timestamp extends LongWithoutOverridesClass {
   /** Returns a Timestamp representing the given number value, provided that it is a finite number. Otherwise, zero is returned. */
   static fromNumber(value: number): Timestamp;
   /**
-     * Returns a Timestamp for the given high and low bits. Each is assumed to use 32 bits.
-     *
-     * @param lowBits - the low 32-bits.
-     * @param highBits - the high 32-bits.
-     */
+   * Returns a Timestamp for the given high and low bits. Each is assumed to use 32 bits.
+   *
+   * @param lowBits - the low 32-bits.
+   * @param highBits - the high 32-bits.
+   */
   static fromBits(lowBits: number, highBits: number): Timestamp;
   /**
-     * Returns a Timestamp from the given string, optionally using the given radix.
-     *
-     * @param str - the textual representation of the Timestamp.
-     * @param optRadix - the radix in which the text is written.
-     */
+   * Returns a Timestamp from the given string, optionally using the given radix.
+   *
+   * @param str - the textual representation of the Timestamp.
+   * @param optRadix - the radix in which the text is written.
+   */
   static fromString(str: string, optRadix: number): Timestamp;
   /* Excluded from this release type: toExtendedJSON */
   /* Excluded from this release type: fromExtendedJSON */
