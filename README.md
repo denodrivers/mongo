@@ -118,6 +118,18 @@ const skipTwo = await users.skip(2).find();
 
 // Limit
 const featuredUser = await users.limit(5).find();
+
+// GridFS Upload
+const bucket = new GridFSBucket(db);
+const upstream = bucket.openUploadStream("test.txt");
+
+const writer = upstream.getWriter();
+writer.write(fileContents);
+
+await writer.close();
+
+//GridFS Download
+const file = await new Response(bucket.openDownloadStream(id)).text();
 ```
 
 ## Contributing
