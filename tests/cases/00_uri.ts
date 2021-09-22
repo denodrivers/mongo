@@ -158,18 +158,46 @@ export default function uriTests() {
   // TODO: add more tests (https://github.com/mongodb/node-mongodb-native/blob/3.6/test/functional/url_parser.test.js)
 
   Deno.test({
-    name:
-      "should correctly parse mongodb+srv://someUser:somePassword@somesubdomain.somedomain.com/someDatabaseName?retryWrites=true&w=majority",
-    fn() {
-      const options = parseSrvUrl(
-        "mongodb+srv://someUser:somePassword@somesubdomain.somedomain.com/someDatabaseName?retryWrites=true&w=majority",
+    name: "should correctly parse uris with authSource and dbName",
+    async fn() {
+      const options = await parse(
+        "mongodb://a:b@localhost:27017/dbName?authSource=admin2",
       );
-      assertEquals(options.db, "someDatabaseName");
-      assertEquals(options.credential?.username, "someUser");
-      assertEquals(options.credential?.password, "somePassword");
-      assertEquals(options.retryWrites, true);
-      // @ts-ignore
-      assertEquals(options["servers"], undefined);
+
+      assertEquals(options.db, "dbName");
+      assertEquals(options.servers[0].host, "localhost");
+      assertEquals(options.servers[0].port, 27017);
+      assertEquals(options.credential!.username, "a");
+      assertEquals(options.credential!.password, "b");
+      assertEquals(options.credential!.db, "admin2");
     },
-  });
+  }),
+    Deno.test({
+      name: "should correctly parse uris with authSource and dbName",
+      fn() {
+        const options = parseSrvUrl(
+          "mongodb+srv://a:b@somesubdomain.somedomain.com/dbName?authSource=admin2",
+        );
+
+        assertEquals(options.db, "dbName");
+        assertEquals(options.credential!.username, "a");
+        assertEquals(options.credential!.password, "b");
+        assertEquals(options.credential!.db, "admin2");
+      },
+    }),
+    Deno.test({
+      name:
+        "should correctly parse mongodb+srv://someUser:somePassword@somesubdomain.somedomain.com/someDatabaseName?retryWrites=true&w=majority",
+      fn() {
+        const options = parseSrvUrl(
+          "mongodb+srv://someUser:somePassword@somesubdomain.somedomain.com/someDatabaseName?retryWrites=true&w=majority",
+        );
+        assertEquals(options.db, "someDatabaseName");
+        assertEquals(options.credential?.username, "someUser");
+        assertEquals(options.credential?.password, "somePassword");
+        assertEquals(options.retryWrites, true);
+        // @ts-ignore
+        assertEquals(options["servers"], undefined);
+      },
+    });
 }
