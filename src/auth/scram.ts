@@ -47,16 +47,16 @@ export class ScramAuthPlugin extends AuthPlugin {
     return request;
   }
 
-  async auth(authContext: AuthContext): Promise<Document> {
+  auth(authContext: AuthContext): Promise<Document> {
     const response = authContext.response;
     if (response && response.speculativeAuthenticate) {
-      return await continueScramConversation(
+      return continueScramConversation(
         this.cryptoMethod,
         response.speculativeAuthenticate,
         authContext,
       );
     }
-    return await executeScram(this.cryptoMethod, authContext);
+    return executeScram(this.cryptoMethod, authContext);
   }
 }
 export function cleanUsername(username: string) {
@@ -117,7 +117,7 @@ export async function executeScram(
 
   const saslStartCmd = makeFirstMessage(cryptoMethod, credentials, nonce);
   const result = await protocol.commandSingle(db, saslStartCmd);
-  return await continueScramConversation(cryptoMethod, result, authContext);
+  return continueScramConversation(cryptoMethod, result, authContext);
 }
 
 export async function continueScramConversation(
@@ -210,7 +210,7 @@ export async function continueScramConversation(
     payload: new Uint8Array(0),
   };
 
-  return await protocol.commandSingle(db, retrySaslContinueCmd);
+  return protocol.commandSingle(db, retrySaslContinueCmd);
 }
 
 //this is a hack to fix codification in payload (in being and end of payload exists a codification problem, needs investigation ...)

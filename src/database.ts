@@ -74,12 +74,12 @@ export class Database {
     return names;
   }
 
-  async createUser(
+  createUser(
     username: string,
     password: string,
     options?: CreateUserOptions,
   ) {
-    await this.#cluster.protocol.commandSingle(this.name, {
+    return this.#cluster.protocol.commandSingle(this.name, {
       createUser: options?.username ?? username,
       pwd: options?.password ?? password,
       customData: options?.customData,
@@ -92,11 +92,11 @@ export class Database {
     });
   }
 
-  async dropUser(username: string, options: {
+  dropUser(username: string, options: {
     writeConcern?: Document;
     comment?: Document;
   } = {}) {
-    await this.#cluster.protocol.commandSingle(this.name, {
+    return this.#cluster.protocol.commandSingle(this.name, {
       dropUser: username,
       writeConcern: options?.writeConcern,
       comment: options?.comment,
