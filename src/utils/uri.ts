@@ -123,21 +123,21 @@ export type SrvConnectOptions = Omit<ConnectOptions, "servers"> & {
 export function parseSrvUrl(url: string): SrvConnectOptions {
   const data = parse_url(url);
 
-  const path = (data.pathname && (data.pathname.length > 1))
+  const defaultAuthDb = (data.pathname && (data.pathname.length > 1))
     ? data.pathname!.substring(1)
     : null;
 
   const authSource = new URLSearchParams(data.search).get("authSource");
 
   const connectOptions: SrvConnectOptions = {
-    db: path ?? authSource ?? "admin",
+    db: defaultAuthDb ?? "test",
   };
 
   if (data.auth) {
     connectOptions.credential = <Credential> {
       username: data.auth.user,
       password: data.auth.password,
-      db: authSource ?? path ?? "admin",
+      db: authSource ?? defaultAuthDb ?? "admin",
       mechanism: data.search.authMechanism || "SCRAM-SHA-256",
     };
   }
@@ -181,7 +181,7 @@ export function parse(url: string): Promise<ConnectOptions> {
 function parseNormalUrl(url: string): ConnectOptions {
   const data = parse_url(url);
 
-  const path = (data.pathname && (data.pathname.length > 1))
+  const defaultAuthDb = (data.pathname && (data.pathname.length > 1))
     ? data.pathname!.substring(1)
     : null;
 
@@ -189,7 +189,7 @@ function parseNormalUrl(url: string): ConnectOptions {
 
   const connectOptions: ConnectOptions = {
     servers: data.servers!,
-    db: path ?? authSource ?? "admin",
+    db: defaultAuthDb ?? "test",
   };
 
   for (const server of connectOptions.servers) {
@@ -203,7 +203,7 @@ function parseNormalUrl(url: string): ConnectOptions {
     connectOptions.credential = <Credential> {
       username: data.auth.user,
       password: data.auth.password,
-      db: authSource ?? path ?? "admin",
+      db: authSource ?? defaultAuthDb ?? "admin",
       mechanism: data.search.authMechanism || "SCRAM-SHA-256",
     };
   }

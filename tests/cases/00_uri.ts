@@ -6,7 +6,7 @@ export default function uriTests() {
     name: "should correctly parse mongodb://localhost",
     async fn() {
       const options = await parse("mongodb://localhost/");
-      assertEquals(options.db, "admin");
+      assertEquals(options.db, "test");
       assertEquals(options.servers.length, 1);
       assertEquals(options.servers[0].host, "localhost");
       assertEquals(options.servers[0].port, 27017);
@@ -17,7 +17,7 @@ export default function uriTests() {
     name: "should correctly parse mongodb://localhost:27017",
     async fn() {
       const options = await parse("mongodb://localhost:27017/");
-      assertEquals(options.db, "admin");
+      assertEquals(options.db, "test");
       assertEquals(options.servers.length, 1);
       assertEquals(options.servers[0].host, "localhost");
       assertEquals(options.servers[0].port, 27017);
@@ -42,7 +42,7 @@ export default function uriTests() {
       const options = await parse(
         "mongodb://localhost/?safe=true&readPreference=secondary",
       );
-      assertEquals(options.db, "admin");
+      assertEquals(options.db, "test");
       assertEquals(options.servers.length, 1);
       assertEquals(options.servers[0].host, "localhost");
       assertEquals(options.servers[0].port, 27017);
@@ -53,7 +53,7 @@ export default function uriTests() {
     name: "should correctly parse mongodb://localhost:28101/",
     async fn() {
       const options = await parse("mongodb://localhost:28101/");
-      assertEquals(options.db, "admin");
+      assertEquals(options.db, "test");
       assertEquals(options.servers.length, 1);
       assertEquals(options.servers[0].host, "localhost");
       assertEquals(options.servers[0].port, 28101);
@@ -68,6 +68,7 @@ export default function uriTests() {
       assertEquals(options.servers[0].host, "localhost");
       assertEquals(options.credential!.username, "fred");
       assertEquals(options.credential!.password, "foobar");
+      assertEquals(options.credential!.db, "baz");
     },
   });
 
@@ -80,6 +81,7 @@ export default function uriTests() {
       assertEquals(options.servers[0].host, "localhost");
       assertEquals(options.credential!.username, "fred");
       assertEquals(options.credential!.password, "foo bar");
+      assertEquals(options.credential!.db, "baz");
     },
   });
 
@@ -89,7 +91,7 @@ export default function uriTests() {
       const options = await parse("mongodb://%2Ftmp%2Fmongodb-27017.sock");
       assertEquals(options.servers.length, 1);
       assertEquals(options.servers[0].domainSocket, "/tmp/mongodb-27017.sock");
-      assertEquals(options.db, "admin");
+      assertEquals(options.db, "test");
     },
   });
 
@@ -104,7 +106,7 @@ export default function uriTests() {
       assertEquals(options.servers[0].domainSocket, "/tmp/mongodb-27017.sock");
       assertEquals(options.credential!.username, "fred");
       assertEquals(options.credential!.password, "foo");
-      assertEquals(options.db, "admin");
+      assertEquals(options.db, "test");
     },
   });
 
@@ -119,6 +121,7 @@ export default function uriTests() {
       assertEquals(options.servers[0].domainSocket, "/tmp/mongodb-27017.sock");
       assertEquals(options.credential!.username, "fred");
       assertEquals(options.credential!.password, "foo");
+      assertEquals(options.credential!.db, "somedb");
       assertEquals(options.db, "somedb");
     },
   });
@@ -134,6 +137,7 @@ export default function uriTests() {
       assertEquals(options.servers[0].domainSocket, "/tmp/mongodb-27017.sock");
       assertEquals(options.credential!.username, "fred");
       assertEquals(options.credential!.password, "foo");
+      assertEquals(options.credential!.db, "somedb");
       assertEquals(options.db, "somedb");
       assertEquals(options.safe, true);
     },
@@ -153,6 +157,7 @@ export default function uriTests() {
       assertEquals(options.servers[1].port, 28101);
       assertEquals(options.credential!.username, "fred");
       assertEquals(options.credential!.password, "foobar");
+      assertEquals(options.credential!.db, "baz");
     },
   });
   // TODO: add more tests (https://github.com/mongodb/node-mongodb-native/blob/3.6/test/functional/url_parser.test.js)
