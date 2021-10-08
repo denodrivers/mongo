@@ -54,3 +54,16 @@ export class MongoServerError extends MongoError implements MongoErrorInfo {
     this.codeName = info.codeName;
   }
 }
+
+/**
+ * A class representation of a command with invalid arguments
+ * @public
+ */
+export class MongoInvalidArgumentError extends MongoError {
+  /**
+   * @param info A string containing the error's message.
+   */
+  constructor(info: string) {
+    super(info);
+  }
+}
