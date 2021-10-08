@@ -46,12 +46,12 @@ export class Collection<T> {
     });
   }
 
-  async findOne(
+  findOne(
     filter?: Filter<T>,
     options?: FindOptions,
   ): Promise<T | undefined> {
     const cursor = this.find(filter, options);
-    return await cursor.next();
+    return cursor.next();
   }
 
   /**
@@ -215,12 +215,12 @@ export class Collection<T> {
     };
   }
 
-  async updateMany(
+  updateMany(
     filter: Filter<T>,
     doc: UpdateFilter<T>,
     options?: UpdateOptions,
   ) {
-    return await update(this.#protocol, this.#dbName, this.name, filter, doc, {
+    return update(this.#protocol, this.#dbName, this.name, filter, doc, {
       ...options,
       multi: options?.multi ?? true,
     });

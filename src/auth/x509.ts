@@ -23,11 +23,11 @@ export class X509AuthPlugin extends AuthPlugin {
     return handshakeDoc;
   }
 
-  async auth(authContext: AuthContext): Promise<Document> {
+  auth(authContext: AuthContext): Promise<Document> {
     if (authContext.response!.speculativeAuthenticate) {
-      return authContext.response!;
+      return Promise.resolve(authContext.response!);
     }
-    return await authContext.protocol.commandSingle(
+    return authContext.protocol.commandSingle(
       "$external",
       x509AuthenticateCommand(authContext.credentials),
     );
