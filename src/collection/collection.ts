@@ -21,7 +21,7 @@ import {
 } from "../types.ts";
 import { AggregateCursor } from "./commands/aggregate.ts";
 import { FindCursor } from "./commands/find.ts";
-import { ListIndexesCursor } from "./commands/listIndexes.ts";
+import { ListIndexesCursor } from "./commands/list_indexes.ts";
 import { update } from "./commands/update.ts";
 
 export class Collection<T> {

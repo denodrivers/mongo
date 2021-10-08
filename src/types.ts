@@ -1,5 +1,5 @@
 import { Bson } from "../deps.ts";
-import { WriteConcern } from "./types/readWriteConcern.ts";
+import { WriteConcern } from "./types/read_write_concern.ts";
 
 export type Document = Bson.Document;
 
