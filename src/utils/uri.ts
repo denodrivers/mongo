@@ -122,18 +122,22 @@ export type SrvConnectOptions = Omit<ConnectOptions, "servers"> & {
 
 export function parseSrvUrl(url: string): SrvConnectOptions {
   const data = parse_url(url);
+
+  const defaultAuthDb = (data.pathname && (data.pathname.length > 1))
+    ? data.pathname!.substring(1)
+    : null;
+
+  const authSource = new URLSearchParams(data.search).get("authSource");
+
   const connectOptions: SrvConnectOptions = {
-    db: new URLSearchParams(data.search).get("authSource") ??
-      ((data.pathname && data.pathname.length > 1)
-        ? data.pathname.substring(1)
-        : "admin"),
+    db: defaultAuthDb ?? "test",
   };
 
   if (data.auth) {
     connectOptions.credential = <Credential> {
       username: data.auth.user,
       password: data.auth.password,
-      db: connectOptions.db,
+      db: authSource ?? defaultAuthDb ?? "admin",
       mechanism: data.search.authMechanism || "SCRAM-SHA-256",
     };
   }
@@ -176,7 +180,17 @@ export function parse(url: string): Promise<ConnectOptions> {
 
 function parseNormalUrl(url: string): ConnectOptions {
   const data = parse_url(url);
-  const connectOptions: ConnectOptions = { servers: data.servers!, db: "" };
+
+  const defaultAuthDb = (data.pathname && (data.pathname.length > 1))
+    ? data.pathname!.substring(1)
+    : null;
+
+  const authSource = new URLSearchParams(data.search).get("authSource");
+
+  const connectOptions: ConnectOptions = {
+    servers: data.servers!,
+    db: defaultAuthDb ?? "test",
+  };
 
   for (const server of connectOptions.servers) {
     if (server.host.includes(".sock")) {
@@ -185,15 +199,11 @@ function parseNormalUrl(url: string): ConnectOptions {
     server.port = server.port || 27017;
   }
 
-  connectOptions.db = new URLSearchParams(data.search).get("authSource") ??
-    (data.pathname && (data.pathname.length > 1)
-      ? data.pathname.substring(1)
-      : "admin");
   if (data.auth) {
     connectOptions.credential = <Credential> {
       username: data.auth.user,
       password: data.auth.password,
-      db: connectOptions.db,
+      db: authSource ?? defaultAuthDb ?? "admin",
       mechanism: data.search.authMechanism || "SCRAM-SHA-256",
     };
   }
