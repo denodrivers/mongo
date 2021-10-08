@@ -1,7 +1,6 @@
 import { Bson } from "../../../deps.ts";
 import { Document, UpdateOptions } from "../../types.ts";
 import { WireProtocol } from "../../protocol/mod.ts";
-import { MongoInvalidArgumentError } from "../../error.ts";
 
 interface UpdateResponse {
   ok: number;
@@ -13,33 +12,14 @@ interface UpdateResponse {
   }[];
 }
 
-export function hasAtomicOperators(doc: Bson.Document | Bson.Document[]) {
-  if (Array.isArray(doc)) {
-    for (const document of doc) {
-      if (hasAtomicOperators(document)) {
-        return true;
-      }
-    }
-    return false;
-  }
-  const keys = Object.keys(doc);
-  return keys.length > 0 && keys[0][0] === "$";
-}
-
 export async function update(
   protocol: WireProtocol,
   dbName: string,
   collectionName: string,
   query: Document,
-  update: Document,
+  doc: Document,
   options?: UpdateOptions,
 ) {
-  if (!hasAtomicOperators(update)) {
-    throw new MongoInvalidArgumentError(
-      "Update document requires atomic operators",
-    );
-  }
-
   const { n, nModified, upserted } = await protocol.commandSingle<
     UpdateResponse
   >(dbName, {
@@ -47,7 +27,7 @@ export async function update(
     updates: [
       {
         q: query,
-        u: update,
+        u: doc,
         upsert: options?.upsert ?? false,
         multi: options?.multi ?? true,
         collation: options?.collation,
