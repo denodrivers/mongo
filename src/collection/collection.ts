@@ -1,5 +1,5 @@
 import { Bson } from "../../deps.ts";
-import { MongoDriverError } from "../error.ts";
+import { MongoDriverError, MongoInvalidArgumentError } from "../error.ts";
 import { WireProtocol } from "../protocol/mod.ts";
 import {
   AggregateOptions,
@@ -220,6 +220,12 @@ export class Collection<T> {
     doc: UpdateFilter<T>,
     options?: UpdateOptions,
   ) {
+    if (!hasAtomicOperators(doc)) {
+      throw new MongoInvalidArgumentError(
+        "Update document requires atomic operators",
+      );
+    }
+
     return update(this.#protocol, this.#dbName, this.name, filter, doc, {
       ...options,
       multi: options?.multi ?? true,
@@ -323,4 +329,17 @@ export class Collection<T> {
       collectionName: this.name,
     });
   }
+}
+
+export function hasAtomicOperators(doc: Bson.Document | Bson.Document[]) {
+  if (Array.isArray(doc)) {
+    for (const document of doc) {
+      if (hasAtomicOperators(document)) {
+        return true;
+      }
+    }
+    return false;
+  }
+  const keys = Object.keys(doc);
+  return keys.length > 0 && keys[0][0] === "$";
 }
