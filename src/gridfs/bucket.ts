@@ -93,7 +93,7 @@ export class GridFSBucket {
     source: ReadableStream,
     options?: GridFSUploadOptions,
   ): ObjectId {
-    const objectid = ObjectId.generate();
+    const objectid = new ObjectId();
     source.pipeTo(this.openUploadStreamWithId(objectid, filename, options));
     return objectid;
   }
