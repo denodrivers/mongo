@@ -40,4 +40,4 @@ jobs:
 
       # Tests
       - name: Test TS
-        run: deno test -A --unstable
+        run: deno test -A
