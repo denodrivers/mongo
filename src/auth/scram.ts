@@ -4,14 +4,9 @@ import { saslprep } from "../utils/saslprep/mod.ts";
 import { AuthContext, AuthPlugin } from "./base.ts";
 import { HandshakeDocument } from "../protocol/handshake.ts";
 import { MongoDriverError } from "../error.ts";
-import {
-  b64,
-  createHash,
-  HmacSha1,
-  HmacSha256,
-  pbkdf2Sync,
-} from "../../deps.ts";
+import { b64, createHash, HmacSha1, HmacSha256 } from "../../deps.ts";
 import { driverMetadata } from "../protocol/mod.ts";
+import { pbkdf2 } from "./pbkdf2.ts";
 
 type CryptoMethod = "sha1" | "sha256";
 
@@ -164,7 +159,7 @@ export async function continueScramConversation(
 
   // Set up start of proof
   const withoutProof = `c=biws,r=${rnonce}`;
-  const saltedPassword = HI(
+  const saltedPassword = await HI(
     processedPassword,
     b64.decode(salt),
     iterations,
@@ -223,7 +218,7 @@ export function fixPayload(payload: string) {
 }
 //this is a second hack to fix codification in payload (in being and end of payload exists a codification problem, needs investigation ...)
 export function fixPayload2(payload: string) {
-  var temp = payload.split("v=");
+  let temp = payload.split("v=");
   temp.shift();
   payload = temp.join("v=");
   temp = payload.split("ok");
@@ -278,7 +273,7 @@ export function H(method: CryptoMethod, text: Uint8Array) {
 
 export function HMAC(
   method: CryptoMethod,
-  key: Uint8Array,
+  key: ArrayBuffer,
   text: Uint8Array | string,
 ) {
   if (method === "sha256") {
@@ -289,7 +284,7 @@ export function HMAC(
 }
 
 interface HICache {
-  [key: string]: Uint8Array;
+  [key: string]: ArrayBuffer;
 }
 
 let _hiCache: HICache = {};
@@ -304,7 +299,7 @@ const hiLengthMap = {
   sha1: 20,
 };
 
-export function HI(
+export async function HI(
   data: string,
   salt: Uint8Array,
   iterations: number,
@@ -319,7 +314,7 @@ export function HI(
   }
 
   // generate the salt
-  const saltedData = pbkdf2Sync(
+  const saltedData = await pbkdf2(
     data,
     salt,
     iterations,
