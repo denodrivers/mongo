@@ -87,8 +87,8 @@ export default function authTests() {
 
   Deno.test({
     name: "HI",
-    fn() {
-      const saltedPassword = HI(
+    async fn() {
+      const saltedPassword = await HI(
         data,
         (new TextEncoder()).encode(salt),
         iter,
@@ -129,8 +129,8 @@ export default function authTests() {
   });
 
   Deno.test("connect authorization test 1 - test db", async () => {
-    var username = "user1";
-    var password = "y3mq3mpZ3J6PGfgg";
+    const username = "user1";
+    const password = "y3mq3mpZ3J6PGfgg";
     const client = new MongoClient();
     await client.connect(
       `mongodb://${username}:${password}@${hostname}:27017/test`,
@@ -142,8 +142,8 @@ export default function authTests() {
   });
 
   Deno.test("connect authorization test 2 - test db", async () => {
-    var username = "user2";
-    var password = "Qa6WkQSuXF425sWZ";
+    const username = "user2";
+    const password = "Qa6WkQSuXF425sWZ";
     const client = new MongoClient();
     await client.connect(
       `mongodb://${username}:${password}@${hostname}:27017/test`,
