@@ -206,6 +206,21 @@ export default function curdTests() {
     assertEquals(result.upsertedCount, 1);
   });
 
+  testWithClient("testReplaceOne", async (client) => {
+    const db = client.database("test");
+    const users = db.collection<IUser>("mongo_test_users");
+    const result = await users.replaceOne({ username: "USER2" }, {
+      username: "USER3",
+    });
+
+    assertEquals(result, {
+      matchedCount: 1,
+      modifiedCount: 1,
+      upsertedCount: 0,
+      upsertedId: undefined,
+    });
+  });
+
   testWithClient("testDeleteOne", async (client) => {
     const db = client.database("test");
     const users = db.collection<IUser>("mongo_test_users");
@@ -317,7 +332,7 @@ export default function curdTests() {
     const db = client.database("test");
     const users = db.collection<IUser>("mongo_test_users");
     const user1 = await users.distinct("username");
-    assertEquals(user1, ["USER2", "user1"]);
+    assertEquals(user1, ["USER3", "user1"]);
   });
 
   testWithClient("testDropConnection", async (client) => {

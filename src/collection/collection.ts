@@ -208,7 +208,7 @@ export class Collection<T> {
       multi: false,
     });
     return {
-      upsertedId: upsertedIds ? upsertedIds[0] : undefined,
+      upsertedId: upsertedIds?.[0],
       upsertedCount,
       matchedCount,
       modifiedCount,
@@ -230,6 +230,38 @@ export class Collection<T> {
       ...options,
       multi: options?.multi ?? true,
     });
+  }
+
+  async replaceOne(
+    filter: Filter<T>,
+    replacement: InsertDocument<T>,
+    options?: UpdateOptions,
+  ) {
+    if (hasAtomicOperators(replacement)) {
+      throw new MongoInvalidArgumentError(
+        "Replacement document must not contain atomic operators",
+      );
+    }
+
+    const { upsertedIds = [], upsertedCount, matchedCount, modifiedCount } =
+      await update(
+        this.#protocol,
+        this.#dbName,
+        this.name,
+        filter,
+        replacement,
+        {
+          ...options,
+          multi: false,
+        },
+      );
+
+    return {
+      upsertedId: upsertedIds?.[0],
+      upsertedCount,
+      matchedCount,
+      modifiedCount,
+    };
   }
 
   async deleteMany(
