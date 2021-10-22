@@ -15,10 +15,14 @@
 ## Examples
 
 ### Import
-replace `LATEST_VERSION` with current latest version
-```ts
-import { Bson, MongoClient } from "https://deno.land/x/mongo@LATEST_VERSION/mod.ts";
 
+replace `LATEST_VERSION` with current latest version
+
+```ts
+import {
+  Bson,
+  MongoClient,
+} from "https://deno.land/x/mongo@LATEST_VERSION/mod.ts";
 ```
 
 ### Connect
@@ -54,6 +58,7 @@ await client.connect(
 ```
 
 ### Access Collection
+
 ```ts
 // Defining schema interface
 interface UserSchema {
@@ -67,6 +72,7 @@ const users = db.collection<UserSchema>("users");
 ```
 
 ### Insert
+
 ```ts
 const insertId = await users.insertOne({
   username: "user1",
@@ -86,6 +92,7 @@ const insertIds = await users.insertMany([
 ```
 
 ### Find
+
 ```ts
 const user1 = await users.findOne({ _id: insertId });
 
@@ -98,13 +105,17 @@ const user1_id = await users.findOne({
 ```
 
 ### Count
+
 ```ts
 const count = await users.countDocuments({ username: { $ne: null } });
 
-const estimatedCount = await users.estimatedDocumentCount({ username: { $ne: null } });
+const estimatedCount = await users.estimatedDocumentCount({
+  username: { $ne: null },
+});
 ```
 
 ### Aggregation
+
 ```ts
 const docs = await users.aggregate([
   { $match: { username: "many" } },
@@ -113,6 +124,7 @@ const docs = await users.aggregate([
 ```
 
 ### Update
+
 ```ts
 const { matchedCount, modifiedCount, upsertedId } = await users.updateOne(
   { username: { $ne: null } },
@@ -126,6 +138,7 @@ const { matchedCount, modifiedCount, upsertedId } = await users.updateMany(
 ```
 
 ### Delete
+
 ```ts
 const deleteCount = await users.deleteOne({ _id: insertId });
 
@@ -133,6 +146,7 @@ const deleteCount2 = await users.deleteMany({ username: "test" });
 ```
 
 ### Cursor methods
+
 ```ts
 const cursor = users.find();
 
@@ -144,13 +158,13 @@ const users = await cursor.toArray();
 
 // iterate
 for await (const user of cursor) {
-  console.log(user)
+  console.log(user);
 }
 ```
 
 ### GridFS
-```ts
 
+```ts
 // Upload
 const bucket = new GridFSBucket(db);
 const upstream = bucket.openUploadStream("test.txt");
