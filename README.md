@@ -10,21 +10,30 @@
 ## Links
 
 - [Docs](https://doc.deno.land/https/deno.land/x/mongo/mod.ts)
-- [Guides]() TODO
-- [Examples]() TODO
 - [Benchmarks]() TODO
 
 ## Examples
 
-```ts
-import { Bson, MongoClient } from "https://deno.land/x/mongo@v0.26.0/mod.ts";
+### Import
 
+replace `LATEST_VERSION` with current latest version
+
+```ts
+import {
+  Bson,
+  MongoClient,
+} from "https://deno.land/x/mongo@LATEST_VERSION/mod.ts";
+```
+
+### Connect
+
+```ts
 const client = new MongoClient();
 
-//Connecting to a Local Database
+// Connecting to a Local Database
 await client.connect("mongodb://localhost:27017");
 
-//Connecting to a Mongo Atlas Database
+// Connecting to a Mongo Atlas Database
 await client.connect({
   db: "<db_name>",
   tls: true,
@@ -42,11 +51,15 @@ await client.connect({
   },
 });
 
-//Or
+// Connect using srv url
 await client.connect(
   "mongodb+srv://<username>:<password>@<db_cluster_url>/<db_name>?authMechanism=SCRAM-SHA-1",
 );
+```
 
+### Access Collection
+
+```ts
 // Defining schema interface
 interface UserSchema {
   _id: { $oid: string };
@@ -56,14 +69,16 @@ interface UserSchema {
 
 const db = client.database("test");
 const users = db.collection<UserSchema>("users");
+```
 
-// insert
+### Insert
+
+```ts
 const insertId = await users.insertOne({
   username: "user1",
   password: "pass1",
 });
 
-// insertMany
 const insertIds = await users.insertMany([
   {
     username: "user1",
@@ -74,52 +89,83 @@ const insertIds = await users.insertMany([
     password: "pass2",
   },
 ]);
+```
 
-// findOne
+### Find
+
+```ts
 const user1 = await users.findOne({ _id: insertId });
 
-// find
 const all_users = await users.find({ username: { $ne: null } }).toArray();
 
 // find by ObjectId
 const user1_id = await users.findOne({
   _id: new Bson.ObjectId("SOME OBJECTID STRING"),
 });
+```
 
-// count
-const count = await users.count({ username: { $ne: null } });
+### Count
 
-// aggregation
+```ts
+const count = await users.countDocuments({ username: { $ne: null } });
+
+const estimatedCount = await users.estimatedDocumentCount({
+  username: { $ne: null },
+});
+```
+
+### Aggregation
+
+```ts
 const docs = await users.aggregate([
   { $match: { username: "many" } },
   { $group: { _id: "$username", total: { $sum: 1 } } },
 ]);
+```
 
-// updateOne
+### Update
+
+```ts
 const { matchedCount, modifiedCount, upsertedId } = await users.updateOne(
   { username: { $ne: null } },
   { $set: { username: "USERNAME" } },
 );
 
-// updateMany
 const { matchedCount, modifiedCount, upsertedId } = await users.updateMany(
   { username: { $ne: null } },
   { $set: { username: "USERNAME" } },
 );
+```
 
-// deleteOne
+### Delete
+
+```ts
 const deleteCount = await users.deleteOne({ _id: insertId });
 
-// deleteMany
 const deleteCount2 = await users.deleteMany({ username: "test" });
+```
 
-// Skip
-const skipTwo = await users.skip(2).find();
+### Cursor methods
 
-// Limit
-const featuredUser = await users.limit(5).find();
+```ts
+const cursor = users.find();
 
-// GridFS Upload
+// Skip & Limit
+cursor.skip(10).limit(10);
+
+// toArray
+const users = await cursor.toArray();
+
+// iterate
+for await (const user of cursor) {
+  console.log(user);
+}
+```
+
+### GridFS
+
+```ts
+// Upload
 const bucket = new GridFSBucket(db);
 const upstream = bucket.openUploadStream("test.txt");
 
@@ -128,7 +174,7 @@ writer.write(fileContents);
 
 await writer.close();
 
-//GridFS Download
+// Download
 const file = await new Response(bucket.openDownloadStream(id)).text();
 ```
 
