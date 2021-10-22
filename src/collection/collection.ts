@@ -208,7 +208,7 @@ export class Collection<T> {
       multi: false,
     });
     return {
-      upsertedId: upsertedIds ? upsertedIds[0] : undefined,
+      upsertedId: upsertedIds?.[0],
       upsertedCount,
       matchedCount,
       modifiedCount,
@@ -257,7 +257,7 @@ export class Collection<T> {
       );
 
     return {
-      upsertedId: upsertedIds ? upsertedIds[0] : undefined,
+      upsertedId: upsertedIds?.[0],
       upsertedCount,
       matchedCount,
       modifiedCount,
