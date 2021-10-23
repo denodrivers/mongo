@@ -18,7 +18,7 @@ export class GridFSBucket {
   #chunksCollection: Collection<Chunk>;
   #filesCollection: Collection<File>;
   #chunkSizeBytes: number;
-  #checkedIndexes: boolean = false;
+  #checkedIndexes = false;
 
   private readonly getBucketData = () => ({
     filesCollection: this.#filesCollection,
