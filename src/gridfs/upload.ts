@@ -1,4 +1,4 @@
-import { Binary, ObjectId } from "../../deps.ts";
+import { Bson } from "../../deps.ts";
 import { Collection } from "../../mod.ts";
 import { Chunk, File, GridFSUploadOptions } from "../types/gridfs.ts";
 
@@ -11,7 +11,7 @@ export interface BucketInfo {
 export function createUploadStream(
   { chunkSizeBytes, chunksCollection, filesCollection }: BucketInfo,
   filename: string,
-  id: ObjectId,
+  id: Bson.ObjectId,
   options?: GridFSUploadOptions,
 ) {
   const chunkSizeBytesCombined = options?.chunkSizeBytes ?? chunkSizeBytes;
@@ -37,7 +37,7 @@ export function createUploadStream(
         await chunksCollection.insertOne({
           files_id: id,
           n: chunksInserted,
-          data: new Binary(uploadBuffer),
+          data: new Bson.Binary(uploadBuffer),
         });
 
         bufferPosition = 0;
@@ -51,7 +51,7 @@ export function createUploadStream(
         await chunksCollection.insertOne({
           files_id: id,
           n: chunksInserted,
-          data: new Binary(uploadBuffer.slice(0, bufferPosition)),
+          data: new Bson.Binary(uploadBuffer.slice(0, bufferPosition)),
         });
       }
 

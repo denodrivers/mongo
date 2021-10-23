@@ -1,4 +1,4 @@
-import { assert, ObjectId } from "../../deps.ts";
+import { assert, Bson } from "../../deps.ts";
 import { Collection } from "../collection/collection.ts";
 import { FindCursor } from "../collection/commands/find.ts";
 import { Database } from "../database.ts";
@@ -54,7 +54,7 @@ export class GridFSBucket {
     options?: GridFSUploadOptions,
   ) {
     return this.openUploadStreamWithId(
-      new ObjectId(),
+      new Bson.ObjectId(),
       filename,
       options,
     );

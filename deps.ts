@@ -1,5 +1,4 @@
-export * as Bson from "./bson/mod.ts";
-export * from "./bson/mod.ts";
+export * as Bson from "https://cdn.skypack.dev/bson@4.5.3?dts";
 export type { Document } from "./bson/mod.ts";
 export { createHash } from "https://deno.land/std@0.111.0/hash/mod.ts";
 export { HmacSha1 } from "https://deno.land/std@0.111.0/hash/sha1.ts";
