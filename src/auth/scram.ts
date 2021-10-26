@@ -1,10 +1,9 @@
 import { Credential, Document } from "../types.ts";
-import { Binary } from "../../bson/mod.ts";
 import { saslprep } from "../utils/saslprep/mod.ts";
 import { AuthContext, AuthPlugin } from "./base.ts";
 import { HandshakeDocument } from "../protocol/handshake.ts";
 import { MongoDriverError } from "../error.ts";
-import { b64, createHash, HmacSha1, HmacSha256 } from "../../deps.ts";
+import { b64, Bson, createHash, HmacSha1, HmacSha256 } from "../../deps.ts";
 import { driverMetadata } from "../protocol/mod.ts";
 import { pbkdf2 } from "./pbkdf2.ts";
 
@@ -84,7 +83,7 @@ export function makeFirstMessage(
   return {
     saslStart: 1,
     mechanism,
-    payload: new Binary(
+    payload: new Bson.Binary(
       Uint8Array.from(
         [...enc.encode("n,,"), ...clientFirstMessageBare(username, nonce)],
       ),
@@ -185,7 +184,7 @@ export async function continueScramConversation(
   const saslContinueCmd = {
     saslContinue: 1,
     conversationId: response.conversationId,
-    payload: new Binary(enc.encode(clientFinal)),
+    payload: new Bson.Binary(enc.encode(clientFinal)),
   };
 
   const result = await protocol.commandSingle(db, saslContinueCmd);

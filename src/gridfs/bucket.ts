@@ -1,4 +1,4 @@
-import { assert, ObjectId } from "../../deps.ts";
+import { assert, Bson } from "../../deps.ts";
 import { Collection } from "../collection/collection.ts";
 import { FindCursor } from "../collection/commands/find.ts";
 import { Database } from "../database.ts";
@@ -18,7 +18,7 @@ export class GridFSBucket {
   #chunksCollection: Collection<Chunk>;
   #filesCollection: Collection<File>;
   #chunkSizeBytes: number;
-  #checkedIndexes: boolean = false;
+  #checkedIndexes = false;
 
   private readonly getBucketData = () => ({
     filesCollection: this.#filesCollection,
@@ -54,7 +54,7 @@ export class GridFSBucket {
     options?: GridFSUploadOptions,
   ) {
     return this.openUploadStreamWithId(
-      new ObjectId(),
+      new Bson.ObjectId(),
       filename,
       options,
     );
