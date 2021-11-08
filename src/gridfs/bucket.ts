@@ -171,8 +171,8 @@ export class GridFSBucket {
     await this.#chunksCollection.drop();
   }
 
-  #checkIndexes = async () =>
-    await checkIndexes(
+  #checkIndexes = () =>
+    checkIndexes(
       this.#filesCollection,
       this.#chunksCollection,
       (value) => (this.#checkedIndexes = value),
