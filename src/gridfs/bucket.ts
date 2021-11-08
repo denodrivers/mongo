@@ -29,10 +29,7 @@ export class GridFSBucket {
   /**
    * Create a new GridFSBucket object on @db with the given @options.
    */
-  constructor(
-    db: Database,
-    options: GridFSBucketOptions = {},
-  ) {
+  constructor(db: Database, options: GridFSBucketOptions = {}) {
     const newLocal = options.bucketName ?? "fs";
     this.#chunksCollection = db.collection(`${newLocal}.chunks`);
     this.#filesCollection = db.collection(`${newLocal}.files`);
@@ -49,10 +46,7 @@ export class GridFSBucket {
    * that use generic type parameters, this method may be omitted since
    * the TFileId type might not be an ObjectId.
    */
-  openUploadStream(
-    filename: string,
-    options?: GridFSUploadOptions,
-  ) {
+  openUploadStream(filename: string, options?: GridFSUploadOptions) {
     return this.openUploadStreamWithId(
       new Bson.ObjectId(),
       filename,
@@ -66,12 +60,12 @@ export class GridFSBucket {
    *
    * Returns a Stream to which the application will write the contents.
    */
-  openUploadStreamWithId(
+  async openUploadStreamWithId(
     id: FileId,
     filename: string,
     options?: GridFSUploadOptions,
   ) {
-    if (!this.#checkedIndexes) this.#checkIndexes();
+    if (!this.#checkedIndexes) await this.#checkIndexes();
     return createUploadStream(this.getBucketData(), filename, id, options);
   }
 
@@ -88,13 +82,15 @@ export class GridFSBucket {
    * that use generic type parameters, this method may be omitted since
    * the TFileId type might not be an ObjectId.
    */
-  uploadFromStream(
+  async uploadFromStream(
     filename: string,
     source: ReadableStream,
     options?: GridFSUploadOptions,
-  ): ObjectId {
-    const objectid = new ObjectId();
-    source.pipeTo(this.openUploadStreamWithId(objectid, filename, options));
+  ): Promise<Bson.ObjectId> {
+    const objectid = new Bson.ObjectId();
+    await source.pipeTo(
+      await this.openUploadStreamWithId(objectid, filename, options),
+    );
     return objectid;
   }
 
@@ -108,13 +104,15 @@ export class GridFSBucket {
    * Note: there is no need to return the id of the uploaded file because the application
    * already supplied it as a parameter.
    */
-  uploadFromStreamWithId(
+  async uploadFromStreamWithId(
     id: FileId,
     filename: string,
     source: ReadableStream,
     options: GridFSUploadOptions,
-  ): void {
-    source.pipeTo(this.openUploadStreamWithId(id, filename, options));
+  ): Promise<void> {
+    await source.pipeTo(
+      await this.openUploadStreamWithId(id, filename, options),
+    );
   }
 
   /** Opens a Stream from which the application can read the contents of the stored file
@@ -122,8 +120,8 @@ export class GridFSBucket {
    *
    * Returns a Stream.
    */
-  openDownloadStream(id: FileId) {
-    if (!this.#checkedIndexes) this.#checkIndexes();
+  async openDownloadStream(id: FileId) {
+    if (!this.#checkedIndexes) await this.#checkIndexes();
 
     return new ReadableStream<Uint8Array>({
       start: async (controller) => {
@@ -140,11 +138,8 @@ export class GridFSBucket {
    * Downloads the contents of the stored file specified by @id and writes
    * the contents to the @destination Stream.
    */
-  async downloadToStream(
-    id: FileId,
-    destination: WritableStream<Uint8Array>,
-  ) {
-    this.openDownloadStream(id).pipeTo(destination);
+  async downloadToStream(id: FileId, destination: WritableStream<Uint8Array>) {
+    await (await this.openDownloadStream(id)).pipeTo(destination);
   }
 
   /**
@@ -180,6 +175,6 @@ export class GridFSBucket {
     checkIndexes(
       this.#filesCollection,
       this.#chunksCollection,
-      (value) => this.#checkedIndexes = value,
+      (value) => (this.#checkedIndexes = value),
     );
 }

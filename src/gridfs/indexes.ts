@@ -1,4 +1,4 @@
-import { Document } from "../../deps.ts";
+import { Document } from "../types.ts";
 import { Collection } from "../collection/collection.ts";
 import { Chunk, File } from "../types/gridfs.ts";
 
@@ -6,23 +6,27 @@ export function createFileIndex(collection: Collection<File>) {
   const index = { filename: 1, uploadDate: 1 };
 
   return collection.createIndexes({
-    indexes: [{
-      name: "gridFSFiles",
-      key: index,
-      background: false,
-    }],
+    indexes: [
+      {
+        name: "gridFSFiles",
+        key: index,
+        background: false,
+      },
+    ],
   });
 }
 export function createChunksIndex(collection: Collection<Chunk>) {
-  const index = { "files_id": 1, n: 1 };
+  const index = { files_id: 1, n: 1 };
 
   return collection.createIndexes({
-    indexes: [{
-      name: "gridFSFiles",
-      key: index,
-      unique: true,
-      background: false,
-    }],
+    indexes: [
+      {
+        name: "gridFSFiles",
+        key: index,
+        unique: true,
+        background: false,
+      },
+    ],
   });
 }
 
@@ -31,18 +35,24 @@ export async function checkIndexes(
   chunksCollection: Collection<Chunk>,
   hasCheckedIndexes: (value: boolean) => void,
 ) {
-  const filesCollectionIsEmpty = !await filesCollection.findOne({}, {
-    projection: { _id: 1 },
-  });
+  const filesCollectionIsEmpty = !(await filesCollection.findOne(
+    {},
+    {
+      projection: { _id: 1 },
+    },
+  ));
 
-  const chunksCollectionIsEmpty = !await chunksCollection.findOne({}, {
-    projection: { _id: 1 },
-  });
+  const chunksCollectionIsEmpty = !(await chunksCollection.findOne(
+    {},
+    {
+      projection: { _id: 1 },
+    },
+  ));
 
   if (filesCollectionIsEmpty || chunksCollectionIsEmpty) {
     // At least one collection is empty so we create indexes
-    createFileIndex(filesCollection);
-    createChunksIndex(chunksCollection);
+    await createFileIndex(filesCollection);
+    await createChunksIndex(chunksCollection);
     hasCheckedIndexes(true);
     return;
   }
@@ -55,7 +65,8 @@ export async function checkIndexes(
     fileIndexes.forEach((index) => {
       const keys = Object.keys(index.key);
       if (
-        keys.length === 2 && index.key.filename === 1 &&
+        keys.length === 2 &&
+        index.key.filename === 1 &&
         index.key.uploadDate === 1
       ) {
         hasFileIndex = true;
@@ -64,7 +75,7 @@ export async function checkIndexes(
   }
 
   if (!hasFileIndex) {
-    createFileIndex(filesCollection);
+    await createFileIndex(filesCollection);
   }
 
   const chunkIndexes = await chunksCollection.listIndexes().toArray();
@@ -74,8 +85,10 @@ export async function checkIndexes(
     chunkIndexes.forEach((index: Document) => {
       const keys = Object.keys(index.key);
       if (
-        keys.length === 2 && index.key.filename === 1 &&
-        index.key.uploadDate === 1 && index.options.unique
+        keys.length === 2 &&
+        index.key.filename === 1 &&
+        index.key.uploadDate === 1 &&
+        index.options.unique
       ) {
         hasChunksIndex = true;
       }
@@ -83,7 +96,7 @@ export async function checkIndexes(
   }
 
   if (!hasChunksIndex) {
-    createChunksIndex(chunksCollection);
+    await createChunksIndex(chunksCollection);
   }
   hasCheckedIndexes(true);
 }

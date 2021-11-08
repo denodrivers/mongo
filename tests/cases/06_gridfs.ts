@@ -11,9 +11,9 @@ export default function gridfsTests() {
     const bucket = new GridFSBucket(client.database("test"), {
       bucketName: "echo",
     });
-    const upstream = bucket.openUploadStream("test.txt");
+    const upstream = await bucket.openUploadStream("test.txt");
     const writer = upstream.getWriter();
-    writer.write(new TextEncoder().encode("Hello World! 👋"));
+    await writer.write(new TextEncoder().encode("Hello World! 👋"));
     await writer.close();
 
     const getId =
@@ -21,7 +21,8 @@ export default function gridfsTests() {
 
     assert(getId);
 
-    const text = await new Response(bucket.openDownloadStream(getId)).text();
+    const text = await new Response(await bucket.openDownloadStream(getId))
+      .text();
 
     assertEquals(text, "Hello World! 👋");
   });
@@ -32,7 +33,7 @@ export default function gridfsTests() {
     });
 
     // Set an impractically low chunkSize to test chunking algorithm
-    const upstream = bucket.openUploadStream("deno_logo.png", {
+    const upstream = await bucket.openUploadStream("deno_logo.png", {
       chunkSizeBytes: 255 * 8,
     });
 
@@ -44,7 +45,7 @@ export default function gridfsTests() {
       (await bucket.find({ filename: "deno_logo.png" }).toArray())[0]._id;
 
     const expected = await fetch("https://deno.land/images/deno_logo.png");
-    const actual = await new Response(bucket.openDownloadStream(getId))
+    const actual = await new Response(await bucket.openDownloadStream(getId))
       .arrayBuffer();
 
     assertArrayBufferEquals(actual, await expected.arrayBuffer());
@@ -57,7 +58,7 @@ export default function gridfsTests() {
         bucketName: "deno_logo",
       });
 
-      const upstream = bucket.openUploadStream("deno_logo.png");
+      const upstream = await bucket.openUploadStream("deno_logo.png");
 
       await (await fetch("https://deno.land/images/deno_logo.png")).body!
         .pipeTo(
@@ -68,7 +69,7 @@ export default function gridfsTests() {
         (await bucket.find({ filename: "deno_logo.png" }).toArray())[0]._id;
 
       const expected = await fetch("https://deno.land/images/deno_logo_4.gif");
-      const actual = await new Response(bucket.openDownloadStream(getId))
+      const actual = await new Response(await bucket.openDownloadStream(getId))
         .arrayBuffer();
 
       assertArrayBufferNotEquals(actual, await expected.arrayBuffer());
@@ -81,13 +82,13 @@ export default function gridfsTests() {
       const bucket = new GridFSBucket(client.database("test"), {
         bucketName: "metadata",
       });
-      const upstream = bucket.openUploadStream("metadata.txt", {
+      const upstream = await bucket.openUploadStream("metadata.txt", {
         metadata: {
           helloWorld: "this is a test",
         },
       });
       const writer = upstream.getWriter();
-      writer.write(new TextEncoder().encode("Hello World! 👋"));
+      await writer.write(new TextEncoder().encode("Hello World! 👋"));
       await writer.close();
 
       const file =
@@ -103,9 +104,9 @@ export default function gridfsTests() {
       const bucket = new GridFSBucket(client.database("test"), {
         bucketName: "delete",
       });
-      const upstream = bucket.openUploadStream("stuff.txt");
+      const upstream = await bucket.openUploadStream("stuff.txt");
       const writer = upstream.getWriter();
-      writer.write(new TextEncoder().encode("[redacted]"));
+      await writer.write(new TextEncoder().encode("[redacted]"));
       await writer.close();
 
       let file = await bucket.find({ filename: "stuff.txt" }).toArray();
