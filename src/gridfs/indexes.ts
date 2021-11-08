@@ -2,10 +2,10 @@ import { Document } from "../types.ts";
 import { Collection } from "../collection/collection.ts";
 import { Chunk, File } from "../types/gridfs.ts";
 
-export async function createFileIndex(collection: Collection<File>) {
+export function createFileIndex(collection: Collection<File>) {
   const index = { filename: 1, uploadDate: 1 };
 
-  return await collection.createIndexes({
+  return collection.createIndexes({
     indexes: [
       {
         name: "gridFSFiles",
@@ -15,10 +15,10 @@ export async function createFileIndex(collection: Collection<File>) {
     ],
   });
 }
-export async function createChunksIndex(collection: Collection<Chunk>) {
+export function createChunksIndex(collection: Collection<Chunk>) {
   const index = { files_id: 1, n: 1 };
 
-  return await collection.createIndexes({
+  return collection.createIndexes({
     indexes: [
       {
         name: "gridFSFiles",

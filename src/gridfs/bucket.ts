@@ -46,8 +46,8 @@ export class GridFSBucket {
    * that use generic type parameters, this method may be omitted since
    * the TFileId type might not be an ObjectId.
    */
-  async openUploadStream(filename: string, options?: GridFSUploadOptions) {
-    return await this.openUploadStreamWithId(
+  openUploadStream(filename: string, options?: GridFSUploadOptions) {
+    return this.openUploadStreamWithId(
       new Bson.ObjectId(),
       filename,
       options,
