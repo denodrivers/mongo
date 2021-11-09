@@ -1,4 +1,4 @@
-export * as Bson from "https://cdn.skypack.dev/bson@4.5.3?dts";
+export * as Bson from "./bson/bson.ts";
 export { createHash } from "https://deno.land/std@0.113.0/hash/mod.ts";
 export { HmacSha1 } from "https://deno.land/std@0.113.0/hash/sha1.ts";
 export { HmacSha256 } from "https://deno.land/std@0.113.0/hash/sha256.ts";

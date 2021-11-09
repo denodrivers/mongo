@@ -1,18 +1,18 @@
-import { Binary, ObjectId } from "../../deps.ts";
+import { Bson } from "../../deps.ts";
 import { Document, ReadPreference } from "../types.ts";
 import { ReadConcern, WriteConcern } from "../types/read_write_concern.ts";
 
-export type FileId = ObjectId;
+export type FileId = Bson.ObjectId;
 
 export interface Chunk {
-  _id: ObjectId;
-  files_id: ObjectId;
+  _id: Bson.ObjectId;
+  files_id: Bson.ObjectId;
   n: number;
-  data: Binary;
+  data: Bson.Binary;
 }
 
 export interface File {
-  _id: ObjectId;
+  _id: Bson.ObjectId;
   length: number;
   chunkSize: number;
   uploadDate: Date;
