@@ -138,6 +138,7 @@ const { matchedCount, modifiedCount, upsertedId } = await users.updateMany(
 ```
 
 ### Replace
+
 ```ts
 const { matchedCount, modifiedCount, upsertedId } = await users.replaceOne(
   { username: "a" },
@@ -163,7 +164,6 @@ const cursor = users.find();
 
 // Skip & Limit
 cursor.skip(10).limit(10);
-
 
 // iterate results
 for await (const user of cursor) {
