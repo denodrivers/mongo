@@ -62,7 +62,7 @@ await client.connect(
 ```ts
 // Defining schema interface
 interface UserSchema {
-  _id: { $oid: string };
+  _id: Bson.ObjectId;
   username: string;
   password: string;
 }
@@ -120,7 +120,7 @@ const estimatedCount = await users.estimatedDocumentCount({
 const docs = await users.aggregate([
   { $match: { username: "many" } },
   { $group: { _id: "$username", total: { $sum: 1 } } },
-]);
+]).toArray();
 ```
 
 ### Update
@@ -134,6 +134,18 @@ const { matchedCount, modifiedCount, upsertedId } = await users.updateOne(
 const { matchedCount, modifiedCount, upsertedId } = await users.updateMany(
   { username: { $ne: null } },
   { $set: { username: "USERNAME" } },
+);
+```
+
+### Replace
+
+```ts
+const { matchedCount, modifiedCount, upsertedId } = await users.replaceOne(
+  { username: "a" },
+  {
+    username: "user1",
+    password: "pass1",
+  }, // new document
 );
 ```
 
@@ -153,13 +165,13 @@ const cursor = users.find();
 // Skip & Limit
 cursor.skip(10).limit(10);
 
-// toArray
-const users = await cursor.toArray();
-
-// iterate
+// iterate results
 for await (const user of cursor) {
   console.log(user);
 }
+
+// or save results to array (uses more memory)
+const users = await cursor.toArray();
 ```
 
 ### GridFS
