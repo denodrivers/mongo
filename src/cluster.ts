@@ -119,7 +119,7 @@ export class Cluster {
   close() {
     for (const conn of this.#connections) {
       try {
-        Deno.close(conn.rid);
+        conn.close();
       } catch (error) {
         console.error(`Error closing connection: ${error}`);
       }
