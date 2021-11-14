@@ -1,5 +1,6 @@
 import { assert, assertEquals } from "../test.deps.ts";
 import { MongoClient } from "../../src/client.ts";
+import { testWithClient } from "../common.ts";
 
 const hostname = "127.0.0.1";
 
@@ -33,14 +34,11 @@ export default function connectTests() {
     client.close();
   });
 
-  Deno.test("test runCommand", async () => {
-    const client = new MongoClient();
-    await client.connect(`mongodb://${hostname}:27017`);
+  testWithClient("runCommand", async (client) => {
     const { databases, ok } = await client.runCommand("admin", {
       listDatabases: 1,
     });
     assert(databases.length > 0);
     assertEquals(ok, 1);
-    client.close();
   });
 }
