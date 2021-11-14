@@ -57,7 +57,6 @@ export class MongoClient {
     return databases;
   }
 
-  // TODO: add test cases
   runCommand<T = any>(db: string, body: Document): Promise<T> {
     assert(this.#cluster);
     return this.#cluster.protocol.commandSingle(db, body);

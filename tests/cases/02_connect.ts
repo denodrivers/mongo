@@ -32,4 +32,15 @@ export default function connectTests() {
     assertEquals(db.name, "my-db");
     client.close();
   });
+
+  Deno.test("test runCommand", async () => {
+    const client = new MongoClient();
+    await client.connect(`mongodb://${hostname}:27017`);
+    const { databases, ok } = await client.runCommand("admin", {
+      listDatabases: 1,
+    });
+    assert(databases.length > 0);
+    assertEquals(ok, 1);
+    client.close();
+  });
 }
