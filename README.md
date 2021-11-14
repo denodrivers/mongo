@@ -16,7 +16,8 @@
 
 ### Import
 
-replace `LATEST_VERSION` with current latest version
+Replace `LATEST_VERSION` with
+[current latest version](https://deno.land/x/mongo)
 
 ```ts
 import {
