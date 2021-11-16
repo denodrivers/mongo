@@ -112,7 +112,6 @@ export function deserializeMessage(
       pos += docLen;
       sections.push({ document });
     } else if (kind === 1) {
-      console.log("kind1");
       const len = view.getInt32(pos, true);
       const sectionBody = new Uint8Array(
         view.buffer.slice(pos + 4, pos + len - 4),
