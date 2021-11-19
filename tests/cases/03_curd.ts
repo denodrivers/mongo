@@ -84,6 +84,7 @@ export default function curdTests() {
         users.insertOne({
           _id: "aaaaaaaaaaaaaaaaaaaaaaaa",
           username: "user1",
+          // deno-lint-ignore no-explicit-any
         }) as any,
       undefined,
       "E11000",

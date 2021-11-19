@@ -10,6 +10,7 @@ function mockResolver(
       if (type === "SRV") return srvRecords;
       if (type === "TXT") return txtRecords;
     },
+    // deno-lint-ignore no-explicit-any
   } as any;
 }
 

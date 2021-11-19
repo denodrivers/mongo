@@ -15,6 +15,7 @@ export const driverMetadata = {
 
 export interface HandshakeDocument extends Document {
   ismaster: boolean;
+  // deno-lint-ignore no-explicit-any
   client: any;
   compression: string[];
   saslSupportedMechs?: string;

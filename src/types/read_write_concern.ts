@@ -18,7 +18,7 @@ export interface ReadConcern {
   /**
    * The level of the read concern.
    */
-  level?: ReadConcernLevel | String;
+  level?: ReadConcernLevel | string;
 }
 
 /**

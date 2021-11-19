@@ -16,6 +16,7 @@ export function createFileIndex(collection: Collection<File>) {
   });
 }
 export function createChunksIndex(collection: Collection<Chunk>) {
+  // deno-lint-ignore camelcase
   const index = { files_id: 1, n: 1 };
 
   return collection.createIndexes({

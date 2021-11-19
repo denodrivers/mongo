@@ -233,14 +233,17 @@ export declare type CalculateObjectSizeOptions = Pick<
  */
 export declare class Code {
   _bsontype: "Code";
+  // deno-lint-ignore ban-types
   code: string | Function;
   scope?: Document;
   /**
    * @param code - a string or function.
    * @param scope - an optional scope for the function.
    */
+  // deno-lint-ignore ban-types
   constructor(code: string | Function, scope?: Document);
   toJSON(): {
+    // deno-lint-ignore ban-types
     code: string | Function;
     scope?: Document;
   };
@@ -250,6 +253,7 @@ export declare class Code {
 }
 /** @public */
 export declare interface CodeExtended {
+  // deno-lint-ignore ban-types
   $code: string | Function;
   $scope?: Document;
 }
@@ -377,6 +381,7 @@ export declare function deserializeStream(
 ): number;
 /** @public */
 export declare interface Document {
+  // deno-lint-ignore no-explicit-any
   [key: string]: any;
 }
 /**
@@ -476,6 +481,7 @@ export declare namespace EJSON {
     value: SerializableTypes,
     replacer?:
       | (number | string)[]
+      // deno-lint-ignore no-explicit-any
       | ((this: any, key: string, value: any) => any)
       | EJSON.Options,
     space?: string | number,
@@ -667,6 +673,7 @@ export declare class Long {
   /**
    * Tests if the specified object is a Long.
    */
+  // deno-lint-ignore no-explicit-any
   static isLong(value: any): value is Long;
   /**
    * Converts the specified value to a Long.

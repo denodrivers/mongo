@@ -57,6 +57,7 @@ export class MongoClient {
     return databases;
   }
 
+  // deno-lint-ignore no-explicit-any
   runCommand<T = any>(db: string, body: Document): Promise<T> {
     assert(this.#cluster);
     return this.#cluster.protocol.commandSingle(db, body);

@@ -29,9 +29,12 @@ jobs:
         run: |
           deno --version
 
-      # Lint
-      - name: Format TS
-        run: deno fmt --check
+      # Lint & Format
+      - name: Lint & Format TS
+        run: |
+          deno fmt --check
+          deno lint
+
       # Start MongoDB
       - name: Start MongoDB (Linux)
         uses: wbari/start-mongoDB@v0.2

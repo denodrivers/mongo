@@ -201,8 +201,8 @@ export default function uriTests() {
         assertEquals(options.credential?.username, "someUser");
         assertEquals(options.credential?.password, "somePassword");
         assertEquals(options.retryWrites, true);
-        // @ts-ignore
-        assertEquals(options["servers"], undefined);
+        // deno-lint-ignore no-explicit-any
+        assertEquals((options as any)["servers"], undefined);
       },
     });
 }

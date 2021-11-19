@@ -69,6 +69,7 @@ export class Collection<T> {
     const result = await this.#protocol.commandSingle<{
       value: T;
       ok: number;
+      // deno-lint-ignore no-explicit-any
       lastErrorObject: any;
     }>(this.#dbName, {
       findAndModify: this.name,
@@ -295,7 +296,7 @@ export class Collection<T> {
   }
 
   async drop(options?: DropOptions): Promise<void> {
-    const res = await this.#protocol.commandSingle(this.#dbName, {
+    const _res = await this.#protocol.commandSingle(this.#dbName, {
       drop: this.name,
       ...options,
     });
