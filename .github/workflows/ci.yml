@@ -32,8 +32,8 @@ jobs:
       # Lint & Format
       - name: Lint & Format TS
         run: |
-          deno fmt --check
           deno lint
+          deno fmt --check
 
       # Start MongoDB
       - name: Start MongoDB (Linux)
