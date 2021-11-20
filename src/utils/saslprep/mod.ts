@@ -39,10 +39,12 @@ function getCodePoint(chr: string): number {
   return codePoint;
 }
 
+// deno-lint-ignore no-explicit-any
 function first(x: any): any {
   return x[0];
 }
 
+// deno-lint-ignore no-explicit-any
 function last(x: any): any {
   return x[x.length - 1];
 } /**

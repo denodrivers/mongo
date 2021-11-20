@@ -4,16 +4,19 @@ import { Srv } from "./srv.ts";
 
 interface Parts {
   auth?: { user: string; password?: string };
+  // deno-lint-ignore no-explicit-any
   hash?: any;
   servers?: Server[];
   href?: string;
   path?: string;
   pathname?: string;
   protocol?: string;
+  // deno-lint-ignore no-explicit-any
   search?: any;
 }
 
 //adapted from https://github.com/QubitProducts/urlite
+// deno-lint-ignore camelcase
 export function parse_url(url: string): Parts {
   const fragments = [
     "protocol",
@@ -30,7 +33,9 @@ export function parse_url(url: string): Parts {
   const multipleServerPattern =
     /([^:/?#]+:)?(?:(?:\/\/)(?:([^/?#]*:?[^@/]+)@)?((?:(?:[^/:?#]+)(?:(?::)(?:\d+))?)+))?/;
 
+  // deno-lint-ignore no-explicit-any, camelcase
   function parse_simple(url: string): any {
+    // deno-lint-ignore no-explicit-any
     const parts: any = { servers: [], href: url };
     const multiServerMatch = url.match(multipleServerPattern);
 
@@ -49,7 +54,7 @@ export function parse_url(url: string): Parts {
     }
 
     const matches = url.match(pattern);
-    var l = fragments.length;
+    let l = fragments.length;
     while (l--) {
       parts[fragments[l]] = matches![l + 1]
         ? decodeURIComponent(matches![l + 1])
@@ -67,6 +72,7 @@ export function parse_url(url: string): Parts {
   }
 
   function parse(url: string): Parts {
+    // deno-lint-ignore no-explicit-any
     const parsed: any = parse_simple(url);
     if (parsed.auth) parsed.auth = decodeAuth(parsed.auth);
     parsed.search = parsed.search ? queryString("?", parsed.search) : {};
@@ -74,6 +80,7 @@ export function parse_url(url: string): Parts {
     return parsed;
   }
 
+  // deno-lint-ignore no-explicit-any
   function decodeAuth(auth: string): any {
     const split = auth.split(":");
     return {
@@ -82,7 +89,9 @@ export function parse_url(url: string): Parts {
     };
   }
 
+  // deno-lint-ignore no-explicit-any
   function queryString(identifier: string, qs: string): any {
+    // deno-lint-ignore no-explicit-any
     const obj: any = {};
     const params = decodeURI(qs || "").replace(
       new RegExp("\\" + identifier),

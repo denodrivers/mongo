@@ -6,6 +6,7 @@ export type FileId = Bson.ObjectId;
 
 export interface Chunk {
   _id: Bson.ObjectId;
+  // deno-lint-ignore camelcase
   files_id: Bson.ObjectId;
   n: number;
   data: Bson.Binary;

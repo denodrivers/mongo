@@ -1,6 +1,7 @@
 /** Grows a pager. */
 function grow(pager: Pager, index: number): void {
   while (pager.maxPages < index) {
+    // deno-lint-ignore no-explicit-any
     const old: any = pager.pages;
     pager.pages = new Array(32768);
     pager.pages[0] = old;
@@ -220,10 +221,12 @@ export class Pager {
     }
 
     factor(i, this.path);
+    // deno-lint-ignore no-explicit-any
     let arr: any[] = this.pages;
 
     for (let j: number = this.level; j > 0; j--) {
       const p: number = this.path[j];
+      // deno-lint-ignore no-explicit-any
       let next: any = arr[p];
 
       if (!next) {

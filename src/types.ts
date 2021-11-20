@@ -262,6 +262,7 @@ export interface DropOptions {
   /**
    * Optional. A user-provided comment to attach to this command.
    */
+  // deno-lint-ignore no-explicit-any
   comment?: any;
 }
 
@@ -496,6 +497,7 @@ export interface IndexOptions {
    * See Text Search Languages for the available languages and Specify a Language
    * for Text Index for more information and examples. The default value is english.
    */
+  // deno-lint-ignore camelcase
   default_language?: string;
 
   /**
@@ -503,6 +505,7 @@ export interface IndexOptions {
    * that contains the override language for the document. The default value is language.
    * See Use any Field to Specify the Language for a Document for an example.
    */
+  // deno-lint-ignore camelcase
   language_override?: string;
 
   /**
@@ -634,7 +637,9 @@ interface FilterOperators<TValue> extends Document {
   $geoWithin?: Document;
   $near?: Document;
   $nearSphere?: TValue;
+  // deno-lint-ignore no-explicit-any
   $all?: Array<any>;
+  // deno-lint-ignore no-explicit-any
   $size?: TValue extends Array<any> ? number : never;
   $bitsAllClear?: BitwiseType;
   $bitsAllSet?: BitwiseType;
@@ -661,17 +666,22 @@ interface UpdateOperators<T> extends Document {
   $rename?: DocumentOperator<Omit<T, "_id">, string>;
   $set?: DocumentOperator<T>;
   $setOnInsert?: DocumentOperator<T>;
+  // deno-lint-ignore no-explicit-any
   $unset?: DocumentOperator<T, any, "" | true | 1>;
+  // deno-lint-ignore no-explicit-any
   $pop?: DocumentOperator<T, Array<any>, (1 | -1)>;
   $pull?: {
+    // deno-lint-ignore no-explicit-any
     [Key in KeysOfType<T, Array<any>>]?:
       | Flatten<T[Key]>
       | FilterOperators<Flatten<T[Key]>>;
   };
   $pullAll?: {
+    // deno-lint-ignore no-explicit-any
     [Key in KeysOfType<T, Array<any>>]?: T[Key];
   };
   $push?: {
+    // deno-lint-ignore no-explicit-any
     [Key in KeysOfType<T, Array<any>>]?: {
       $each?: T[Key];
       $slice?: number;
@@ -725,6 +735,7 @@ type AggregateOperators =
   | "$unset"
   | "$unwind";
 
+// deno-lint-ignore no-explicit-any
 type DocumentOperator<T, OnlyType = any, Value = OnlyType> = IsAny<
   OnlyType,
   (Partial<T> & Document),
@@ -733,6 +744,7 @@ type DocumentOperator<T, OnlyType = any, Value = OnlyType> = IsAny<
   }
 >;
 
+// deno-lint-ignore no-explicit-any
 type NotImplementedOperators<Operators extends string, Value = any> = {
   [Key in Operators]?: Value;
 };
@@ -760,6 +772,7 @@ type Flatten<T> = T extends Array<infer Item> ? Item : T;
 
 type IsAny<T, Y, N> = 0 extends (1 & T) ? Y : N;
 
+// deno-lint-ignore no-explicit-any
 export type InsertDocument<TDocument extends { _id?: any }> =
   & Omit<TDocument, "_id">
   & {
