@@ -32,7 +32,7 @@ jobs:
       # Lint & Format
       - name: Lint & Format TS
         run: |
-          deno lint
+          deno lint --ignore=./bson/bson.d.ts
           deno fmt --check
 
       # Start MongoDB
