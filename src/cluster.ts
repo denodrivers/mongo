@@ -33,7 +33,9 @@ export class Cluster {
 
     if (!options.tls) return Deno.connect(denoConnectOps);
 
-    if (options.certFile) denoConnectOps.certFile = options.certFile;
+    if (options.certFile) {
+      denoConnectOps.caCerts = [Deno.readTextFileSync(options.certFile)];
+    }
 
     if (options.keyFile) {
       //TODO: need something like const key = decrypt(options.keyFile) ...
