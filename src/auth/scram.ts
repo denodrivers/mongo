@@ -3,7 +3,7 @@ import { saslprep } from "../utils/saslprep/mod.ts";
 import { AuthContext, AuthPlugin } from "./base.ts";
 import { HandshakeDocument } from "../protocol/handshake.ts";
 import { MongoDriverError } from "../error.ts";
-import { b64, Bson, createHash, HmacSha1, HmacSha256 } from "../../deps.ts";
+import { b64, Bson, crypto as stdCrypto, hex } from "../../deps.ts";
 import { driverMetadata } from "../protocol/mod.ts";
 import { pbkdf2 } from "./pbkdf2.ts";
 
@@ -137,7 +137,7 @@ export async function continueScramConversation(
   if (cryptoMethod === "sha256") {
     processedPassword = saslprep(password);
   } else {
-    processedPassword = passwordDigest(username, password);
+    processedPassword = await passwordDigest(username, password);
   }
 
   const payload = fixPayload(dec.decode(response.payload.buffer));
@@ -165,21 +165,20 @@ export async function continueScramConversation(
     cryptoMethod,
   );
 
-  const clientKey = HMAC(cryptoMethod, saltedPassword, "Client Key");
-
-  const serverKey = HMAC(cryptoMethod, saltedPassword, "Server Key");
-  const storedKey = H(cryptoMethod, clientKey);
+  const clientKey = await HMAC(cryptoMethod, saltedPassword, "Client Key");
+  const serverKey = await HMAC(cryptoMethod, saltedPassword, "Server Key");
+  const storedKey = await H(cryptoMethod, clientKey);
   const authMessage = [
     dec.decode(clientFirstMessageBare(username, nonce)),
     payload,
     withoutProof,
   ].join(",");
 
-  const clientSignature = HMAC(cryptoMethod, storedKey, authMessage);
+  const clientSignature = await HMAC(cryptoMethod, storedKey, authMessage);
   const clientProof = `p=${xor(clientKey, clientSignature)}`;
   const clientFinal = [withoutProof, clientProof].join(",");
 
-  const serverSignature = HMAC(cryptoMethod, serverKey, authMessage);
+  const serverSignature = await HMAC(cryptoMethod, serverKey, authMessage);
 
   const saslContinueCmd = {
     saslContinue: 1,
@@ -192,7 +191,12 @@ export async function continueScramConversation(
   const parsedResponse = parsePayload(
     fixPayload2(dec.decode(result.payload.buffer)),
   );
-  if (!compareDigest(b64.decode(parsedResponse.v), serverSignature)) {
+  if (
+    !compareDigest(
+      b64.decode(parsedResponse.v),
+      new Uint8Array(serverSignature),
+    )
+  ) {
     // throw new MongoDriverError("Server returned an invalid signature");
   }
   if (result.done) {
@@ -236,7 +240,10 @@ export function parsePayload(payload: string) {
   return dict;
 }
 
-export function passwordDigest(username: string, password: string) {
+export async function passwordDigest(
+  username: string,
+  password: string,
+): Promise<string> {
   if (typeof username !== "string") {
     throw new MongoDriverError("username must be a string");
   }
@@ -249,13 +256,18 @@ export function passwordDigest(username: string, password: string) {
     throw new MongoDriverError("password cannot be empty");
   }
 
-  const md5 = createHash("md5");
-  md5.update(`${username}:mongo:${password}`);
-  return md5.toString(); //hex
+  const result = await stdCrypto.subtle.digest(
+    "MD5",
+    enc.encode(`${username}:mongo:${password}`),
+  );
+  return dec.decode(hex.encode(new Uint8Array(result)));
 }
 
 // XOR two buffers
-export function xor(a: Uint8Array, b: Uint8Array) {
+export function xor(_a: ArrayBuffer, _b: ArrayBuffer) {
+  const a = new Uint8Array(_a);
+  const b = new Uint8Array(_b);
+
   const length = Math.max(a.length, b.length);
   const res = new Uint8Array(length);
 
@@ -266,20 +278,36 @@ export function xor(a: Uint8Array, b: Uint8Array) {
   return b64.encode(res);
 }
 
-export function H(method: CryptoMethod, text: Uint8Array) {
-  return new Uint8Array(createHash(method).update(text).digest());
+export function H(method: CryptoMethod, text: BufferSource) {
+  return crypto.subtle.digest(
+    method === "sha256" ? "SHA-256" : "SHA-1",
+    text,
+  );
 }
 
-export function HMAC(
+export async function HMAC(
   method: CryptoMethod,
-  key: ArrayBuffer,
-  text: Uint8Array | string,
+  secret: ArrayBuffer,
+  text: string,
 ) {
-  if (method === "sha256") {
-    return new Uint8Array(new HmacSha256(key).update(text).digest());
-  } else {
-    return new Uint8Array(new HmacSha1(key).update(text).digest());
-  }
+  const key = await crypto.subtle.importKey(
+    "raw",
+    secret,
+    {
+      name: "HMAC",
+      hash: method === "sha256" ? "SHA-256" : "SHA-1",
+    },
+    false,
+    ["sign", "verify"],
+  );
+
+  const signature = await crypto.subtle.sign(
+    "HMAC",
+    key,
+    enc.encode(text),
+  );
+
+  return signature;
 }
 
 interface HICache {
@@ -303,7 +331,7 @@ export async function HI(
   salt: Uint8Array,
   iterations: number,
   cryptoMethod: CryptoMethod,
-) {
+): Promise<ArrayBuffer> {
   // omit the work if already generated
   const key = [data, b64.encode(salt), iterations].join(
     "_",
@@ -328,7 +356,7 @@ export async function HI(
 
   _hiCache[key] = saltedData;
   _hiCacheCount += 1;
-  return new Uint8Array(saltedData);
+  return saltedData;
 }
 
 export function compareDigest(lhs: Uint8Array, rhs: Uint8Array) {
