@@ -95,7 +95,7 @@ export default function authTests() {
         "sha1",
       );
       assertEquals(
-        saltedPassword,
+        new Uint8Array(saltedPassword),
         Uint8Array.from([
           72,
           84,
