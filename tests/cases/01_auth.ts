@@ -33,8 +33,8 @@ export default function authTests() {
   for (const { username, password, digest } of passwordValids) {
     Deno.test({
       name: `passwordDigest:${username}:${password}`,
-      fn() {
-        const digestRes: string = passwordDigest(username, password);
+      async fn() {
+        const digestRes: string = await passwordDigest(username, password);
         assertEquals(digestRes, digest);
       },
     });
@@ -95,7 +95,7 @@ export default function authTests() {
         "sha1",
       );
       assertEquals(
-        saltedPassword,
+        new Uint8Array(saltedPassword),
         Uint8Array.from([
           72,
           84,
