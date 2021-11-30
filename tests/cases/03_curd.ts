@@ -19,6 +19,13 @@ export default function curdTests() {
     assertEquals(names, ["startup_log"]);
   });
 
+  /**
+   * After this test
+   * ```
+   * > db.mongo_test_users.find()
+   * { "_id" : ???, username: "user1", password: "pass1", date: `new Date(dateNow)` }
+   * ```
+   */
   testWithClient("testInsertOne", async (client) => {
     const db = client.database("test");
     const users = db.collection<IUser>("mongo_test_users");
@@ -42,6 +49,14 @@ export default function curdTests() {
     });
   });
 
+  /**
+   * After this test
+   * ```
+   * > db.mongo_test_users.find()
+   * { "_id" : ???, username: "user1", password: "pass1", date: `new Date(dateNow)` }
+   * { "_id" : "aaaaaaaaaaaaaaaaaaaaaaaa", username: "user1", password: "pass1", date: `new Date(dateNow)` }
+   * ```
+   */
   testWithClient("testUpsertOne", async (client) => {
     const db = client.database("test");
     const users = db.collection<IUser>("mongo_test_users");
@@ -91,6 +106,14 @@ export default function curdTests() {
     );
   });
 
+  /**
+   * After this test
+   * ```
+   * > db.mongo_test_users.find()
+   * { "_id" : ???, username: "user1", password: "pass1", date: `new Date(dateNow)` }
+   * { "_id" : "aaaaaaaaaaaaaaaaaaaaaaaa", username: "user1", password: "pass1", date: `new Date(dateNow)` }
+   * ```
+   */
   testWithClient("testFindOne", async (client) => {
     const db = client.database("test");
     const users = db.collection<IUser>("mongo_test_users");
@@ -112,6 +135,16 @@ export default function curdTests() {
     assertEquals(Object.keys(projectionUserWithId!), ["_id", "username"]);
   });
 
+  /**
+   * After this test
+   * ```
+   * > db.mongo_test_users.find()
+   * { "_id" : ???, username: "user1", password: "pass1", date: `new Date(dateNow)` }
+   * { "_id" : "aaaaaaaaaaaaaaaaaaaaaaaa", username: "user1", password: "pass1", date: `new Date(dateNow)` }
+   * { "_id" : ???, username: "many", password: "pass1" }
+   * { "_id" : ???, username: "many", password: "pass2" }
+   * ```
+   */
   testWithClient("testInsertMany", async (client) => {
     const db = client.database("test");
     const users = db.collection<IUser>("mongo_test_users");
@@ -164,6 +197,16 @@ export default function curdTests() {
     assertEquals(tryFind, undefined);
   });
 
+  /**
+   * After this test
+   * ```
+   * > db.mongo_test_users.find()
+   * { "_id" : ???, username: "user1", password: "pass1", date: `new Date(dateNow)` }
+   * { "_id" : "aaaaaaaaaaaaaaaaaaaaaaaa", username: "user1", password: "pass1", date: `new Date(dateNow)` }
+   * { "_id" : ???, username: "many", password: "pass1" }
+   * { "_id" : ???, username: "many", password: "pass2" }
+   * ```
+   */
   testWithClient("test chain call for Find", async (client) => {
     const db = client.database("test");
     const users = db.collection<IUser>("mongo_test_users");
@@ -171,6 +214,16 @@ export default function curdTests() {
     assertEquals(user!.length > 0, true);
   });
 
+  /**
+   * After this test
+   * ```
+   * > db.mongo_test_users.find()
+   * { "_id" : ???, username: "USER1", password: "pass1" }
+   * { "_id" : "aaaaaaaaaaaaaaaaaaaaaaaa", username: "user1", password: "pass1", date: `new Date(dateNow)` }
+   * { "_id" : ???, username: "many", password: "pass1" }
+   * { "_id" : ???, username: "many", password: "pass2" }
+   * ```
+   */
   testWithClient("testUpdateOne", async (client) => {
     const db = client.database("test");
     const users = db.collection<IUser>("mongo_test_users");
@@ -183,6 +236,16 @@ export default function curdTests() {
     });
   });
 
+  /**
+   * After this test
+   * ```
+   * > db.mongo_test_users.find()
+   * { "_id" : ???, username: "USER1", password: "pass1" }
+   * { "_id" : "aaaaaaaaaaaaaaaaaaaaaaaa", username: "user1", password: "pass1", date: `new Date(dateNow)` }
+   * { "_id" : ???, username: "many", password: "pass1" }
+   * { "_id" : ???, username: "many", password: "pass2" }
+   * ```
+   */
   testWithClient("testUpdateOne Error", async (client) => { // TODO: move tesr errors to a new file
     const db = client.database("test");
     const users = db.collection<IUser>("mongo_test_users");
@@ -194,6 +257,17 @@ export default function curdTests() {
     }
   });
 
+  /**
+   * After this test
+   * ```
+   * > db.mongo_test_users.find()
+   * { "_id" : ???, username: "USER1", password: "pass1" }
+   * { "_id" : "aaaaaaaaaaaaaaaaaaaaaaaa", username: "user1", password: "pass1", date: `new Date(dateNow)` }
+   * { "_id" : ???, username: "many", password: "pass1" }
+   * { "_id" : ???, username: "many", password: "pass2" }
+   * { "_id" : ???, username: "USER2" }
+   * ```
+   */
   testWithClient("testUpdateOneWithUpsert", async (client) => {
     const db = client.database("test");
     const users = db.collection<IUser>("mongo_test_users");
@@ -207,6 +281,17 @@ export default function curdTests() {
     assertEquals(result.upsertedCount, 1);
   });
 
+  /**
+   * After this test
+   * ```
+   * > db.mongo_test_users.find()
+   * { "_id" : ???, username: "USER1", password: "pass1" }
+   * { "_id" : "aaaaaaaaaaaaaaaaaaaaaaaa", username: "user1", password: "pass1", date: `new Date(dateNow)` }
+   * { "_id" : ???, username: "many", password: "pass1" }
+   * { "_id" : ???, username: "many", password: "pass2" }
+   * { "_id" : ???, username: "USER3" }
+   * ```
+   */
   testWithClient("testReplaceOne", async (client) => {
     const db = client.database("test");
     const users = db.collection<IUser>("mongo_test_users");
@@ -222,6 +307,16 @@ export default function curdTests() {
     });
   });
 
+  /**
+   * After this test
+   * ```
+   * > db.mongo_test_users.find()
+   * { "_id" : "aaaaaaaaaaaaaaaaaaaaaaaa", username: "user1", password: "pass1", date: `new Date(dateNow)` }
+   * { "_id" : ???, username: "many", password: "pass1" }
+   * { "_id" : ???, username: "many", password: "pass2" }
+   * { "_id" : ???, username: "USER3" }
+   * ```
+   */
   testWithClient("testDeleteOne", async (client) => {
     const db = client.database("test");
     const users = db.collection<IUser>("mongo_test_users");
@@ -229,6 +324,16 @@ export default function curdTests() {
     assertEquals(deleteCount, 1);
   });
 
+  /**
+   * After this test
+   * ```
+   * > db.mongo_test_users.find()
+   * { "_id" : "aaaaaaaaaaaaaaaaaaaaaaaa", username: "user1", password: "pass1", date: `new Date(dateNow)` }
+   * { "_id" : ???, username: "many", password: "pass1" }
+   * { "_id" : ???, username: "many", password: "pass2" }
+   * { "_id" : ???, username: "USER3" }
+   * ```
+   */
   testWithClient("testFindOr", async (client) => {
     const db = client.database("test");
     const users = db.collection<IUser>("mongo_test_users");
@@ -241,6 +346,16 @@ export default function curdTests() {
     assertEquals(user1.length, 3);
   });
 
+  /**
+   * After this test
+   * ```
+   * > db.mongo_test_users.find()
+   * { "_id" : "aaaaaaaaaaaaaaaaaaaaaaaa", username: "user1", password: "pass1", date: `new Date(dateNow)` }
+   * { "_id" : ???, username: "many", password: "pass1" }
+   * { "_id" : ???, username: "many", password: "pass2" }
+   * { "_id" : ???, username: "USER3" }
+   * ```
+   */
   testWithClient("testFind", async (client) => {
     const db = client.database("test");
     const users = db.collection<IUser>("mongo_test_users");
@@ -254,6 +369,16 @@ export default function curdTests() {
     assertEquals(notFound, []);
   });
 
+  /**
+   * After this test
+   * ```
+   * > db.mongo_test_users.find()
+   * { "_id" : "aaaaaaaaaaaaaaaaaaaaaaaa", username: "user1", password: "pass1", date: `new Date(dateNow)` }
+   * { "_id" : ???, username: "many", password: "pass1" }
+   * { "_id" : ???, username: "many", password: "pass2" }
+   * { "_id" : ???, username: "USER3" }
+   * ```
+   */
   testWithClient("test multiple queries at the same time", async (client) => {
     const db = client.database("test");
     const users = db.collection<IUser>("mongo_test_users");
@@ -271,6 +396,16 @@ export default function curdTests() {
     ]);
   });
 
+  /**
+   * After this test
+   * ```
+   * > db.mongo_test_users.find()
+   * { "_id" : "aaaaaaaaaaaaaaaaaaaaaaaa", username: "user1", password: "pass1", date: `new Date(dateNow)` }
+   * { "_id" : ???, username: "many", password: "pass1" }
+   * { "_id" : ???, username: "many", password: "pass2" }
+   * { "_id" : ???, username: "USER3" }
+   * ```
+   */
   testWithClient("testCount", async (client) => {
     const db = client.database("test");
     const users = db.collection<IUser>("mongo_test_users");
@@ -278,6 +413,16 @@ export default function curdTests() {
     assertEquals(count, 2);
   });
 
+  /**
+   * After this test
+   * ```
+   * > db.mongo_test_users.find()
+   * { "_id" : "aaaaaaaaaaaaaaaaaaaaaaaa", username: "user1", password: "pass1", date: `new Date(dateNow)` }
+   * { "_id" : ???, username: "many", password: "pass1" }
+   * { "_id" : ???, username: "many", password: "pass2" }
+   * { "_id" : ???, username: "USER3" }
+   * ```
+   */
   testWithClient("testCountDocuments", async (client) => {
     const db = client.database("test");
     const users = db.collection<IUser>("mongo_test_users");
@@ -288,6 +433,16 @@ export default function curdTests() {
     assertEquals(count, 2);
   });
 
+  /**
+   * After this test
+   * ```
+   * > db.mongo_test_users.find()
+   * { "_id" : "aaaaaaaaaaaaaaaaaaaaaaaa", username: "user1", password: "pass1", date: `new Date(dateNow)` }
+   * { "_id" : ???, username: "many", password: "pass1" }
+   * { "_id" : ???, username: "many", password: "pass2" }
+   * { "_id" : ???, username: "USER3" }
+   * ```
+   */
   testWithClient("testEstimatedDocumentCount", async (client) => {
     const db = client.database("test");
     const users = db.collection<IUser>("mongo_test_users");
@@ -295,6 +450,16 @@ export default function curdTests() {
     assertEquals(count, 4);
   });
 
+  /**
+   * After this test
+   * ```
+   * > db.mongo_test_users.find()
+   * { "_id" : "aaaaaaaaaaaaaaaaaaaaaaaa", username: "user1", password: "pass1", date: `new Date(dateNow)` }
+   * { "_id" : ???, username: "many", password: "pass1" }
+   * { "_id" : ???, username: "many", password: "pass2" }
+   * { "_id" : ???, username: "USER3" }
+   * ```
+   */
   testWithClient("testAggregation", async (client) => {
     const db = client.database("test");
     const users = db.collection<IUser>("mongo_test_users");
@@ -307,6 +472,16 @@ export default function curdTests() {
     assertEquals(docs, [{ _id: "many", total: 2 }]);
   });
 
+  /**
+   * After this test
+   * ```
+   * > db.mongo_test_users.find()
+   * { "_id" : "aaaaaaaaaaaaaaaaaaaaaaaa", username: "user1", password: "pass1", date: `new Date(dateNow)` }
+   * { "_id" : ???, username: "MANY", password: "pass1" }
+   * { "_id" : ???, username: "MANY", password: "pass2" }
+   * { "_id" : ???, username: "USER3" }
+   * ```
+   */
   testWithClient("testUpdateMany", async (client) => {
     const db = client.database("test");
     const users = db.collection<IUser>("mongo_test_users");
@@ -322,6 +497,14 @@ export default function curdTests() {
     });
   });
 
+  /**
+   * After this test
+   * ```
+   * > db.mongo_test_users.find()
+   * { "_id" : "aaaaaaaaaaaaaaaaaaaaaaaa", username: "user1", password: "pass1", date: `new Date(dateNow)` }
+   * { "_id" : ???, username: "USER3" }
+   * ```
+   */
   testWithClient("testDeleteMany", async (client) => {
     const db = client.database("test");
     const users = db.collection<IUser>("mongo_test_users");
@@ -329,6 +512,14 @@ export default function curdTests() {
     assertEquals(deleteCount, 2);
   });
 
+  /**
+   * After this test
+   * ```
+   * > db.mongo_test_users.find()
+   * { "_id" : "aaaaaaaaaaaaaaaaaaaaaaaa", username: "user1", password: "pass1", date: `new Date(dateNow)` }
+   * { "_id" : ???, username: "USER3" }
+   * ```
+   */
   testWithClient("testDistinct", async (client) => {
     const db = client.database("test");
     const users = db.collection<IUser>("mongo_test_users");
@@ -336,12 +527,33 @@ export default function curdTests() {
     assertEquals(user1, ["USER3", "user1"]);
   });
 
+  /**
+   * After this test
+   * ```
+   * > db.mongo_test_users.find()
+   * ```
+   */
   testWithClient("testDropConnection", async (client) => {
     const db = client.database("test");
     await db.collection("mongo_test_users_2").drop();
     await db.collection("mongo_test_users").drop();
   });
 
+  /**
+   * After this test
+   * ```
+   * > db.mongo_test_users.find()
+   * { "_id" : ???, username: "testFindWithSort", password: "pass1", uid: 1 }
+   * { "_id" : ???, username: "testFindWithSort", password: "pass1", uid: 2 }
+   * { "_id" : ???, username: "testFindWithSort", password: "pass1", uid: 3 }
+   * { "_id" : ???, username: "testFindWithSort", password: "pass1", uid: 4 }
+   * { "_id" : ???, username: "testFindWithSort", password: "pass1", uid: 5 }
+   * { "_id" : ???, username: "testFindWithSort", password: "pass1", uid: 6 }
+   * { "_id" : ???, username: "testFindWithSort", password: "pass1", uid: 7 }
+   * { "_id" : ???, username: "testFindWithSort", password: "pass1", uid: 8 }
+   * { "_id" : ???, username: "testFindWithSort", password: "pass1", uid: 9 }
+   * ```
+   */
   testWithClient("testFindWithSort", async (client) => {
     const db = client.database("test");
     const users = db.collection<IUser>("mongo_test_users");
@@ -380,6 +592,21 @@ export default function curdTests() {
     );
   });
 
+  /**
+   * After this test
+   * ```
+   * > db.mongo_test_users.find()
+   * { "_id" : ???, username: "testFindWithSort", password: "pass1", uid: 1 }
+   * { "_id" : ???, username: "testFindWithSort", password: "pass1", uid: 2 }
+   * { "_id" : ???, username: "testFindWithSort", password: "pass1", uid: 3 }
+   * { "_id" : ???, username: "testFindWithSort", password: "pass1", uid: 4 }
+   * { "_id" : ???, username: "testFindWithSort", password: "pass1", uid: 5 }
+   * { "_id" : ???, username: "testFindWithSort", password: "pass1", uid: 6 }
+   * { "_id" : ???, username: "testFindWithSort", password: "pass1", uid: 7 }
+   * { "_id" : ???, username: "testFindWithSort", password: "pass1", uid: 8 }
+   * { "_id" : ???, username: "testFindWithSort", password: "pass1", uid: 9 }
+   * ```
+   */
   testWithClient("testFindEmptyAsyncIteration", async (client) => {
     const db = client.database("test");
     const users = db.collection<IUser>("mongo_test_users");
