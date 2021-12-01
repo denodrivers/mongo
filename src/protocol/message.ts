@@ -1,4 +1,4 @@
-import { MessageHeader, OpCode, serializeHeader } from "./header.ts";
+import { MessageHeader, OpCode, writeHeader } from "./header.ts";
 import { Document } from "../types.ts";
 import { deserializeBson, serializeBson } from "../utils/bson.ts";
 
@@ -68,27 +68,33 @@ function serializeSections(
   return { length: totalLen, sections: buffers };
 }
 
-export function serializeMessage(message: Message): Uint8Array[] {
-  const { length, sections } = serializeSections(message.sections);
-  const buffer = new Uint8Array(4 + length);
+export function serializeMessage(message: Message): Uint8Array {
+  const { length: sectionLength, sections } = serializeSections(
+    message.sections,
+  );
 
+  const buffer = new Uint8Array(20 + sectionLength); // 16 bytes header + 4 bytes flags + sections
   const view = new DataView(buffer.buffer);
-  view.setInt32(0, message.flags ?? 0, true);
 
-  let pos = 4;
-  for (const section of sections) {
-    buffer.set(section, pos);
-    pos += section.byteLength;
-  }
-
-  const header = serializeHeader({
-    messageLength: 16 + buffer.byteLength,
+  // set header
+  writeHeader(view, {
+    messageLength: buffer.byteLength,
     responseTo: message.responseTo,
     requestId: message.requestId,
     opCode: OpCode.MSG,
   });
 
-  return [header, buffer];
+  // set flags
+  view.setInt32(16, message.flags ?? 0, true);
+
+  // set sections
+  let pos = 20;
+  for (const section of sections) {
+    buffer.set(section, pos);
+    pos += section.byteLength;
+  }
+
+  return buffer;
 }
 
 export function deserializeMessage(
