@@ -51,9 +51,10 @@ export class WireProtocol {
     this.#commandQueue.push(commandTask);
     this.send();
 
-    this.#pendingResponses.set(requestId, deferred());
+    const pendingMessage = deferred<Message>();
+    this.#pendingResponses.set(requestId, pendingMessage);
     this.receive();
-    const message = await this.#pendingResponses.get(requestId);
+    const message = await pendingMessage;
 
     let documents: T[] = [];
 
@@ -73,7 +74,7 @@ export class WireProtocol {
     this.#isPendingRequest = true;
     while (this.#commandQueue.length > 0) {
       const task = this.#commandQueue.shift()!;
-      const chunks = serializeMessage({
+      const buffer = serializeMessage({
         requestId: task.requestId,
         responseTo: 0,
         sections: [
@@ -86,9 +87,7 @@ export class WireProtocol {
         ],
       });
 
-      for (const chunk of chunks) {
-        await writeAll(this.#socket, chunk);
-      }
+      await writeAll(this.#socket, buffer);
     }
     this.#isPendingRequest = false;
   }
@@ -99,12 +98,12 @@ export class WireProtocol {
     while (this.#pendingResponses.size > 0) {
       const headerBuffer = await this.#reader.readFull(new Uint8Array(16));
       assert(headerBuffer);
-      const header = parseHeader(headerBuffer!);
+      const header = parseHeader(headerBuffer);
       const bodyBuffer = await this.#reader.readFull(
         new Uint8Array(header.messageLength - 16),
       );
       assert(bodyBuffer);
-      const reply = deserializeMessage(header, bodyBuffer!);
+      const reply = deserializeMessage(header, bodyBuffer);
       const pendingMessage = this.#pendingResponses.get(header.responseTo);
       this.#pendingResponses.delete(header.responseTo);
       pendingMessage?.resolve(reply);

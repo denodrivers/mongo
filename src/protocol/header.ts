@@ -17,13 +17,14 @@ export interface MessageHeader {
   opCode: OpCode;
 }
 
-export function serializeHeader(header: MessageHeader): Uint8Array {
-  const view = new DataView(new ArrayBuffer(16));
+export function setHeader(
+  view: DataView,
+  header: MessageHeader,
+) {
   view.setInt32(0, header.messageLength, true);
   view.setInt32(4, header.requestId, true);
   view.setInt32(8, header.responseTo, true);
   view.setInt32(12, header.opCode, true);
-  return new Uint8Array(view.buffer);
 }
 
 export function parseHeader(buffer: Uint8Array): MessageHeader {
