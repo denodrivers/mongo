@@ -17,7 +17,7 @@ export interface MessageHeader {
   opCode: OpCode;
 }
 
-export function writeHeader(
+export function setHeader(
   view: DataView,
   header: MessageHeader,
 ) {

@@ -1,4 +1,4 @@
-import { MessageHeader, OpCode, writeHeader } from "./header.ts";
+import { MessageHeader, OpCode, setHeader } from "./header.ts";
 import { Document } from "../types.ts";
 import { deserializeBson, serializeBson } from "../utils/bson.ts";
 
@@ -69,15 +69,15 @@ function serializeSections(
 }
 
 export function serializeMessage(message: Message): Uint8Array {
-  const { length: sectionLength, sections } = serializeSections(
+  const { length: sectionsLength, sections } = serializeSections(
     message.sections,
   );
 
-  const buffer = new Uint8Array(20 + sectionLength); // 16 bytes header + 4 bytes flags + sections
+  const buffer = new Uint8Array(20 + sectionsLength); // 16 bytes header + 4 bytes flags + sections
   const view = new DataView(buffer.buffer);
 
   // set header
-  writeHeader(view, {
+  setHeader(view, {
     messageLength: buffer.byteLength,
     responseTo: message.responseTo,
     requestId: message.requestId,
