@@ -1,4 +1,4 @@
-import { assertEquals, assertThrowsAsync } from "../test.deps.ts";
+import { assertEquals, assertRejects } from "../test.deps.ts";
 import { Srv } from "../../src/utils/srv.ts";
 
 function mockResolver(
@@ -18,7 +18,7 @@ export default function srvTests() {
   Deno.test({
     name: "SRV: it throws an error if url doesn't have subdomain",
     fn() {
-      assertThrowsAsync(
+      assertRejects(
         () => new Srv().resolve("foo.bar"),
         Error,
         "Expected url in format 'host.domain.tld', received foo.bar",
@@ -30,7 +30,7 @@ export default function srvTests() {
     name:
       "SRV: it throws an error if SRV resolution doesn't return any SRV records",
     fn() {
-      assertThrowsAsync(
+      assertRejects(
         () => new Srv(mockResolver()).resolve("mongohost.mongodomain.com"),
         Error,
         "Expected at least one SRV record, received 0 for url mongohost.mongodomain.com",
@@ -41,7 +41,7 @@ export default function srvTests() {
   Deno.test({
     name: "SRV: it throws an error if TXT resolution returns no records",
     fn() {
-      assertThrowsAsync(
+      assertRejects(
         () =>
           new Srv(mockResolver([{ target: "mongohost1.mongodomain.com" }]))
             .resolve("mongohost.mongodomain.com"),
@@ -55,7 +55,7 @@ export default function srvTests() {
     name:
       "SRV: it throws an error if TXT resolution returns more than one record",
     fn() {
-      assertThrowsAsync(
+      assertRejects(
         () =>
           new Srv(
             mockResolver(
@@ -73,7 +73,7 @@ export default function srvTests() {
   Deno.test({
     name: "SRV: it throws an error if TXT record contains illegal options",
     fn() {
-      assertThrowsAsync(
+      assertRejects(
         () =>
           new Srv(
             mockResolver(

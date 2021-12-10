@@ -1,6 +1,6 @@
 import { MongoInvalidArgumentError } from "../../src/error.ts";
 import { testWithClient, testWithTestDBClient } from "../common.ts";
-import { assert, assertEquals, assertThrowsAsync } from "../test.deps.ts";
+import { assert, assertEquals, assertRejects } from "../test.deps.ts";
 
 interface IUser {
   username?: string;
@@ -81,7 +81,7 @@ export default function curdTests() {
       username: "user1",
     });
 
-    await assertThrowsAsync(
+    await assertRejects(
       () =>
         users.insertOne({
           _id: "aaaaaaaaaaaaaaaaaaaaaaaa",
