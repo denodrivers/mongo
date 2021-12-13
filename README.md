@@ -1,6 +1,7 @@
 # deno_mongo
 
-> **deno_mongo** is a **MongoDB** database driver developed for deno
+> **deno_mongo** is a **MongoDB** database driver developed for Deno. supports
+> Deno Deploy as well.
 
 [![tag](https://img.shields.io/github/tag/manyuanrong/deno_mongo.svg)](https://github.com/manyuanrong/deno_mongo/releases)
 [![Build Status](https://github.com/manyuanrong/deno_mongo/workflows/ci/badge.svg?branch=main)](https://github.com/manyuanrong/deno_mongo/actions)
@@ -13,6 +14,9 @@
 - [Benchmarks]() TODO
 
 ## Examples
+
+- [deno-deploy-mongo](https://github.com/erfanium/deno-deploy-mongo) A basic
+  twitter like app with Deno, MongoDB and oak deployed on Deno Deploy
 
 ### Import
 
