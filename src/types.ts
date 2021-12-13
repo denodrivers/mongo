@@ -626,7 +626,7 @@ interface FilterOperators<TValue> extends Document {
   $lt?: TValue;
   $lte?: TValue;
   $ne?: TValue;
-  $nin?: Array<TValue>;
+  $nin?: TValue extends (infer T)[] ? T[] : Array<TValue>;
   $not?: FilterOperators<TValue>;
   $exists?: boolean;
   $expr?: Document;
