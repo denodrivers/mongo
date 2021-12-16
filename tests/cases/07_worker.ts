@@ -1,4 +1,4 @@
-import { assert } from "../test.deps.ts";
+import { assertEquals, deferred } from "../test.deps.ts";
 
 export default function workerTests() {
   Deno.test({
@@ -8,14 +8,10 @@ export default function workerTests() {
         new URL("import_worker.ts", import.meta.url).href,
         { type: "module" },
       );
-
+      const p = deferred<string>();
+      importWorker.onmessage = (e) => p.resolve(e.data);
       importWorker.postMessage("startWorker");
-      await new Promise<void>((done) => {
-        importWorker.onmessage = (_e) => {
-          assert(true);
-          done();
-        };
-      });
+      assertEquals(await p, "done");
     },
   });
 }
