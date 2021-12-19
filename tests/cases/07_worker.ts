@@ -1,4 +1,5 @@
-import { assertEquals, deferred } from "../test.deps.ts";
+import { deferred } from "../../deps.ts";
+import { assertEquals } from "../test.deps.ts";
 
 export default function workerTests() {
   Deno.test({
