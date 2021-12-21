@@ -1,4 +1,4 @@
-export * as Bson from "https://deno.land/x/web_bson@v0.1.2/mod.ts";
+export * as Bson from "https://deno.land/x/web_bson@v0.1.3/mod.ts";
 export { crypto } from "https://deno.land/std@0.118.0/crypto/mod.ts";
 export { BufReader } from "https://deno.land/std@0.118.0/io/mod.ts";
 export { writeAll } from "https://deno.land/std@0.118.0/streams/conversion.ts";
