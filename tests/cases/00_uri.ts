@@ -68,7 +68,7 @@ export default function uriTests() {
       assertEquals(options.servers[0].host, "localhost");
       assertEquals(options.credential!.username, "fred");
       assertEquals(options.credential!.password, "foobar");
-      assertEquals(options.credential!.db, "baz");
+      assertEquals(options.credential!.db, "admin");
     },
   });
 
@@ -81,7 +81,7 @@ export default function uriTests() {
       assertEquals(options.servers[0].host, "localhost");
       assertEquals(options.credential!.username, "fred");
       assertEquals(options.credential!.password, "foo bar");
-      assertEquals(options.credential!.db, "baz");
+      assertEquals(options.credential!.db, "admin");
     },
   });
 
@@ -121,7 +121,7 @@ export default function uriTests() {
       assertEquals(options.servers[0].domainSocket, "/tmp/mongodb-27017.sock");
       assertEquals(options.credential!.username, "fred");
       assertEquals(options.credential!.password, "foo");
-      assertEquals(options.credential!.db, "somedb");
+      assertEquals(options.credential!.db, "admin");
       assertEquals(options.db, "somedb");
     },
   });
@@ -137,7 +137,7 @@ export default function uriTests() {
       assertEquals(options.servers[0].domainSocket, "/tmp/mongodb-27017.sock");
       assertEquals(options.credential!.username, "fred");
       assertEquals(options.credential!.password, "foo");
-      assertEquals(options.credential!.db, "somedb");
+      assertEquals(options.credential!.db, "admin");
       assertEquals(options.db, "somedb");
       assertEquals(options.safe, true);
     },
@@ -157,7 +157,7 @@ export default function uriTests() {
       assertEquals(options.servers[1].port, 28101);
       assertEquals(options.credential!.username, "fred");
       assertEquals(options.credential!.password, "foobar");
-      assertEquals(options.credential!.db, "baz");
+      assertEquals(options.credential!.db, "admin");
     },
   });
   // TODO: add more tests (https://github.com/mongodb/node-mongodb-native/blob/3.6/test/functional/url_parser.test.js)
