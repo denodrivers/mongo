@@ -200,6 +200,7 @@ export default function uriTests() {
         assertEquals(options.db, "someDatabaseName");
         assertEquals(options.credential?.username, "someUser");
         assertEquals(options.credential?.password, "somePassword");
+        assertEquals(options.credential?.db, "admin");
         assertEquals(options.retryWrites, true);
         // deno-lint-ignore no-explicit-any
         assertEquals((options as any)["servers"], undefined);
