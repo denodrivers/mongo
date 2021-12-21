@@ -146,7 +146,7 @@ export function parseSrvUrl(url: string): SrvConnectOptions {
     connectOptions.credential = <Credential> {
       username: data.auth.user,
       password: data.auth.password,
-      db: authSource ?? defaultAuthDb ?? "admin",
+      db: authSource ?? "admin",
       mechanism: data.search.authMechanism || "SCRAM-SHA-256",
     };
   }
@@ -212,7 +212,7 @@ function parseNormalUrl(url: string): ConnectOptions {
     connectOptions.credential = <Credential> {
       username: data.auth.user,
       password: data.auth.password,
-      db: authSource ?? defaultAuthDb ?? "admin",
+      db: authSource ?? "admin",
       mechanism: data.search.authMechanism || "SCRAM-SHA-256",
     };
   }
