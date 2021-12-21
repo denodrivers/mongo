@@ -133,7 +133,7 @@ export default function authTests() {
     const password = "y3mq3mpZ3J6PGfgg";
     const client = new MongoClient();
     await client.connect(
-      `mongodb://${username}:${password}@${hostname}:27017/test`,
+      `mongodb://${username}:${password}@${hostname}:27017/test?authSource=test`,
     );
     const names = await client.listDatabases();
     assert(names instanceof Array);
@@ -146,7 +146,7 @@ export default function authTests() {
     const password = "Qa6WkQSuXF425sWZ";
     const client = new MongoClient();
     await client.connect(
-      `mongodb://${username}:${password}@${hostname}:27017/test`,
+      `mongodb://${username}:${password}@${hostname}:27017/test?authSource=test`,
     );
     const names = await client.listDatabases();
     assert(names instanceof Array);
