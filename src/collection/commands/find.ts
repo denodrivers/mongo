@@ -18,7 +18,7 @@ export class FindCursor<T> extends CommandCursor<T> {
       find: collectionName,
       filter,
       batchSize: 1,
-      noCursorTimeout: true,
+      noCursorTimeout: false,
       ...options,
     });
     return {
