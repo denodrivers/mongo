@@ -8,7 +8,6 @@ import {
 import { parse } from "./utils/uri.ts";
 import { MongoDriverError } from "./error.ts";
 import { Cluster } from "./cluster.ts";
-import { assert } from "../deps.ts";
 
 export class MongoClient {
   #cluster?: Cluster;
@@ -17,6 +16,14 @@ export class MongoClient {
 
   get buildInfo() {
     return this.#buildInfo;
+  }
+
+  getCluster() {
+    if (!this.#cluster) {
+      throw new MongoDriverError("MongoClient is no connected to the Database");
+    }
+
+    return this.#cluster;
   }
 
   async connect(
@@ -49,23 +56,23 @@ export class MongoClient {
     authorizedCollections?: boolean;
     comment?: Document;
   } = {}): Promise<ListDatabaseInfo[]> {
-    assert(this.#cluster);
-    const { databases } = await this.#cluster.protocol.commandSingle("admin", {
-      listDatabases: 1,
-      ...options,
-    });
+    const { databases } = await this.getCluster().protocol.commandSingle(
+      "admin",
+      {
+        listDatabases: 1,
+        ...options,
+      },
+    );
     return databases;
   }
 
   // deno-lint-ignore no-explicit-any
   runCommand<T = any>(db: string, body: Document): Promise<T> {
-    assert(this.#cluster);
-    return this.#cluster.protocol.commandSingle(db, body);
+    return this.getCluster().protocol.commandSingle(db, body);
   }
 
   database(name = this.#defaultDbName): Database {
-    assert(this.#cluster);
-    return new Database(this.#cluster, name);
+    return new Database(this.getCluster(), name);
   }
 
   close() {

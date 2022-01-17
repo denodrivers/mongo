@@ -1,5 +1,9 @@
-import { assert, BufReader, Deferred, deferred, writeAll } from "../../deps.ts";
-import { MongoErrorInfo, MongoServerError } from "../error.ts";
+import { BufReader, Deferred, deferred, writeAll } from "../../deps.ts";
+import {
+  MongoDriverError,
+  MongoErrorInfo,
+  MongoServerError,
+} from "../error.ts";
 import { Document } from "../types.ts";
 import { handshake } from "./handshake.ts";
 import { parseHeader } from "./header.ts";
@@ -97,12 +101,12 @@ export class WireProtocol {
     this.#isPendingResponse = true;
     while (this.#pendingResponses.size > 0) {
       const headerBuffer = await this.#reader.readFull(new Uint8Array(16));
-      assert(headerBuffer);
+      if (!headerBuffer) throw new MongoDriverError("Invalid response header");
       const header = parseHeader(headerBuffer);
       const bodyBuffer = await this.#reader.readFull(
         new Uint8Array(header.messageLength - 16),
       );
-      assert(bodyBuffer);
+      if (!bodyBuffer) throw new MongoDriverError("Invalid response body");
       const reply = deserializeMessage(header, bodyBuffer);
       const pendingMessage = this.#pendingResponses.get(header.responseTo);
       this.#pendingResponses.delete(header.responseTo);

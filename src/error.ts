@@ -67,3 +67,13 @@ export class MongoInvalidArgumentError extends MongoError {
     super(info);
   }
 }
+
+export class MongoRuntimeError extends MongoDriverError {
+  constructor(message: string) {
+    super(message);
+  }
+
+  get name(): string {
+    return "MongoRuntimeError";
+  }
+}
