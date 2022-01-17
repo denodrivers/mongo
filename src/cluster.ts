@@ -2,7 +2,6 @@ import { WireProtocol } from "./protocol/mod.ts";
 import { ConnectOptions } from "./types.ts";
 import { AuthContext, ScramAuthPlugin, X509AuthPlugin } from "./auth/mod.ts";
 import { MongoDriverError } from "./error.ts";
-import { assert } from "../deps.ts";
 import { Server } from "./types.ts";
 
 export class Cluster {
@@ -113,9 +112,7 @@ export class Cluster {
   }
 
   get protocol() {
-    const protocol = this.getMaster().protocol;
-    assert(protocol);
-    return protocol;
+    return this.getMaster().protocol;
   }
 
   close() {

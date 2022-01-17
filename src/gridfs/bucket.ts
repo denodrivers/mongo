@@ -1,4 +1,4 @@
-import { assert, Bson } from "../../deps.ts";
+import { Bson } from "../../deps.ts";
 import { Collection } from "../collection/collection.ts";
 import { FindCursor } from "../collection/commands/find.ts";
 import { Database } from "../database.ts";
@@ -13,6 +13,7 @@ import {
 } from "../types/gridfs.ts";
 import { checkIndexes } from "./indexes.ts";
 import { createUploadStream } from "./upload.ts";
+import { MongoRuntimeError } from "../error.ts";
 
 export class GridFSBucket {
   #chunksCollection: Collection<Chunk>;
@@ -149,7 +150,9 @@ export class GridFSBucket {
   async delete(id: FileId) {
     await this.#filesCollection.deleteOne({ _id: id });
     const response = await this.#chunksCollection.deleteMany({ files_id: id });
-    assert(response, `File not found for id ${id}`);
+    if (!response) {
+      throw new MongoRuntimeError(`File not found for id ${id}`);
+    }
   }
 
   /**
