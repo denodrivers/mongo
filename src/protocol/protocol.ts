@@ -35,11 +35,13 @@ export class WireProtocol {
     const { connectionId: _connectionId } = await handshake(this);
   }
 
-  async commandSingle<T = Document>(db: string, body: Document): Promise<T> {
-    const [doc] = await this.command<MongoErrorInfo | T>(db, body);
-    const maybeError = doc as MongoErrorInfo;
-    if (maybeError.ok === 0) {
-      throw new MongoServerError(maybeError);
+  async commandSingle<T = Document>(
+    db: string,
+    body: Document,
+  ): Promise<T> {
+    const [doc] = await this.command(db, body);
+    if (doc.ok === 0) {
+      throw new MongoServerError(doc as MongoErrorInfo);
     }
     return doc as T;
   }
