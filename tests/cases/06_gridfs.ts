@@ -1,10 +1,10 @@
 import { GridFSBucket } from "../../mod.ts";
-import {
-  assertArrayBufferEquals,
-  assertArrayBufferNotEquals,
-  testWithClient,
-} from "../common.ts";
-import { assert, assertEquals } from "../test.deps.ts";
+import { testWithClient } from "../common.ts";
+import { assert, assertEquals, bytesEquals } from "../test.deps.ts";
+
+function bufferEquals(a: ArrayBuffer, b: ArrayBuffer) {
+  return bytesEquals(new Uint8Array(a), new Uint8Array(b));
+}
 
 export default function gridfsTests() {
   testWithClient("GridFS: Echo small Hello World", async (client) => {
@@ -48,7 +48,7 @@ export default function gridfsTests() {
     const actual = await new Response(await bucket.openDownloadStream(getId))
       .arrayBuffer();
 
-    assertArrayBufferEquals(actual, await expected.arrayBuffer());
+    assert(bufferEquals(actual, await expected.arrayBuffer()));
   });
 
   testWithClient(
@@ -72,7 +72,7 @@ export default function gridfsTests() {
       const actual = await new Response(await bucket.openDownloadStream(getId))
         .arrayBuffer();
 
-      assertArrayBufferNotEquals(actual, await expected.arrayBuffer());
+      assert(!bufferEquals(actual, await expected.arrayBuffer()));
     },
   );
 
