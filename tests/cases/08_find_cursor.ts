@@ -4,16 +4,17 @@ import { assertEquals } from "../test.deps.ts";
 
 export default function findCursorTests() {
   Deno.test({
-    name: "FindCursor: Options object is immutable and not shared between cursors",
+    name:
+      "FindCursor: Options object is immutable and not shared between cursors",
     fn: () => {
       const FIND_OPTIONS: { limit?: number } = {};
 
       const cursor_a = new FindCursor<{ id: number }>({
         filter: {},
         protocol: {} as WireProtocol,
-        collectionName: 'test-collection-name',
-        dbName: 'test-db-name',
-        options: FIND_OPTIONS
+        collectionName: "test-collection-name",
+        dbName: "test-db-name",
+        options: FIND_OPTIONS,
       });
 
       cursor_a.limit(10);

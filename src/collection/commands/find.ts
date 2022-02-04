@@ -35,7 +35,7 @@ export class FindCursor<T> extends CommandCursor<T> {
   limit(limit: number): this {
     this.#context.options = {
       ...this.#context.options,
-      limit
+      limit,
     };
     return this;
   }
@@ -43,7 +43,7 @@ export class FindCursor<T> extends CommandCursor<T> {
   skip(skip: number): this {
     this.#context.options = {
       ...this.#context.options,
-      skip
+      skip,
     };
     return this;
   }
@@ -51,7 +51,7 @@ export class FindCursor<T> extends CommandCursor<T> {
   sort(sort: Document): this {
     this.#context.options = {
       ...this.#context.options,
-      sort
+      sort,
     };
     return this;
   }
