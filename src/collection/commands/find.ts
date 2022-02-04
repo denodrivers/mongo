@@ -33,17 +33,26 @@ export class FindCursor<T> extends CommandCursor<T> {
   }
 
   limit(limit: number): this {
-    this.#context.options.limit = limit;
+    this.#context.options = {
+      ...this.#context.options,
+      limit
+    };
     return this;
   }
 
   skip(skip: number): this {
-    this.#context.options.skip = skip;
+    this.#context.options = {
+      ...this.#context.options,
+      skip
+    };
     return this;
   }
 
   sort(sort: Document): this {
-    this.#context.options.sort = sort;
+    this.#context.options = {
+      ...this.#context.options,
+      sort
+    };
     return this;
   }
 }
