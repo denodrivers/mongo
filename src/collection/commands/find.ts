@@ -29,7 +29,12 @@ export class FindCursor<T> extends CommandCursor<T> {
 
   constructor(context: FindCursorContext) {
     super(context.protocol, () => this.executor());
-    this.#context = context;
+    this.#context = {
+      ...context,
+      options: {
+        ...context.options,
+      },
+    };
   }
 
   limit(limit: number): this {
