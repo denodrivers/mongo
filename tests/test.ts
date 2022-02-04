@@ -4,8 +4,9 @@ import connectTests from "./cases/02_connect.ts";
 import curdTests from "./cases/03_curd.ts";
 import indexesTests from "./cases/04_indexes.ts";
 import srvTests from "./cases/05_srv.ts";
-import workerTests from "./cases/07_worker.ts";
 import gridfsTests from "./cases/06_gridfs.ts";
+import workerTests from "./cases/07_worker.ts";
+import findCursorTests from "./cases/08_find_cursor.ts";
 import cleanup from "./cases/99_cleanup.ts";
 
 uriTests();
@@ -16,5 +17,6 @@ gridfsTests();
 indexesTests();
 srvTests();
 workerTests();
+findCursorTests();
 
 cleanup();
