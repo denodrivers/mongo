@@ -29,30 +29,26 @@ export class FindCursor<T> extends CommandCursor<T> {
 
   constructor(context: FindCursorContext) {
     super(context.protocol, () => this.executor());
-    this.#context = context;
+    this.#context = {
+      ...context,
+      options: {
+        ...context.options,
+      },
+    };
   }
 
   limit(limit: number): this {
-    this.#context.options = {
-      ...this.#context.options,
-      limit,
-    };
+    this.#context.options.limit = limit;
     return this;
   }
 
   skip(skip: number): this {
-    this.#context.options = {
-      ...this.#context.options,
-      skip,
-    };
+    this.#context.options.skip = skip;
     return this;
   }
 
   sort(sort: Document): this {
-    this.#context.options = {
-      ...this.#context.options,
-      sort,
-    };
+    this.#context.options.sort = sort;
     return this;
   }
 }
