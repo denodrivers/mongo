@@ -1,4 +1,5 @@
 import { FindCursor } from "../../src/collection/commands/find.ts";
+import { WireProtocol } from "../../src/protocol/protocol.ts";
 import { assertEquals } from "../test.deps.ts";
 
 export default function findCursorTests() {
@@ -7,9 +8,9 @@ export default function findCursorTests() {
     fn: () => {
       const FIND_OPTIONS: { limit?: number } = {};
 
-      const cursor_a = new FindCursor<any>({
+      const cursor_a = new FindCursor<{ id: number }>({
         filter: {},
-        protocol: {} as any,
+        protocol: {} as WireProtocol,
         collectionName: 'test-collection-name',
         dbName: 'test-db-name',
         options: FIND_OPTIONS
