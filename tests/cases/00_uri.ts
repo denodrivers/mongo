@@ -36,23 +36,23 @@ export default function uriTests() {
   });
 
   Deno.test({
-    name: 'should parse ?ssl=true',
+    name: "should parse ?ssl=true",
     async fn() {
       const options = await parse(
         "mongodb://localhost:27017/test?ssl=true",
-      )
-      assertEquals(options.tls, true)
-    }
+      );
+      assertEquals(options.tls, true);
+    },
   });
 
   Deno.test({
-    name: 'should parse ?ssl=true',
+    name: "should parse ?ssl=true",
     async fn() {
       const options = await parse(
         "mongodb+srv://localhost:27017/test?ssl=true",
-      )
-      assertEquals(options.tls, true)
-    }
+      );
+      assertEquals(options.tls, true);
+    },
   });
 
   Deno.test({

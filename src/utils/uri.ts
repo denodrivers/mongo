@@ -143,7 +143,7 @@ export function parseSrvUrl(url: string): SrvConnectOptions {
   };
 
   if (data.auth) {
-    connectOptions.credential = <Credential>{
+    connectOptions.credential = <Credential> {
       username: data.auth.user,
       password: data.auth.password,
       db: authSource ?? defaultAuthDb ?? "admin",
@@ -212,7 +212,7 @@ function parseNormalUrl(url: string): ConnectOptions {
   }
 
   if (data.auth) {
-    connectOptions.credential = <Credential>{
+    connectOptions.credential = <Credential> {
       username: data.auth.user,
       password: data.auth.password,
       db: authSource ?? defaultAuthDb ?? "admin",
