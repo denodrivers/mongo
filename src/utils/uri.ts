@@ -143,7 +143,7 @@ export function parseSrvUrl(url: string): SrvConnectOptions {
   };
 
   if (data.auth) {
-    connectOptions.credential = <Credential> {
+    connectOptions.credential = <Credential>{
       username: data.auth.user,
       password: data.auth.password,
       db: authSource ?? defaultAuthDb ?? "admin",
@@ -157,6 +157,9 @@ export function parseSrvUrl(url: string): SrvConnectOptions {
 
   if (data.search.appname) {
     connectOptions.appname = data.search.appname;
+  }
+  if (data.search.ssl) {
+    connectOptions.tls = data.search.ssl === "true";
   }
   if (data.search.tls) {
     connectOptions.tls = data.search.tls === "true";
@@ -209,7 +212,7 @@ function parseNormalUrl(url: string): ConnectOptions {
   }
 
   if (data.auth) {
-    connectOptions.credential = <Credential> {
+    connectOptions.credential = <Credential>{
       username: data.auth.user,
       password: data.auth.password,
       db: authSource ?? defaultAuthDb ?? "admin",
@@ -221,6 +224,9 @@ function parseNormalUrl(url: string): ConnectOptions {
     : [];
   if (data.search.appname) {
     connectOptions.appname = data.search.appname;
+  }
+  if (data.search.ssl) {
+    connectOptions.tls = data.search.ssl === "true";
   }
   if (data.search.tls) {
     connectOptions.tls = data.search.tls === "true";
@@ -236,6 +242,9 @@ function parseNormalUrl(url: string): ConnectOptions {
   }
   if (data.search.safe) {
     connectOptions.safe = data.search.safe === "true";
+  }
+  if (data.search.retryWrites) {
+    connectOptions.retryWrites = data.search.retryWrites === "true";
   }
   return connectOptions;
 }

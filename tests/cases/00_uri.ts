@@ -36,6 +36,26 @@ export default function uriTests() {
   });
 
   Deno.test({
+    name: 'should parse ?ssl=true',
+    async fn() {
+      const options = await parse(
+        "mongodb://localhost:27017/test?ssl=true",
+      )
+      assertEquals(options.tls, true)
+    }
+  });
+
+  Deno.test({
+    name: 'should parse ?ssl=true',
+    async fn() {
+      const options = await parse(
+        "mongodb+srv://localhost:27017/test?ssl=true",
+      )
+      assertEquals(options.tls, true)
+    }
+  });
+
+  Deno.test({
     name:
       "should correctly parse mongodb://localhost/?safe=true&readPreference=secondary",
     async fn() {
