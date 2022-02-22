@@ -1,22 +1,10 @@
-import uriTests from "./cases/00_uri.ts";
-import authTests from "./cases/01_auth.ts";
-import connectTests from "./cases/02_connect.ts";
-import curdTests from "./cases/03_curd.ts";
-import indexesTests from "./cases/04_indexes.ts";
-import srvTests from "./cases/05_srv.ts";
-import gridfsTests from "./cases/06_gridfs.ts";
-import workerTests from "./cases/07_worker.ts";
-import findCursorTests from "./cases/08_find_cursor.ts";
-import cleanup from "./cases/99_cleanup.ts";
-
-uriTests();
-authTests();
-connectTests();
-curdTests();
-gridfsTests();
-indexesTests();
-srvTests();
-workerTests();
-findCursorTests();
-
-cleanup();
+import "./cases/00_uri.ts";
+import "./cases/01_auth.ts";
+import "./cases/02_connect.ts";
+import "./cases/03_curd.ts";
+import "./cases/04_indexes.ts";
+import "./cases/05_srv.ts";
+import "./cases/06_gridfs.ts";
+import "./cases/07_worker.ts";
+import "./cases/08_find_cursor.ts";
+import "./cases/99_cleanup.ts";
