@@ -15,8 +15,7 @@ testWithClient("GridFS: Echo small Hello World", async (client) => {
   await writer.write(new TextEncoder().encode("Hello World! 👋"));
   await writer.close();
 
-  const getId =
-    (await bucket.find({ filename: "test.txt" }).toArray())[0]._id;
+  const getId = (await bucket.find({ filename: "test.txt" }).toArray())[0]._id;
 
   assert(getId);
 
@@ -90,8 +89,7 @@ testWithClient(
     await writer.write(new TextEncoder().encode("Hello World! 👋"));
     await writer.close();
 
-    const file =
-      (await bucket.find({ filename: "metadata.txt" }).toArray())[0];
+    const file = (await bucket.find({ filename: "metadata.txt" }).toArray())[0];
 
     assertEquals("this is a test", file.metadata?.helloWorld);
   },

@@ -115,8 +115,7 @@ Deno.test({
 });
 
 Deno.test({
-  name:
-    "should correctly parse mongodb://fred:foo@%2Ftmp%2Fmongodb-27017.sock",
+  name: "should correctly parse mongodb://fred:foo@%2Ftmp%2Fmongodb-27017.sock",
   async fn() {
     const options = await parse(
       "mongodb://fred:foo@%2Ftmp%2Fmongodb-27017.sock",
