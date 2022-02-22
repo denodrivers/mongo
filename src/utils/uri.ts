@@ -158,6 +158,9 @@ export function parseSrvUrl(url: string): SrvConnectOptions {
   if (data.search.appname) {
     connectOptions.appname = data.search.appname;
   }
+  if (data.search.ssl) {
+    connectOptions.tls = data.search.ssl === "true";
+  }
   if (data.search.tls) {
     connectOptions.tls = data.search.tls === "true";
   } else {
@@ -222,6 +225,9 @@ function parseNormalUrl(url: string): ConnectOptions {
   if (data.search.appname) {
     connectOptions.appname = data.search.appname;
   }
+  if (data.search.ssl) {
+    connectOptions.tls = data.search.ssl === "true";
+  }
   if (data.search.tls) {
     connectOptions.tls = data.search.tls === "true";
   }
@@ -236,6 +242,9 @@ function parseNormalUrl(url: string): ConnectOptions {
   }
   if (data.search.safe) {
     connectOptions.safe = data.search.safe === "true";
+  }
+  if (data.search.retryWrites) {
+    connectOptions.retryWrites = data.search.retryWrites === "true";
   }
   return connectOptions;
 }
