@@ -67,7 +67,7 @@ await client.connect(
 ```ts
 // Defining schema interface
 interface UserSchema {
-  _id: Bson.ObjectId;
+  _id: ObjectId;
   username: string;
   password: string;
 }
@@ -105,7 +105,7 @@ const all_users = await users.find({ username: { $ne: null } }).toArray();
 
 // find by ObjectId
 const user1_id = await users.findOne({
-  _id: new Bson.ObjectId("SOME OBJECTID STRING"),
+  _id: new ObjectId("SOME OBJECTID STRING"),
 });
 ```
 
@@ -204,3 +204,8 @@ https://docs.mongodb.com/manual/reference/command/
 ### API style refer to
 
 http://mongodb.github.io/node-mongodb-native/3.6/api/
+
+### Local testing with Docker
+
+1. `docker run -d  -p 27017:27017 mongo`
+2. deno test -A

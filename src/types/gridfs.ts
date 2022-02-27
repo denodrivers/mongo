@@ -1,19 +1,19 @@
-import { Bson } from "../../deps.ts";
-import { Document, ReadPreference } from "../types.ts";
+import { Binary, Document, ObjectId } from "../../deps.ts";
+import { ReadPreference } from "../types.ts";
 import { ReadConcern, WriteConcern } from "../types/read_write_concern.ts";
 
-export type FileId = Bson.ObjectId;
+export type FileId = ObjectId;
 
 export interface Chunk {
-  _id: Bson.ObjectId;
+  _id: ObjectId;
   // deno-lint-ignore camelcase
-  files_id: Bson.ObjectId;
+  files_id: ObjectId;
   n: number;
-  data: Bson.Binary;
+  data: Binary;
 }
 
 export interface File {
-  _id: Bson.ObjectId;
+  _id: ObjectId;
   length: number;
   chunkSize: number;
   uploadDate: Date;

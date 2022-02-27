@@ -1,5 +1,5 @@
-import { Bson } from "../../../deps.ts";
-import { Document, UpdateOptions } from "../../types.ts";
+import { Document, ObjectId } from "../../../deps.ts";
+import { UpdateOptions } from "../../types.ts";
 import { WireProtocol } from "../../protocol/mod.ts";
 
 interface UpdateResponse {
@@ -8,7 +8,7 @@ interface UpdateResponse {
   n: number;
   upserted?: {
     index: number;
-    _id: Bson.ObjectId;
+    _id: ObjectId;
   }[];
 }
 

@@ -1,6 +1,5 @@
 import { MessageHeader, OpCode, setHeader } from "./header.ts";
-import { Document } from "../types.ts";
-import { Bson } from "../../deps.ts";
+import { deserialize, Document, serialize } from "../../deps.ts";
 
 type MessageFlags = number;
 
@@ -32,7 +31,7 @@ function serializeSections(
   let totalLen = 0;
   const buffers = sections.map((section) => {
     if ("document" in section) {
-      const document = Bson.serialize(section.document);
+      const document = serialize(section.document);
       const section0 = new Uint8Array(1 + document.byteLength);
       new DataView(section0.buffer).setUint8(0, 0);
       section0.set(document, 1);
@@ -42,7 +41,7 @@ function serializeSections(
       const identifier = encoder.encode(section.identifier + "\0");
       let documentsLength = 0;
       const docs = section.documents.map((doc) => {
-        const document = Bson.serialize(doc);
+        const document = serialize(doc);
         documentsLength += document.byteLength;
         return document;
       });
@@ -114,7 +113,7 @@ export function deserializeMessage(
     pos++;
     if (kind === 0) {
       const docLen = view.getInt32(pos, true);
-      const document = Bson.deserialize(
+      const document = deserialize(
         new Uint8Array(view.buffer.slice(pos, pos + docLen)),
       );
       pos += docLen;
@@ -149,7 +148,7 @@ function parseDocuments(buffer: Uint8Array): Document[] {
   const view = new DataView(buffer);
   while (pos < buffer.byteLength) {
     const docLen = view.getInt32(pos, true);
-    const doc = Bson.deserialize(buffer.slice(pos, pos + docLen));
+    const doc = deserialize(buffer.slice(pos, pos + docLen));
     docs.push(doc);
     pos += docLen;
   }
