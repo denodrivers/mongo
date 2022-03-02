@@ -1,7 +1,6 @@
-import { Bson } from "../../deps.ts";
 import { WireProtocol } from "./protocol.ts";
-import { Document } from "../types.ts";
 import { parseNamespace } from "../utils/ns.ts";
+import { Document, Long } from "../../deps.ts";
 
 export interface CommandCursorOptions<T> {
   id: bigint | number | string;
@@ -54,7 +53,7 @@ export class CommandCursor<T> {
     }
 
     const { cursor } = await this.#protocol.commandSingle(this.#db!, {
-      getMore: Bson.Long.fromBigInt(this.#id!),
+      getMore: Long.fromBigInt(this.#id!),
       collection: this.#collection,
     });
     this.#batches = cursor.nextBatch || [];

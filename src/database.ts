@@ -1,7 +1,8 @@
 import { Collection } from "./collection/mod.ts";
 import { CommandCursor } from "./protocol/mod.ts";
-import { CreateUserOptions, Document } from "./types.ts";
+import { CreateUserOptions } from "./types.ts";
 import { Cluster } from "./cluster.ts";
+import { Document } from "../deps.ts";
 
 interface ListCollectionsReponse {
   cursor: {

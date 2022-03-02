@@ -1,4 +1,4 @@
-import { Bson } from "../../deps.ts";
+import { Document, ObjectId } from "../../deps.ts";
 import { MongoDriverError, MongoInvalidArgumentError } from "../error.ts";
 import { WireProtocol } from "../protocol/mod.ts";
 import {
@@ -8,7 +8,6 @@ import {
   CreateIndexOptions,
   DeleteOptions,
   DistinctOptions,
-  Document,
   DropIndexOptions,
   DropOptions,
   Filter,
@@ -163,13 +162,13 @@ export class Collection<T> {
     options?: InsertOptions,
   ): Promise<
     {
-      insertedIds: (Bson.ObjectId | Required<InsertDocument<T>>["_id"])[];
+      insertedIds: (ObjectId | Required<InsertDocument<T>>["_id"])[];
       insertedCount: number;
     }
   > {
     const insertedIds = docs.map((doc) => {
       if (!doc._id) {
-        doc._id = new Bson.ObjectId();
+        doc._id = new ObjectId();
       }
 
       return doc._id;
@@ -364,7 +363,7 @@ export class Collection<T> {
   }
 }
 
-export function hasAtomicOperators(doc: Bson.Document | Bson.Document[]) {
+export function hasAtomicOperators(doc: Document | Document[]) {
   if (Array.isArray(doc)) {
     for (const document of doc) {
       if (hasAtomicOperators(document)) {

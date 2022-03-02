@@ -1,4 +1,3 @@
-import { Bson } from "../../deps.ts";
 import { Collection } from "../collection/collection.ts";
 import { FindCursor } from "../collection/commands/find.ts";
 import { Database } from "../database.ts";
@@ -14,6 +13,7 @@ import {
 import { checkIndexes } from "./indexes.ts";
 import { createUploadStream } from "./upload.ts";
 import { MongoRuntimeError } from "../error.ts";
+import { ObjectId } from "../../deps.ts";
 
 export class GridFSBucket {
   #chunksCollection: Collection<Chunk>;
@@ -49,7 +49,7 @@ export class GridFSBucket {
    */
   openUploadStream(filename: string, options?: GridFSUploadOptions) {
     return this.openUploadStreamWithId(
-      new Bson.ObjectId(),
+      new ObjectId(),
       filename,
       options,
     );
@@ -87,8 +87,8 @@ export class GridFSBucket {
     filename: string,
     source: ReadableStream,
     options?: GridFSUploadOptions,
-  ): Promise<Bson.ObjectId> {
-    const objectid = new Bson.ObjectId();
+  ): Promise<ObjectId> {
+    const objectid = new ObjectId();
     await source.pipeTo(
       await this.openUploadStreamWithId(objectid, filename, options),
     );

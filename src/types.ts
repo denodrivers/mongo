@@ -1,7 +1,15 @@
-import { Bson } from "../deps.ts";
+import {
+  Binary,
+  BSONRegExp,
+  Decimal128,
+  Document,
+  Double,
+  Int32,
+  Long,
+  ObjectId,
+  Timestamp,
+} from "../deps.ts";
 import { WriteConcern } from "./types/read_write_concern.ts";
-
-export type Document = Bson.Document;
 
 export interface Server {
   host: string;
@@ -593,11 +601,11 @@ export interface DropIndexOptions {
   comment?: Document;
 }
 
-type BitwiseType = Bson.Binary | Array<number> | number;
+type BitwiseType = Binary | Array<number> | number;
 
-type IntegerType = number | Bson.Int32 | Bson.Long;
+type IntegerType = number | Int32 | Long;
 
-type NumericType = IntegerType | Bson.Decimal128 | Bson.Double;
+type NumericType = IntegerType | Decimal128 | Double;
 
 interface RootFilterOperators<T> extends Document {
   $and?: Filter<T>[];
@@ -632,7 +640,7 @@ interface FilterOperators<TValue> extends Document {
   $expr?: Document;
   $jsonSchema?: Document;
   $mod?: TValue extends number ? [number, number] : never;
-  $regex?: string | RegExp | Bson.BSONRegExp;
+  $regex?: string | RegExp | BSONRegExp;
   $geoIntersects?: { $geometry: Document };
   $geoWithin?: Document;
   $near?: Document;
@@ -656,7 +664,7 @@ interface FilterOperators<TValue> extends Document {
 interface UpdateOperators<T> extends Document {
   $currentDate?: DocumentOperator<
     T,
-    Bson.Timestamp | Date,
+    Timestamp | Date,
     true | { $type: "date" | "timestamp" }
   >;
   $inc?: DocumentOperator<T, NumericType>;
@@ -772,11 +780,10 @@ type Flatten<T> = T extends Array<infer Item> ? Item : T;
 
 type IsAny<T, Y, N> = 0 extends (1 & T) ? Y : N;
 
-// deno-lint-ignore no-explicit-any
-export type InsertDocument<TDocument extends { _id?: any }> =
+export type InsertDocument<TDocument extends { _id?: ObjectId }> =
   & Omit<TDocument, "_id">
   & {
-    _id?: TDocument["_id"] | Bson.ObjectId;
+    _id?: TDocument["_id"] | ObjectId;
   };
 
 type KeysOfType<T, Type> = {
