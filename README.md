@@ -11,12 +11,6 @@
 ## Links
 
 - [Docs](https://doc.deno.land/https/deno.land/x/mongo/mod.ts)
-- [Benchmarks]() TODO
-
-## Examples
-
-- [deno-deploy-mongo](https://github.com/erfanium/deno-deploy-mongo) A basic
-  twitter like app with Deno, MongoDB and oak deployed on Deno Deploy
 
 ### Import
 
@@ -195,20 +189,19 @@ await writer.close();
 const file = await new Response(bucket.openDownloadStream(id)).text();
 ```
 
-## Unit-Testing
+## Community Resources
 
-To mock mongo-collections for use in unit-tests, please refer to the
-[denomongo-unittest-utils](https://deno.land/x/denomongo_unittest_utils) module.
+### Examples
+
+- [deno-deploy-mongo](https://github.com/erfanium/deno-deploy-mongo) A simple
+  app with Deno, MongoDB and oak deployed on Deno Deploy and MongoDB Atlas
+
+### Tools
+
+- [denomongo-unittest-utils](https://deno.land/x/denomongo_unittest_utils) To
+  mock mongo-collections for use in unit-tests
 
 ## Contributing
-
-### Command to be implemented
-
-https://docs.mongodb.com/manual/reference/command/
-
-### API style refer to
-
-http://mongodb.github.io/node-mongodb-native/3.6/api/
 
 ### Local testing with Docker
 
