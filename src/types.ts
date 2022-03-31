@@ -47,6 +47,10 @@ export interface FindOptions {
   projection?: Document;
   sort?: Document;
   noCursorTimeout?: boolean;
+  /**
+   * The maximum time of milliseconds the operation is allowed to take
+   */
+  maxTimeMS?: number;
 }
 
 export interface ListDatabaseInfo {
