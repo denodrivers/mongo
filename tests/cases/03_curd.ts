@@ -583,7 +583,7 @@ testWithTestDBClient("testFindWithMaxTimeMS", async (db) => {
   const users = db.collection<IUser>("mongo_test_users");
   for (let i = 0; i < 10; i++) {
     await users.insertOne({
-      username: "testFindWithSort",
+      username: "testFindWithMaxTimeMS",
       password: "pass1",
       uid: i,
     });
