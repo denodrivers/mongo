@@ -1,4 +1,4 @@
-import { MongoError, MongoInvalidArgumentError } from "../../src/error.ts";
+import { MongoInvalidArgumentError } from "../../src/error.ts";
 import { testWithClient, testWithTestDBClient } from "../common.ts";
 import { assert, assertEquals, assertRejects } from "../test.deps.ts";
 
