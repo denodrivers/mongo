@@ -603,7 +603,7 @@ testWithTestDBClient("testFindWithMaxTimeMS", async (db) => {
   try {
     await users.find({
       uid: 0,
-      $where: "sleep(50) || true",
+      $where: "sleep(10) || true",
     }, { maxTimeMS: 1 }).toArray();
     assert(false);
   } catch (e) {
@@ -612,17 +612,17 @@ testWithTestDBClient("testFindWithMaxTimeMS", async (db) => {
     assertEquals(e.errmsg, "operation exceeded time limit");
   }
 
-  try {
-    await users.findOne({
-      uid: 0,
-      $where: "sleep(50) || true",
-    }, { maxTimeMS: 1 });
-    assert(false);
-  } catch (e) {
-    assertEquals(e.ok, 0);
-    assertEquals(e.codeName, "MaxTimeMSExpired");
-    assertEquals(e.errmsg, "operation exceeded time limit");
-  }
+  // try {
+  //   await users.findOne({
+  //     uid: 0,
+  //     $where: "sleep(10) || true",
+  //   }, { maxTimeMS: 1 });
+  //   assert(false);
+  // } catch (e) {
+  //   assertEquals(e.ok, 0);
+  //   assertEquals(e.codeName, "MaxTimeMSExpired");
+  //   assertEquals(e.errmsg, "operation exceeded time limit");
+  // }
 
   await db.collection("mongo_test_users").drop();
 });
