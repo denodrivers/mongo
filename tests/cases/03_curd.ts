@@ -1,12 +1,6 @@
 import { MongoInvalidArgumentError } from "../../src/error.ts";
 import { testWithClient, testWithTestDBClient } from "../common.ts";
-import {
-  assert,
-  assertEquals,
-  AssertionError,
-  assertRejects,
-  semver,
-} from "../test.deps.ts";
+import { assert, assertEquals, assertRejects, semver } from "../test.deps.ts";
 
 interface IUser {
   username?: string;
