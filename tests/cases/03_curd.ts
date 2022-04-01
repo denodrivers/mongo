@@ -1,12 +1,6 @@
 import { MongoInvalidArgumentError } from "../../src/error.ts";
 import { testWithClient, testWithTestDBClient } from "../common.ts";
-import {
-  assert,
-  assertEquals,
-  AssertionError,
-  assertRejects,
-  semver,
-} from "../test.deps.ts";
+import { assert, assertEquals, assertRejects } from "../test.deps.ts";
 
 interface IUser {
   username?: string;
@@ -585,11 +579,7 @@ testWithTestDBClient("testFindEmptyAsyncIteration", async (db) => {
   await db.collection("mongo_test_users").drop();
 });
 
-testWithClient("testFindWithMaxTimeMS", async (client) => {
-  const db = client.database("test");
-
-  const supportsMaxTimeMS = semver.gte(client.buildInfo!.version, "4.2.0");
-
+testWithTestDBClient("testFindWithMaxTimeMS", async (db) => {
   const users = db.collection<IUser>("mongo_test_users");
   for (let i = 0; i < 10; i++) {
     await users.insertOne({
@@ -617,13 +607,9 @@ testWithClient("testFindWithMaxTimeMS", async (client) => {
     }, { maxTimeMS: 1 }).toArray();
     assert(false);
   } catch (e) {
-    if (supportsMaxTimeMS) {
-      assertEquals(e.codeName, "MaxTimeMSExpired");
-      assertEquals(e.errmsg, "operation exceeded time limit");
-    } else {
-      console.log(e.toString());
-      assert(e instanceof AssertionError);
-    }
+    assertEquals(e.ok, 0);
+    assertEquals(e.codeName, "MaxTimeMSExpired");
+    assertEquals(e.errmsg, "operation exceeded time limit");
   }
 
   try {
@@ -633,13 +619,9 @@ testWithClient("testFindWithMaxTimeMS", async (client) => {
     }, { maxTimeMS: 1 });
     assert(false);
   } catch (e) {
-    if (supportsMaxTimeMS) {
-      assertEquals(e.codeName, "MaxTimeMSExpired");
-      assertEquals(e.errmsg, "operation exceeded time limit");
-    } else {
-      console.log(e.toString());
-      assert(e instanceof AssertionError);
-    }
+    assertEquals(e.ok, 0);
+    assertEquals(e.codeName, "MaxTimeMSExpired");
+    assertEquals(e.errmsg, "operation exceeded time limit");
   }
 
   await db.collection("mongo_test_users").drop();
