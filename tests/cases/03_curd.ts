@@ -607,7 +607,7 @@ testWithTestDBClient("testFindWithMaxTimeMS", async (db) => {
     }, { maxTimeMS: 1 }).toArray();
     assert(false);
   } catch (e) {
-    assertEquals(e.ok, 0);
+    assertEquals(Boolean(e.ok), false);
     assertEquals(e.codeName, "MaxTimeMSExpired");
     assertEquals(e.errmsg, "operation exceeded time limit");
   }
@@ -619,7 +619,7 @@ testWithTestDBClient("testFindWithMaxTimeMS", async (db) => {
     }, { maxTimeMS: 1 });
     assert(false);
   } catch (e) {
-    assertEquals(e.ok, 0);
+    assertEquals(Boolean(e.ok), false);
     assertEquals(e.codeName, "MaxTimeMSExpired");
     assertEquals(e.errmsg, "operation exceeded time limit");
   }
