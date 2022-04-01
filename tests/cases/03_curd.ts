@@ -610,7 +610,10 @@ testWithTestDBClient("testFindWithMaxTimeMS", async (db) => {
     typeof e.ok !== "undefined" && assertEquals(e.ok, 0);
     typeof e.codeName !== "undefined" &&
       assertEquals(e.codeName, "MaxTimeMSExpired");
-    assertEquals(e.errmsg, "operation exceeded time limit");
+    typeof e.errmsg !== "undefined" &&
+      assertEquals(e.errmsg, "operation exceeded time limit");
+    typeof e.errmsg === "undefined" &&
+      assert(e.toString().includes("operation exceeded time limit"));
   }
 
   try {
@@ -623,7 +626,10 @@ testWithTestDBClient("testFindWithMaxTimeMS", async (db) => {
     typeof e.ok !== "undefined" && assertEquals(e.ok, 0);
     typeof e.codeName !== "undefined" &&
       assertEquals(e.codeName, "MaxTimeMSExpired");
-    assertEquals(e.errmsg, "operation exceeded time limit");
+    typeof e.errmsg !== "undefined" &&
+      assertEquals(e.errmsg, "operation exceeded time limit");
+    typeof e.errmsg === "undefined" &&
+      assert(e.toString().includes("operation exceeded time limit"));
   }
 
   await db.collection("mongo_test_users").drop();
