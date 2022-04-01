@@ -603,7 +603,7 @@ testWithTestDBClient("testFindWithMaxTimeMS", async (db) => {
   try {
     await users.find({
       uid: 0,
-      $where: "sleep(10) || true",
+      $where: "sleep(50) || true",
     }, { maxTimeMS: 1 }).toArray();
     assert(false);
   } catch (e) {
@@ -615,7 +615,7 @@ testWithTestDBClient("testFindWithMaxTimeMS", async (db) => {
   try {
     await users.findOne({
       uid: 0,
-      $where: "sleep(10) || true",
+      $where: "sleep(50) || true",
     }, { maxTimeMS: 1 });
     assert(false);
   } catch (e) {
