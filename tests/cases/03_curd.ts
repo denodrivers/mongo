@@ -1,6 +1,12 @@
 import { MongoInvalidArgumentError } from "../../src/error.ts";
 import { testWithClient, testWithTestDBClient } from "../common.ts";
-import { assert, assertEquals, assertRejects } from "../test.deps.ts";
+import {
+  assert,
+  assertEquals,
+  AssertionError,
+  assertRejects,
+  semver,
+} from "../test.deps.ts";
 
 interface IUser {
   username?: string;
@@ -579,7 +585,11 @@ testWithTestDBClient("testFindEmptyAsyncIteration", async (db) => {
   await db.collection("mongo_test_users").drop();
 });
 
-testWithTestDBClient("testFindWithMaxTimeMS", async (db) => {
+testWithClient("testFindWithMaxTimeMS", async (client) => {
+  const db = client.database("test");
+
+  const supportsMaxTimeMS = semver.gte(client.buildInfo!.version, "4.2.0");
+
   const users = db.collection<IUser>("mongo_test_users");
   for (let i = 0; i < 10; i++) {
     await users.insertOne({
@@ -603,33 +613,33 @@ testWithTestDBClient("testFindWithMaxTimeMS", async (db) => {
   try {
     await users.find({
       uid: 0,
-      $where: "sleep(5) || true",
+      $where: "sleep(10) || true",
     }, { maxTimeMS: 1 }).toArray();
     assert(false);
   } catch (e) {
-    typeof e.ok !== "undefined" && assertEquals(e.ok, 0);
-    typeof e.codeName !== "undefined" &&
+    if (supportsMaxTimeMS) {
       assertEquals(e.codeName, "MaxTimeMSExpired");
-    typeof e.errmsg !== "undefined" &&
       assertEquals(e.errmsg, "operation exceeded time limit");
-    typeof e.errmsg === "undefined" &&
+    } else {
       console.log(e.toString());
+      assert(e instanceof AssertionError);
+    }
   }
 
   try {
     await users.findOne({
       uid: 0,
-      $where: "sleep(5) || true",
+      $where: "sleep(10) || true",
     }, { maxTimeMS: 1 });
     assert(false);
   } catch (e) {
-    typeof e.ok !== "undefined" && assertEquals(e.ok, 0);
-    typeof e.codeName !== "undefined" &&
+    if (supportsMaxTimeMS) {
       assertEquals(e.codeName, "MaxTimeMSExpired");
-    typeof e.errmsg !== "undefined" &&
       assertEquals(e.errmsg, "operation exceeded time limit");
-    typeof e.errmsg === "undefined" &&
+    } else {
       console.log(e.toString());
+      assert(e instanceof AssertionError);
+    }
   }
 
   await db.collection("mongo_test_users").drop();
