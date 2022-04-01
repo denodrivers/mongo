@@ -1,6 +1,12 @@
 import { MongoInvalidArgumentError } from "../../src/error.ts";
 import { testWithClient, testWithTestDBClient } from "../common.ts";
-import { assert, assertEquals, assertRejects } from "../test.deps.ts";
+import {
+  assert,
+  assertEquals,
+  AssertionError,
+  assertRejects,
+  semver,
+} from "../test.deps.ts";
 
 interface IUser {
   username?: string;
@@ -579,7 +585,14 @@ testWithTestDBClient("testFindEmptyAsyncIteration", async (db) => {
   await db.collection("mongo_test_users").drop();
 });
 
-testWithTestDBClient("testFindWithMaxTimeMS", async (db) => {
+testWithClient("testFindWithMaxTimeMS", async (client) => {
+  const db = client.database("local");
+
+  const supportsMaxTimeMSInFindOne = semver.gte(
+    client.buildInfo!.version,
+    "4.2.0",
+  );
+
   const users = db.collection<IUser>("mongo_test_users");
   for (let i = 0; i < 10; i++) {
     await users.insertOne({
@@ -612,17 +625,19 @@ testWithTestDBClient("testFindWithMaxTimeMS", async (db) => {
     assertEquals(e.errmsg, "operation exceeded time limit");
   }
 
-  // try {
-  //   await users.findOne({
-  //     uid: 0,
-  //     $where: "sleep(10) || true",
-  //   }, { maxTimeMS: 1 });
-  //   assert(false);
-  // } catch (e) {
-  //   assertEquals(e.ok, 0);
-  //   assertEquals(e.codeName, "MaxTimeMSExpired");
-  //   assertEquals(e.errmsg, "operation exceeded time limit");
-  // }
+  if (supportsMaxTimeMSInFindOne) {
+    try {
+      await users.findOne({
+        uid: 0,
+        $where: "sleep(10) || true",
+      }, { maxTimeMS: 1 });
+      assert(false);
+    } catch (e) {
+      assertEquals(e.ok, 0);
+      assertEquals(e.codeName, "MaxTimeMSExpired");
+      assertEquals(e.errmsg, "operation exceeded time limit");
+    }
+  }
 
   await db.collection("mongo_test_users").drop();
 });
