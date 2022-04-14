@@ -202,6 +202,8 @@ const file = await new Response(bucket.openDownloadStream(id)).text();
 
 - [denomongo-unittest-utils](https://deno.land/x/denomongo_unittest_utils) To
   mock mongo-collections for use in unit-tests
+- [Deno Rest](https://github.com/vicky-gonsalves/deno_rest) A simple oak based
+  boilerplate for RESTful apis using deno_mongo
 
 ## Contributing
 
