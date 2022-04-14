@@ -195,13 +195,13 @@ const file = await new Response(bucket.openDownloadStream(id)).text();
 
 - [deno-deploy-mongo](https://github.com/erfanium/deno-deploy-mongo) A simple
   app with Deno, MongoDB and oak deployed on Deno Deploy and MongoDB Atlas
+- [Deno Rest](https://github.com/vicky-gonsalves/deno_rest) A simple oak based
+  boilerplate for RESTful apis using deno_mongo
 
 ### Tools
 
 - [denomongo-unittest-utils](https://deno.land/x/denomongo_unittest_utils) To
   mock mongo-collections for use in unit-tests
-- [Deno Rest](https://github.com/vicky-gonsalves/deno_rest) A simple oak based
-  boilerplate for RESTful apis using deno_mongo
 
 ## Contributing
 
