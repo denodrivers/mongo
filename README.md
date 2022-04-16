@@ -200,6 +200,8 @@ const file = await new Response(bucket.openDownloadStream(id)).text();
 
 ### Tools
 
+- [atlas_sdk](https://github.com/erfanium/atlas_sdk) TypeSafe MongoDB Atlas Data
+  API SDK for Deno & Deno Deploy
 - [denomongo-unittest-utils](https://deno.land/x/denomongo_unittest_utils) To
   mock mongo-collections for use in unit-tests
 
