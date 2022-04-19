@@ -6,3 +6,4 @@ export { deferred } from "https://deno.land/std@0.130.0/async/deferred.ts";
 export type { Deferred } from "https://deno.land/std@0.130.0/async/deferred.ts";
 export * as b64 from "https://deno.land/std@0.130.0/encoding/base64.ts";
 export * as hex from "https://deno.land/std@0.130.0/encoding/hex.ts";
+export * as GeoJSON from "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/master/types/geojson/index.d.ts";
