@@ -656,6 +656,8 @@ interface FilterOperators<TValue> extends Document {
   $geoWithin?: $geoPolygon | $geoMultiPolygon | ShapeOperator;
   $near?: CenterSpecifier;
   $nearSphere?: CenterSpecifier;
+  $minDistance?: number;
+  $maxDistance?: number;
   // deno-lint-ignore no-explicit-any
   $all?: Array<any>;
   // deno-lint-ignore no-explicit-any
