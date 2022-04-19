@@ -18,6 +18,7 @@ import {
   ShapeOperator,
 } from "../../src/geospatial_types.ts";
 import { testWithClient } from "../common.ts";
+import { assert, assertEquals } from "../test.deps.ts";
 
 interface IPlace {
   _id: string;
@@ -206,6 +207,7 @@ testWithClient(
   async (client) => {
     const db = client.database("test");
     await test_$near_and_$nearSphere_queries(db);
+    await test_$geoWithin_queries(db);
     await db.collection("mongo_test_places").drop().catch(console.error);
   },
 );
@@ -375,4 +377,80 @@ function removeUndefinedDistanceConstraint<T>(
   }
 
   return result;
+}
+
+async function test_$geoWithin_queries(db: Database) {
+  await test_$geoWithin_by_GeoJson_queries(db);
+  await test_$geoWithin_by_ShapeOperators(db);
+}
+
+async function test_$geoWithin_by_GeoJson_queries(db: Database) {
+  const places = db.collection<IPlace>("mongo_test_places");
+
+  const foundPlacesByPolygon = await places.find({
+    location: {
+      $geoWithin: {
+        $geometry: {
+          type: "Polygon",
+          coordinates: [
+            [
+              [-73.857, 40.848],
+              [-73.857, 40.849],
+              [-73.856, 40.849],
+              [-73.856, 40.848],
+              [-73.857, 40.848],
+            ],
+          ],
+        },
+      },
+    },
+  }).toArray();
+
+  assert(foundPlacesByPolygon);
+
+  // Manipulated the query so that there should be only one place, which is "Morris Park Bake Shop"
+  assertEquals(foundPlacesByPolygon.length, 1);
+  assertEquals(foundPlacesByPolygon[0].name, "Morris Park Bake Shop");
+
+  const foundPlacesByMultiPolygon = await places.find({
+    location: {
+      $geoWithin: {
+        $geometry: {
+          type: "MultiPolygon",
+          coordinates: [
+            [
+              [
+                [-73.958, 40.8003],
+                [-73.9498, 40.7968],
+                [-73.9737, 40.7648],
+                [-73.9814, 40.7681],
+                [-73.958, 40.8003],
+              ],
+            ],
+            [
+              [
+                [-73.958, 40.8003],
+                [-73.9498, 40.7968],
+                [-73.9737, 40.7648],
+                [-73.958, 40.8003],
+              ],
+            ],
+          ],
+        },
+      },
+    },
+  }).toArray();
+
+  assert(foundPlacesByMultiPolygon);
+
+  // Manipulated the places data so that there should be only one place, which is "Cafe1 & Cafe 4 (American Museum Of Natural History)"
+  assertEquals(foundPlacesByMultiPolygon.length, 1);
+  assertEquals(
+    foundPlacesByMultiPolygon[0].name,
+    "Cafe1 & Cafe 4 (American Museum Of Natural History)",
+  );
+}
+
+async function test_$geoWithin_by_ShapeOperators(_db: Database) {
+  await console.warn("Not Implemented");
 }
