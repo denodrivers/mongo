@@ -31,6 +31,12 @@ interface IPlace {
   };
 }
 
+interface INeighborhoods {
+  _id: string;
+  name: string;
+  geometry: GeoJSON.GeometryObject;
+}
+
 interface IPosition {
   _id: string;
   pos: [number, number];
@@ -68,6 +74,18 @@ const placeData: IPlace[] = (JSON.parse(placeDataString) as any[])
       lon: el.location.coordinates[0],
       lat: el.location.coordinates[1],
     },
+  }));
+
+const neighborhoodsDataString = await Deno.readTextFile(
+  "tests/testdata/sample_neighborhoods.json",
+);
+
+const neighborhoodsData: INeighborhoods[] =
+  // deno-lint-ignore no-explicit-any
+  (JSON.parse(neighborhoodsDataString) as any[]).map((item) => ({
+    _id: item._id.$oid,
+    name: item.name,
+    geometry: item.geometry as GeoJSON.Geometry,
   }));
 
 Deno.test({
@@ -206,6 +224,9 @@ Deno.test({
  *
  * Places
  * https://raw.githubusercontent.com/mongodb/docs-assets/geospatial/restaurants.json
+ *
+ * Neighborhoods
+ * https://raw.githubusercontent.com/mongodb/docs-assets/geospatial/neighborhoods.json
  */
 testWithClient(
   "Geospatial: sanity tests for types by actual querying",
@@ -213,8 +234,10 @@ testWithClient(
     const db = client.database("test");
     await test_$near_and_$nearSphere_queries(db);
     await test_$geoWithin_queries(db);
+    await test_$geoIntersects(db);
     await db.collection("mongo_test_places").drop().catch(console.error);
     await db.collection("mongo_test_positions").drop().catch(console.error);
+    await db.collection("mongo_test_neighborhoods").drop().catch(console.error);
   },
 );
 
@@ -544,4 +567,314 @@ async function test_$geoWithin_by_$centerSphere(
   assert(foundPositions);
   // 0.0174535 radian is a bit greater than 1.0, so it covers 5 points in the coordinates
   assertEquals(foundPositions.length, 5);
+}
+
+async function test_$geoIntersects(db: Database) {
+  const neighborhoods = db.collection<INeighborhoods>(
+    "mongo_test_neighborhoods",
+  );
+
+  await neighborhoods.createIndexes({
+    indexes: [
+      // An 2dsphere index for `geometry`
+      {
+        name: "geometry_2dsphere",
+        key: { geometry: "2dsphere" },
+        "2dsphereIndexVersion": 3,
+      },
+    ],
+  });
+
+  await neighborhoods.insertMany(neighborhoodsData);
+
+  const intersectionByPoint = await neighborhoods.find({
+    geometry: {
+      $geoIntersects: {
+        $geometry: {
+          "type": "Point",
+          "coordinates": [-73.95095412329623, 40.77543392621753],
+        },
+      },
+    },
+  }).toArray();
+
+  assert(intersectionByPoint);
+  assertEquals(intersectionByPoint.length, 1);
+  assertEquals(intersectionByPoint[0].name, "Yorkville");
+
+  const intersectionByLineString = await neighborhoods.find({
+    geometry: {
+      $geoIntersects: {
+        $geometry: {
+          type: "LineString",
+          coordinates: [
+            [-73.95852104926365, 40.77889702821282],
+            [-73.95095412329623, 40.77543392621753],
+          ],
+        },
+      },
+    },
+  }).toArray();
+
+  assert(intersectionByLineString);
+  assertEquals(intersectionByLineString.length, 1);
+  assertEquals(intersectionByLineString[0].name, "Yorkville");
+
+  const intersectionByPolygon = await neighborhoods.find({
+    geometry: {
+      $geoIntersects: {
+        $geometry: {
+          type: "Polygon",
+          coordinates: [
+            [
+              [
+                -73.95852104926365,
+                40.77889702821282,
+              ],
+              [
+                -73.95095412329623,
+                40.77543392621753,
+              ],
+              [
+                -73.95296019452276,
+                40.779724262361626,
+              ],
+              [
+                -73.95605545882601,
+                40.77954043344108,
+              ],
+              [
+                -73.95852104926365,
+                40.77889702821282,
+              ],
+            ],
+          ],
+        },
+      },
+    },
+  }).toArray();
+
+  assert(intersectionByPolygon);
+  assertEquals(intersectionByPolygon.length, 1);
+  assertEquals(intersectionByPolygon[0].name, "Yorkville");
+
+  const intersectionByMultiPoint = await neighborhoods.find({
+    geometry: {
+      $geoIntersects: {
+        $geometry: {
+          type: "MultiPoint",
+          coordinates: [
+            [
+              -73.95852104926365,
+              40.77889702821282,
+            ],
+            [
+              -73.95095412329623,
+              40.77543392621753,
+            ],
+            [
+              -73.95296019452276,
+              40.779724262361626,
+            ],
+            [
+              -73.95605545882601,
+              40.77954043344108,
+            ],
+            [
+              -73.95852104926365,
+              40.77889702821282,
+            ],
+          ],
+        },
+      },
+    },
+  }).toArray();
+
+  assert(intersectionByMultiPoint);
+  assertEquals(intersectionByMultiPoint.length, 1);
+  assertEquals(intersectionByMultiPoint[0].name, "Yorkville");
+
+  const intersectionByMultiLineString = await neighborhoods.find({
+    geometry: {
+      $geoIntersects: {
+        $geometry: {
+          type: "MultiLineString",
+          coordinates: [
+            [
+              [
+                -73.95852104926365,
+                40.77889702821282,
+              ],
+              [
+                -73.95095412329623,
+                40.77543392621753,
+              ],
+            ],
+            [
+              [
+                -73.95605545882601,
+                40.77954043344108,
+              ],
+              [
+                -73.95296019452276,
+                40.779724262361626,
+              ],
+            ],
+          ],
+        },
+      },
+    },
+  }).toArray();
+
+  assert(intersectionByMultiLineString);
+  assertEquals(intersectionByMultiLineString.length, 1);
+  assertEquals(intersectionByMultiLineString[0].name, "Yorkville");
+
+  const intersectionByMultiPolygon = await neighborhoods.find({
+    geometry: {
+      $geoIntersects: {
+        $geometry: {
+          type: "MultiPolygon",
+          coordinates: [
+            [
+              [
+                [
+                  -73.958,
+                  40.8003,
+                ],
+                [
+                  -73.9737,
+                  40.7648,
+                ],
+                [
+                  -73.9498,
+                  40.7968,
+                ],
+                [
+                  -73.958,
+                  40.8003,
+                ],
+              ],
+            ],
+            [
+              [
+                [
+                  -73.95852104926365,
+                  40.77889702821282,
+                ],
+                [
+                  -73.95095412329623,
+                  40.77543392621753,
+                ],
+                [
+                  -73.95296019452276,
+                  40.779724262361626,
+                ],
+                [
+                  -73.95605545882601,
+                  40.77954043344108,
+                ],
+                [
+                  -73.95852104926365,
+                  40.77889702821282,
+                ],
+              ],
+            ],
+          ],
+        },
+      },
+    },
+  }).toArray();
+
+  assert(intersectionByMultiPolygon);
+  assertEquals(intersectionByMultiPolygon.length, 1);
+  assertEquals(intersectionByMultiPolygon[0].name, "Yorkville");
+
+  const intersectionByCollection = await neighborhoods.find(
+    {
+      geometry: {
+        $geoIntersects: {
+          $geometry: {
+            type: "GeometryCollection",
+            geometries: [
+              {
+                type: "Point",
+                coordinates: [-73.95095412329623, 40.77543392621753],
+              },
+              {
+                type: "MultiPoint",
+                coordinates: [
+                  [
+                    -73.958,
+                    40.8003,
+                  ],
+                  [
+                    -73.9498,
+                    40.7968,
+                  ],
+                  [
+                    -73.9737,
+                    40.7648,
+                  ],
+                  [
+                    -73.9814,
+                    40.7681,
+                  ],
+                ],
+              },
+              {
+                type: "MultiLineString",
+                coordinates: [
+                  [
+                    [
+                      -73.96943,
+                      40.78519,
+                    ],
+                    [
+                      -73.96082,
+                      40.78095,
+                    ],
+                  ],
+                  [
+                    [
+                      -73.96415,
+                      40.79229,
+                    ],
+                    [
+                      -73.95544,
+                      40.78854,
+                    ],
+                  ],
+                  [
+                    [
+                      -73.97162,
+                      40.78205,
+                    ],
+                    [
+                      -73.96374,
+                      40.77715,
+                    ],
+                  ],
+                  [
+                    [
+                      -73.9788,
+                      40.77247,
+                    ],
+                    [
+                      -73.97036,
+                      40.76811,
+                    ],
+                  ],
+                ],
+              },
+            ],
+          },
+        },
+      },
+    },
+  ).toArray();
+
+  assert(intersectionByCollection);
+  assertEquals(intersectionByCollection.length, 1);
+  assertEquals(intersectionByCollection[0].name, "Yorkville");
 }
