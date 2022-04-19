@@ -7,4 +7,5 @@ import "./cases/05_srv.ts";
 import "./cases/06_gridfs.ts";
 import "./cases/07_worker.ts";
 import "./cases/08_find_cursor.ts";
+import "./cases/09_geospatial_types.ts";
 import "./cases/99_cleanup.ts";
