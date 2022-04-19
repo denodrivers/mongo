@@ -1,4 +1,4 @@
-import { Document } from "../mod.ts";
+import { Document } from "../../deps.ts";
 import {
   GeoJsonObject,
   GeometryCollection,
@@ -10,7 +10,7 @@ import {
   Point,
   Polygon,
   Position,
-} from "./types/geojson.ts";
+} from "./geojson.ts";
 
 /**
  * https://www.mongodb.com/docs/manual/reference/operator/query/geometry/#mongodb-query-op.-geometry

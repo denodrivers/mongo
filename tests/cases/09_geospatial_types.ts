@@ -16,7 +16,7 @@ import {
   DistanceConstraint,
   LegacyPoint,
   ShapeOperator,
-} from "../../src/geospatial_types.ts";
+} from "../../src/types/geospatial.ts";
 import { Geometry, GeometryObject, Point } from "../../src/types/geojson.ts";
 import { testWithClient } from "../common.ts";
 import { assert, assertEquals } from "../test.deps.ts";

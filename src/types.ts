@@ -16,7 +16,7 @@ import {
   $geoPolygon,
   CenterSpecifier,
   ShapeOperator,
-} from "./geospatial_types.ts";
+} from "./types/geospatial.ts";
 
 export interface Server {
   host: string;
