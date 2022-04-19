@@ -17,13 +17,14 @@ import {
   LegacyPoint,
   ShapeOperator,
 } from "../../src/geospatial_types.ts";
+import { Geometry, GeometryObject, Point } from "../../src/types/geojson.ts";
 import { testWithClient } from "../common.ts";
 import { assert, assertEquals } from "../test.deps.ts";
 
 interface IPlace {
   _id: string;
   name: string;
-  location: GeoJSON.Point;
+  location: Point;
   legacyLocation: [number, number]; // a testing field for legacy operators
   legacyLocationDocument: {
     lon: number;
@@ -34,7 +35,7 @@ interface IPlace {
 interface INeighborhoods {
   _id: string;
   name: string;
-  geometry: GeoJSON.GeometryObject;
+  geometry: GeometryObject;
 }
 
 interface IPosition {
@@ -68,7 +69,7 @@ const placeData: IPlace[] = (JSON.parse(placeDataString) as any[])
   .map((el) => ({
     _id: el._id.$oid,
     name: el.name,
-    location: el.location as GeoJSON.Point,
+    location: el.location as Point,
     legacyLocation: el.location.coordinates as [number, number],
     legacyLocationDocument: {
       lon: el.location.coordinates[0],
@@ -85,7 +86,7 @@ const neighborhoodsData: INeighborhoods[] =
   (JSON.parse(neighborhoodsDataString) as any[]).map((item) => ({
     _id: item._id.$oid,
     name: item.name,
-    geometry: item.geometry as GeoJSON.Geometry,
+    geometry: item.geometry as Geometry,
   }));
 
 Deno.test({

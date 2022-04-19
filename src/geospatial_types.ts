@@ -1,9 +1,21 @@
 import { Document } from "../mod.ts";
+import {
+  GeoJsonObject,
+  GeometryCollection,
+  GeometryObject,
+  LineString,
+  MultiLineString,
+  MultiPoint,
+  MultiPolygon,
+  Point,
+  Polygon,
+  Position,
+} from "./types/geojson.ts";
 
 /**
  * https://www.mongodb.com/docs/manual/reference/operator/query/geometry/#mongodb-query-op.-geometry
  */
-interface GeoJsonOperators<G extends GeoJSON.GeoJsonObject> {
+interface GeoJsonOperators<G extends GeoJsonObject> {
   $geometry: G & CoordinateReferenceSystem;
 }
 
@@ -26,18 +38,18 @@ export interface DistanceConstraint {
   $maxDistance?: number;
 }
 
-export type LegacyPoint = GeoJSON.Position;
+export type LegacyPoint = Position;
 
 /**
  * Example:
  *
  * ```ts
  * {
- *    $geometry: GeoJSON.GeometryObject, // any GeoJSON object
+ *    $geometry: GeometryObject, // any GeoJSON object
  * }
  * ```
  */
-export type $geoAny = GeoJsonOperators<GeoJSON.GeometryObject>;
+export type $geoAny = GeoJsonOperators<GeometryObject>;
 
 /**
  * Example:
@@ -50,7 +62,7 @@ export type $geoAny = GeoJsonOperators<GeoJSON.GeometryObject>;
  *
  * https://www.mongodb.com/docs/manual/reference/geojson/#point
  */
-export type $geoPoint = GeoJsonOperators<GeoJSON.Point>;
+export type $geoPoint = GeoJsonOperators<Point>;
 
 /**
  * Example:
@@ -63,7 +75,7 @@ export type $geoPoint = GeoJsonOperators<GeoJSON.Point>;
  *
  * https://www.mongodb.com/docs/manual/reference/geojson/#linestring
  */
-export type $geoLineString = GeoJsonOperators<GeoJSON.LineString>;
+export type $geoLineString = GeoJsonOperators<LineString>;
 
 /**
  * Example:
@@ -79,7 +91,7 @@ export type $geoLineString = GeoJsonOperators<GeoJSON.LineString>;
  * ```
  * https://www.mongodb.com/docs/manual/reference/geojson/#polygon
  */
-export type $geoPolygon = GeoJsonOperators<GeoJSON.Polygon>;
+export type $geoPolygon = GeoJsonOperators<Polygon>;
 
 /**
  * Example:
@@ -100,7 +112,7 @@ export type $geoPolygon = GeoJsonOperators<GeoJSON.Polygon>;
  *
  * https://www.mongodb.com/docs/manual/reference/geojson/#multipoint
  */
-export type $geoMultiPoint = GeoJsonOperators<GeoJSON.MultiPoint>;
+export type $geoMultiPoint = GeoJsonOperators<MultiPoint>;
 
 /**
  * Example:
@@ -121,7 +133,7 @@ export type $geoMultiPoint = GeoJsonOperators<GeoJSON.MultiPoint>;
  *
  * https://www.mongodb.com/docs/manual/reference/geojson/#multilinestring
  */
-export type $geoMultiLineString = GeoJsonOperators<GeoJSON.MultiLineString>;
+export type $geoMultiLineString = GeoJsonOperators<MultiLineString>;
 
 /**
  * Example:
@@ -140,7 +152,7 @@ export type $geoMultiLineString = GeoJsonOperators<GeoJSON.MultiLineString>;
  *
  * https://www.mongodb.com/docs/manual/reference/geojson/#multipolygon
  */
-export type $geoMultiPolygon = GeoJsonOperators<GeoJSON.MultiPolygon>;
+export type $geoMultiPolygon = GeoJsonOperators<MultiPolygon>;
 
 /**
  * Example:
@@ -175,7 +187,7 @@ export type $geoMultiPolygon = GeoJsonOperators<GeoJSON.MultiPolygon>;
  *
  * https://www.mongodb.com/docs/manual/reference/geojson/#geometrycollection
  */
-export type $geoCollection = GeoJsonOperators<GeoJSON.GeometryCollection>;
+export type $geoCollection = GeoJsonOperators<GeometryCollection>;
 
 /**
  * Example:
