@@ -1,3 +1,5 @@
+import { Database } from "../../mod.ts";
+import { Collection } from "../../src/collection/collection.ts";
 import {
   $box,
   $center,
@@ -11,8 +13,56 @@ import {
   $geoPolygon,
   $polygon,
   CenterSpecifier,
+  DistanceConstraint,
+  LegacyPoint,
   ShapeOperator,
 } from "../../src/geospatial_types.ts";
+import { testWithClient } from "../common.ts";
+
+interface IPlace {
+  _id: string;
+  name: string;
+  location: GeoJSON.Point;
+  legacyLocation: [number, number]; // a testing field for legacy operators
+  legacyLocationDocument: {
+    lon: number;
+    lat: number;
+  };
+}
+
+// Test utility types
+type LegacyNearQuery = {
+  $near: LegacyPoint;
+} & DistanceConstraint;
+
+type LegacyNearSphereQuery = {
+  $nearSphere: LegacyPoint;
+} & DistanceConstraint;
+
+type LegacyNearDocumentQuery = {
+  $near: { lon: number; lat: number };
+} & DistanceConstraint;
+
+type LegacyNearSphereDocumentQuery = {
+  $nearSphere: { lon: number; lat: number };
+} & DistanceConstraint;
+
+const placeDataString = await Deno.readTextFile(
+  "tests/testdata/sample_places.json",
+);
+
+// deno-lint-ignore no-explicit-any
+const placeData: IPlace[] = (JSON.parse(placeDataString) as any[])
+  .map((el) => ({
+    _id: el._id.$oid,
+    name: el.name,
+    location: el.location as GeoJSON.Point,
+    legacyLocation: el.location.coordinates as [number, number],
+    legacyLocationDocument: {
+      lon: el.location.coordinates[0],
+      lat: el.location.coordinates[1],
+    },
+  }));
 
 Deno.test({
   name: "Geospatial: sanity tests for types",
@@ -138,3 +188,191 @@ Deno.test({
     const _documentStylePoint: CenterSpecifier = { lon: 0, lat: 1 };
   },
 });
+
+/**
+ * Sanity tests for geospatial queries.
+ *
+ * Tests are based on the summary table of geospatial query operators from the link below.
+ * https://www.mongodb.com/docs/manual/geospatial-queries/#geospatial-models
+ *
+ * Test data picked from below links
+ * https://www.mongodb.com/docs/manual/tutorial/geospatial-tutorial/#searching-for-restaurants
+ *
+ * Places
+ * https://raw.githubusercontent.com/mongodb/docs-assets/geospatial/restaurants.json
+ */
+testWithClient(
+  "Geospatial: sanity tests for types by actual querying",
+  async (client) => {
+    const db = client.database("test");
+    await test_$near_and_$nearSphere_queries(db);
+    await db.collection("mongo_test_places").drop().catch(console.error);
+  },
+);
+
+async function test_$near_and_$nearSphere_queries(db: Database) {
+  const placeCollection = db.collection<IPlace>("mongo_test_places");
+
+  await placeCollection.createIndexes({
+    indexes: [
+      // An 2dsphere index for `location`
+      {
+        name: "location_2dsphere",
+        key: { location: "2dsphere" },
+        "2dsphereIndexVersion": 3,
+      },
+      // An 2d index for `legacyLocation`
+      {
+        name: "legacyLocation_2d",
+        key: { legacyLocation: "2d" },
+      },
+      {
+        name: "legacyLocationDocument_2d",
+        key: { legacyLocationDocument: "2d" },
+      },
+    ],
+  });
+
+  await placeCollection.insertMany(placeData);
+
+  const queries = [
+    {
+      coordinates: [-73.856077, 40.848447],
+    },
+    {
+      // with a $maxDistance contraint
+      coordinates: [-73.856077, 40.848447],
+      $maxDistance: 100,
+    },
+    {
+      // with a $minDistance contraint
+      coordinates: [-73.856077, 40.848447],
+      $minDistance: 100,
+    },
+    {
+      // GeoJSON with a $min/$max distance contraint
+      coordinates: [-73.856077, 40.848447],
+      $maxDistance: 100,
+      $minDistance: 10,
+    },
+  ];
+
+  await testGeoJsonQueries(placeCollection, queries);
+  await testLegacyQueries(placeCollection, queries);
+}
+
+async function testGeoJsonQueries(
+  placeCollection: Collection<IPlace>,
+  queries: ({ coordinates: number[] } & DistanceConstraint)[],
+) {
+  const geoJsonQueries: ($geoPoint & DistanceConstraint)[] = queries.map(
+    (data) => {
+      const { coordinates, $maxDistance, $minDistance } = data;
+      const geoJsonQueryItem: $geoPoint & DistanceConstraint = {
+        $geometry: {
+          type: "Point",
+          coordinates,
+        },
+        $minDistance,
+        $maxDistance,
+      };
+
+      return removeUndefinedDistanceConstraint(geoJsonQueryItem);
+    },
+  );
+
+  for await (const geoQuery of geoJsonQueries) {
+    // with $near
+    await placeCollection.find({
+      location: {
+        $near: geoQuery,
+      },
+    }).toArray();
+
+    // with $nearSphere
+    await placeCollection.find({
+      location: {
+        $nearSphere: geoQuery,
+      },
+    }).toArray();
+  }
+}
+
+async function testLegacyQueries(
+  placeCollection: Collection<IPlace>,
+  queries: ({ coordinates: number[] } & DistanceConstraint)[],
+) {
+  const legacyQueries:
+    ({ $near: LegacyPoint; $nearSphere: LegacyPoint } & DistanceConstraint)[] =
+      queries.map(
+        (data) => {
+          const { coordinates, $maxDistance, $minDistance } = data;
+
+          const queryItem = {
+            $near: coordinates,
+            $nearSphere: coordinates,
+            $minDistance,
+            $maxDistance,
+          };
+
+          if ($maxDistance === undefined) {
+            delete queryItem["$maxDistance"];
+          }
+          if ($minDistance === undefined) {
+            delete queryItem["$minDistance"];
+          }
+
+          return queryItem;
+        },
+      );
+
+  for await (const query of legacyQueries) {
+    // with $near
+    await placeCollection.find({
+      legacyLocation: query as LegacyNearQuery,
+    }).toArray();
+
+    // with $nearSphere
+    await placeCollection.find({
+      legacyLocation: query as LegacyNearSphereQuery,
+    }).toArray();
+
+    const [lon, lat] = query.$near!;
+    const { $minDistance, $maxDistance } = query;
+
+    const documentStyleQuery = removeUndefinedDistanceConstraint({
+      $near: { lon, lat },
+      $nearSphere: { lon, lat },
+      $minDistance,
+      $maxDistance,
+    });
+
+    // with $near
+    await placeCollection.find({
+      legacyLocationDocument: documentStyleQuery as LegacyNearDocumentQuery,
+    }).toArray();
+
+    // with $nearSphere
+    await placeCollection.find({
+      legacyLocationDocument:
+        documentStyleQuery as LegacyNearSphereDocumentQuery,
+    }).toArray();
+  }
+}
+
+function removeUndefinedDistanceConstraint<T>(
+  obj: T & DistanceConstraint,
+): T & DistanceConstraint {
+  const result = { ...obj };
+  const { $minDistance, $maxDistance } = obj;
+
+  if ($minDistance === undefined) {
+    delete result["$minDistance"];
+  }
+
+  if ($maxDistance === undefined) {
+    delete result["$maxDistance"];
+  }
+
+  return result;
+}
