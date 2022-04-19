@@ -10,6 +10,13 @@ import {
   Timestamp,
 } from "../deps.ts";
 import { WriteConcern } from "./types/read_write_concern.ts";
+import {
+  $geoAny,
+  $geoMultiPolygon,
+  $geoPolygon,
+  CenterSpecifier,
+  ShapeOperator,
+} from "./types/geospatial.ts";
 
 export interface Server {
   host: string;
@@ -645,10 +652,12 @@ interface FilterOperators<TValue> extends Document {
   $jsonSchema?: Document;
   $mod?: TValue extends number ? [number, number] : never;
   $regex?: string | RegExp | BSONRegExp;
-  $geoIntersects?: { $geometry: Document };
-  $geoWithin?: Document;
-  $near?: Document;
-  $nearSphere?: TValue;
+  $geoIntersects?: $geoAny;
+  $geoWithin?: $geoPolygon | $geoMultiPolygon | ShapeOperator;
+  $near?: CenterSpecifier;
+  $nearSphere?: CenterSpecifier;
+  $minDistance?: number;
+  $maxDistance?: number;
   // deno-lint-ignore no-explicit-any
   $all?: Array<any>;
   // deno-lint-ignore no-explicit-any
