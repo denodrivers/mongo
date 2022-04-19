@@ -31,6 +31,11 @@ interface IPlace {
   };
 }
 
+interface IPosition {
+  _id: string;
+  pos: [number, number];
+}
+
 // Test utility types
 type LegacyNearQuery = {
   $near: LegacyPoint;
@@ -209,6 +214,7 @@ testWithClient(
     await test_$near_and_$nearSphere_queries(db);
     await test_$geoWithin_queries(db);
     await db.collection("mongo_test_places").drop().catch(console.error);
+    await db.collection("mongo_test_positions").drop().catch(console.error);
   },
 );
 
@@ -451,6 +457,91 @@ async function test_$geoWithin_by_GeoJson_queries(db: Database) {
   );
 }
 
-async function test_$geoWithin_by_ShapeOperators(_db: Database) {
-  await console.warn("Not Implemented");
+async function test_$geoWithin_by_ShapeOperators(db: Database) {
+  const positions = db.collection<IPosition>("mongo_test_positions");
+
+  await positions.createIndexes({
+    indexes: [
+      // An 2d index for `pos`
+      {
+        name: "pos_2d",
+        key: { pos: "2d" },
+      },
+    ],
+  });
+
+  const dataToInsert: Omit<IPosition, "_id">[] = [];
+  const xs = [-1, 0, 1];
+  const ys = [-1, 0, 1];
+
+  for (const x of xs) {
+    for (const y of ys) {
+      dataToInsert.push({ pos: [x, y] });
+    }
+  }
+
+  await positions.insertMany(dataToInsert);
+
+  await test_$geoWithin_by_$box(positions);
+  await test_$geoWithin_by_$polygon(positions);
+  await test_$geoWithin_by_$center(positions);
+  await test_$geoWithin_by_$centerSphere(positions);
+}
+
+async function test_$geoWithin_by_$box(positions: Collection<IPosition>) {
+  const foundPositions = await positions.find({
+    pos: {
+      $geoWithin: {
+        $box: [
+          [-1, -1], // bottom left
+          [1, 1], // upper right
+        ],
+      },
+    },
+  }).toArray();
+
+  assert(foundPositions);
+  assertEquals(foundPositions.length, 9);
+}
+
+async function test_$geoWithin_by_$polygon(positions: Collection<IPosition>) {
+  const foundPositions = await positions.find({
+    pos: {
+      $geoWithin: {
+        $polygon: [[-1, 0], [0, 1], [1, 0], [0, -1]], // a diamond shaped polygon
+      },
+    },
+  }).toArray();
+
+  assert(foundPositions);
+  assertEquals(foundPositions.length, 5);
+}
+
+async function test_$geoWithin_by_$center(positions: Collection<IPosition>) {
+  const foundPositions = await positions.find({
+    pos: {
+      $geoWithin: {
+        $center: [[0, 0], 1], // a circle with radius 1
+      },
+    },
+  }).toArray();
+
+  assert(foundPositions);
+  assertEquals(foundPositions.length, 5);
+}
+
+async function test_$geoWithin_by_$centerSphere(
+  positions: Collection<IPosition>,
+) {
+  const foundPositions = await positions.find({
+    pos: {
+      $geoWithin: {
+        $centerSphere: [[0, 0], 0.0174535], // a sphere with 0.0174535 radian
+      },
+    },
+  }).toArray();
+
+  assert(foundPositions);
+  // 0.0174535 radian is a bit greater than 1.0, so it covers 5 points in the coordinates
+  assertEquals(foundPositions.length, 5);
 }
