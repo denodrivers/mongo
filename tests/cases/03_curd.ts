@@ -1,4 +1,8 @@
-import { MongoInvalidArgumentError } from "../../src/error.ts";
+import {
+  MongoInvalidArgumentError,
+  MongoServerError,
+} from "../../src/error.ts";
+import { CreateCollectionOptions } from "../../src/types.ts";
 import { testWithClient, testWithTestDBClient } from "../common.ts";
 import { assert, assertEquals, assertRejects, semver } from "../test.deps.ts";
 
@@ -635,3 +639,139 @@ testWithClient("testFindWithMaxTimeMS", async (client) => {
 
   await db.collection("mongo_test_users").drop();
 });
+
+interface IStudents {
+  _id: string;
+  name: string;
+  year: number;
+  major: string;
+  gpa?: number;
+  address: {
+    city: string;
+    street: string;
+  };
+}
+
+testWithClient(
+  "createCollection should create a collection without options",
+  async (client) => {
+    const db = client.database("test");
+
+    const testCollectionName = "test_collection_for_createCollection_0";
+
+    const createdCollection = await db
+      .createCollection<{ _id: string; name: string }>(
+        testCollectionName,
+      );
+
+    assert(createdCollection);
+
+    await db.collection(testCollectionName).drop();
+  },
+);
+
+testWithClient(
+  "createCollection should create a collection with options",
+  async (client) => {
+    // Note that database is 'test'
+    const db = client.database("test");
+
+    const testCollectionName = "test_collection_for_createCollection_1";
+
+    // Example from https://www.mongodb.com/docs/manual/reference/operator/query/jsonSchema/#mongodb-query-op.-jsonSchema
+    const options: CreateCollectionOptions = {
+      validator: {
+        $jsonSchema: {
+          bsonType: "object",
+          required: ["name", "year", "major", "address"],
+          properties: {
+            name: {
+              bsonType: "string",
+              description: "must be a string and is required",
+            },
+            year: {
+              bsonType: "int",
+              minimum: 2017,
+              maximum: 3017,
+              description:
+                "must be an integer in [ 2017, 3017 ] and is required",
+            },
+            major: {
+              enum: ["Math", "English", "Computer Science", "History", null],
+              description: "can only be one of the enum values and is required",
+            },
+            gpa: {
+              bsonType: ["double"],
+              description: "must be a double if the field exists",
+            },
+            address: {
+              bsonType: "object",
+              required: ["city"],
+              properties: {
+                street: {
+                  bsonType: "string",
+                  description: "must be a string if the field exists",
+                },
+                city: {
+                  bsonType: "string",
+                  "description": "must be a string and is required",
+                },
+              },
+            },
+          },
+        },
+      },
+    };
+
+    const createdCollection = await db
+      .createCollection<IStudents>(
+        testCollectionName,
+        options,
+      );
+
+    assert(createdCollection);
+
+    // sanity test to check whether the speicified validator from options works
+    // error with message: "Document failed validation"
+    await assertRejects(
+      () =>
+        createdCollection.insertOne({
+          name: "Alice",
+          year: 2019,
+          major: "History",
+          gpa: 3,
+          address: {
+            city: "NYC",
+            street: "33rd Street",
+          },
+        }),
+    );
+
+    // TODO: refactor to clean up the test collection properly.
+    // It should clean up the collection when above insertion succeeds in any case, which is unwanted result.
+    // Refactor when test utility is more provided.
+    await db.collection(testCollectionName).drop();
+  },
+);
+
+testWithClient(
+  "createCollection should throw an error with invalid options",
+  async (client) => {
+    const db = client.database("test");
+
+    const testCollectionName = "test_collection_for_createCollection_2";
+    const invalidOptions: CreateCollectionOptions = {
+      capped: true,
+    };
+
+    await assertRejects(
+      () =>
+        db.createCollection<{ _id: string; name: string }>(
+          testCollectionName,
+          invalidOptions,
+        ),
+      // error with the message "the 'size' field is required when 'capped' is true"
+      MongoServerError,
+    );
+  },
+);
