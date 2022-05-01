@@ -1,6 +1,6 @@
 import { Collection } from "./collection/mod.ts";
 import { CommandCursor } from "./protocol/mod.ts";
-import { CreateUserOptions } from "./types.ts";
+import { CreateCollectionOptions, CreateUserOptions } from "./types.ts";
 import { Cluster } from "./cluster.ts";
 import { Document } from "../deps.ts";
 
@@ -73,6 +73,23 @@ export class Database {
       names.push(item.name);
     }
     return names;
+  }
+
+  /**
+   * `createCollection` executes a create command to create a new collection with the specified name and options.
+   *
+   * https://www.mongodb.com/docs/manual/reference/command/create/#mongodb-dbcommand-dbcmd.create
+   */
+  async createCollection<T>(
+    name: string,
+    options?: CreateCollectionOptions,
+  ): Promise<Collection<T>> {
+    await this.#cluster.protocol.commandSingle(
+      this.name,
+      { create: name, ...options },
+    );
+
+    return this.collection<T>(name);
   }
 
   createUser(

@@ -880,3 +880,32 @@ export const enum ReadPreference {
   SecondaryPreferred = "secondaryPreferred",
   Nearest = "nearest",
 }
+
+export type TimeSeriesGranularity = "seconds" | "minutes" | "hours";
+export type ValidationLevel = "off" | "strict" | "moderate";
+export type ValidationAction = "error" | "warn";
+
+/**
+ * https://www.mongodb.com/docs/manual/reference/method/db.createCollection/
+ */
+export interface CreateCollectionOptions {
+  capped?: boolean;
+  timeseries?: {
+    timeField: string;
+    metaField?: string;
+    granularity?: TimeSeriesGranularity;
+  };
+  expireAfterSeconds?: number;
+  autoIndex?: boolean;
+  size?: number;
+  max?: number;
+  storageEngine?: Document;
+  validator?: Document;
+  validationLevel?: ValidationLevel;
+  validationAction?: ValidationAction;
+  indexOptionDefaults?: Document;
+  viewOn?: string;
+  pipeline?: Document[];
+  collation?: Document;
+  writeConcern?: Document;
+}
