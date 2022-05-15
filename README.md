@@ -3,6 +3,10 @@
 > **deno_mongo** is a **MongoDB** database driver developed for Deno. supports
 > Deno Deploy as well.
 
+<div align="center">
+  <img src="https://user-images.githubusercontent.com/47688578/168461127-aeadaaf5-224d-4664-8a1d-4789c4ee9281.jpg" width="210">
+</div>
+
 [![tag](https://img.shields.io/github/tag/manyuanrong/deno_mongo.svg)](https://github.com/manyuanrong/deno_mongo/releases)
 [![Build Status](https://github.com/manyuanrong/deno_mongo/workflows/ci/badge.svg?branch=main)](https://github.com/manyuanrong/deno_mongo/actions)
 [![license](https://img.shields.io/github/license/manyuanrong/deno_mongo.svg)](https://github.com/manyuanrong/deno_mongo)
