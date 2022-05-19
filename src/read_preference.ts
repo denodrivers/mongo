@@ -1,7 +1,7 @@
 import type { Document } from "../bson.ts";
 import { MongoInvalidArgumentError } from "./error.ts";
 
-type TagSet = Record<string, string>
+type TagSet = Record<string, string>;
 
 /** @public */
 export type ReadPreferenceLike = ReadPreference | ReadPreferenceMode;

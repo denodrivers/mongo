@@ -1,14 +1,15 @@
+// deno-lint-ignore-file no-explicit-any
 import { AuthMechanismProperties } from "./auth/mongo_credentials.ts";
 import { AuthMechanism } from "./auth/providers.ts";
 import { ReadConcernLevel, ReadConcernLike } from "./read_concern.ts";
 import { ReadPreference, ReadPreferenceMode } from "./read_preference.ts";
 
 export interface Auth {
-   /** The username for auth */
-   username?: string;
-   /** The password for auth */
-   password?: string;
- }
+  /** The username for auth */
+  username?: string;
+  /** The password for auth */
+  password?: string;
+}
 
 export interface MongoClientOptions {
   /** Specifies the name of the replica set, if the mongod is a member of a replica set. */
@@ -36,7 +37,7 @@ export interface MongoClientOptions {
   /** The time in milliseconds to attempt a send or receive on a socket before the attempt times out. */
   socketTimeoutMS?: number;
   /** An array or comma-delimited string of compressors to enable network compression for communication between this client and a mongod/mongos instance. */
-  compressors?: ('none' | 'snappy' | 'zlib')[] | string;
+  compressors?: ("none" | "snappy" | "zlib")[] | string;
   /** An integer that specifies the compression level if using zlib for network compression. */
   zlibCompressionLevel?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | undefined;
   /** The maximum number of hosts to connect to when using an srv connection string, a setting of `0` means unlimited hosts */
