@@ -1,4 +1,4 @@
-import { Document, ObjectId } from "../../../deps.ts";
+import { Document, ObjectId } from "../../../bson.ts";
 import { UpdateOptions } from "../../types.ts";
 import { WireProtocol } from "../../protocol/mod.ts";
 

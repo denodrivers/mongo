@@ -1,4 +1,4 @@
-import { Binary, Document, ObjectId } from "../../deps.ts";
+import { Binary, Document, ObjectId } from "../../bson.ts";
 import { ReadPreference } from "../types.ts";
 import { ReadConcern, WriteConcern } from "../types/read_write_concern.ts";
 

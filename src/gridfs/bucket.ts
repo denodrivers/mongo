@@ -13,7 +13,7 @@ import {
 import { checkIndexes } from "./indexes.ts";
 import { createUploadStream } from "./upload.ts";
 import { MongoRuntimeError } from "../error.ts";
-import { ObjectId } from "../../deps.ts";
+import { ObjectId } from "../../bson.ts";
 
 export class GridFSBucket {
   #chunksCollection: Collection<Chunk>;

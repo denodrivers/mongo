@@ -1,5 +1,5 @@
 import { WireProtocol } from "./protocol.ts";
-import { Document } from "../../deps.ts";
+import { Document } from "../../bson.ts";
 
 export const driverMetadata = {
   driver: {

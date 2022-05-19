@@ -3,7 +3,7 @@ import { BuildInfo, ConnectOptions, ListDatabaseInfo } from "./types.ts";
 import { parse } from "./utils/uri.ts";
 import { MongoDriverError } from "./error.ts";
 import { Cluster } from "./cluster.ts";
-import { Document } from "../deps.ts";
+import { Document } from "../bson.ts";
 
 export class MongoClient {
   #cluster?: Cluster;

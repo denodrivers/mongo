@@ -3,7 +3,8 @@ import { saslprep } from "../utils/saslprep/mod.ts";
 import { AuthContext, AuthPlugin } from "./base.ts";
 import { HandshakeDocument } from "../protocol/handshake.ts";
 import { MongoDriverError } from "../error.ts";
-import { b64, Binary, crypto as stdCrypto, Document, hex } from "../../deps.ts";
+import { b64, crypto as stdCrypto, hex } from "../../deps.ts";
+import { Binary, Document } from "../../bson.ts";
 import { driverMetadata } from "../protocol/mod.ts";
 import { pbkdf2 } from "./pbkdf2.ts";
 

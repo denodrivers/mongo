@@ -8,7 +8,7 @@ import {
   Long,
   ObjectId,
   Timestamp,
-} from "../deps.ts";
+} from "../bson.ts";
 import { WriteConcern } from "./types/read_write_concern.ts";
 import {
   $geoAny,

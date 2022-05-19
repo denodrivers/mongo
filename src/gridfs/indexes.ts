@@ -1,4 +1,4 @@
-import { Document } from "../../deps.ts";
+import { Document } from "../../bson.ts";
 import { Collection } from "../collection/collection.ts";
 import { Chunk, File } from "../types/gridfs.ts";
 

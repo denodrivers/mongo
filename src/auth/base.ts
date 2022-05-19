@@ -1,6 +1,6 @@
 import { ConnectOptions, Credential } from "../types.ts";
 import { WireProtocol } from "../protocol/mod.ts";
-import { Document } from "../../deps.ts";
+import { Document } from "../../bson.ts";
 
 export abstract class AuthPlugin {
   abstract prepare(

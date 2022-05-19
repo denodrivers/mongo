@@ -106,8 +106,7 @@ testWithTestDBClient("testFindOne", async (db) => {
   const user1 = await users.findOne();
   assertEquals(Object.keys(user1!), ["_id", "username", "password", "date"]);
 
-  const query = { test: 1 };
-  const findNull = await users.findOne(query);
+  const findNull = await users.findOne({ username: "not_exists" });
   assertEquals(findNull, undefined);
   const projectionUser = await users.findOne(
     {},
@@ -310,7 +309,7 @@ testWithTestDBClient("testFind", async (db) => {
   assert(findUsers instanceof Array);
   assertEquals(findUsers.length, 1);
 
-  const notFound = await users.find({ test: 1 }).toArray();
+  const notFound = await users.find({ username: "not_exists" }).toArray();
   assertEquals(notFound, []);
 });
 
@@ -573,7 +572,7 @@ testWithTestDBClient("testFindEmptyAsyncIteration", async (db) => {
       uid: i,
     });
   }
-  const cursor = users.find({ nonexistent: "foo" });
+  const cursor = users.find({ username: "not_exists" });
   const docs = [];
   for await (const doc of cursor) {
     docs.push(doc);

@@ -1,4 +1,4 @@
-import { Document, ObjectId } from "../../deps.ts";
+import { Document, ObjectId } from "../../bson.ts";
 import { MongoDriverError, MongoInvalidArgumentError } from "../error.ts";
 import { WireProtocol } from "../protocol/mod.ts";
 import {

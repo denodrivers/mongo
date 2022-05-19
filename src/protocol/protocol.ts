@@ -1,10 +1,5 @@
-import {
-  BufReader,
-  Deferred,
-  deferred,
-  Document,
-  writeAll,
-} from "../../deps.ts";
+import { BufReader, Deferred, deferred, writeAll } from "../../deps.ts";
+import { Document } from "../../bson.ts";
 import {
   MongoDriverError,
   MongoErrorInfo,

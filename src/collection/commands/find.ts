@@ -1,4 +1,4 @@
-import { Document } from "../../../deps.ts";
+import { Document } from "../../../bson.ts";
 import { CommandCursor, WireProtocol } from "../../protocol/mod.ts";
 import { FindOptions } from "../../types.ts";
 
