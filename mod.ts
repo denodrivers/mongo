@@ -2,7 +2,7 @@ export { MongoClient } from "./src/client.ts";
 export { Database } from "./src/database.ts";
 export { Collection } from "./src/collection/mod.ts";
 export * from "./src/types.ts";
-export * as Bson from "./deps.ts";
+export * as Bson from "./bson.ts";
 export {
   Binary,
   BSONRegExp,
@@ -18,6 +18,6 @@ export {
   ObjectId,
   Timestamp,
   UUID,
-} from "./deps.ts";
-export type { Document } from "./deps.ts";
+} from "./bson.ts";
+export type { Document } from "./bson.ts";
 export { GridFSBucket } from "./src/gridfs/bucket.ts";
