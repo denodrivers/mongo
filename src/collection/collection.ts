@@ -1,5 +1,9 @@
 import { Document, ObjectId } from "../../deps.ts";
-import { MongoDriverError, MongoInvalidArgumentError } from "../error.ts";
+import {
+  MongoDriverError,
+  MongoInvalidArgumentError,
+  MongoServerError,
+} from "../error.ts";
 import { WireProtocol } from "../protocol/mod.ts";
 import {
   AggregateOptions,
@@ -185,7 +189,7 @@ export class Collection<T> {
     const { writeErrors } = res;
     if (writeErrors) {
       const [{ errmsg }] = writeErrors;
-      throw new Error(errmsg);
+      throw new MongoServerError(errmsg);
     }
     return {
       insertedIds,
@@ -199,7 +203,7 @@ export class Collection<T> {
     options?: UpdateOptions,
   ) {
     const {
-      upsertedIds = [],
+      upsertedIds,
       upsertedCount,
       matchedCount,
       modifiedCount,
@@ -243,7 +247,7 @@ export class Collection<T> {
       );
     }
 
-    const { upsertedIds = [], upsertedCount, matchedCount, modifiedCount } =
+    const { upsertedIds, upsertedCount, matchedCount, modifiedCount } =
       await update(
         this.#protocol,
         this.#dbName,

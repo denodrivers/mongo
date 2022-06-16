@@ -1,3 +1,4 @@
+import { ObjectId } from "../../mod.ts";
 import {
   MongoInvalidArgumentError,
   MongoServerError,
@@ -6,10 +7,10 @@ import { CreateCollectionOptions } from "../../src/types.ts";
 import { testWithClient, testWithTestDBClient } from "../common.ts";
 import { assert, assertEquals, assertRejects, semver } from "../test.deps.ts";
 
-interface IUser {
+interface User {
+  _id: string | ObjectId;
   username?: string;
   password?: string;
-  _id: string;
   uid?: number;
   date?: Date;
 }
@@ -23,7 +24,7 @@ testWithClient("testListCollectionNames", async (client) => {
 });
 
 testWithTestDBClient("testInsertOne", async (db) => {
-  const users = db.collection<IUser>("mongo_test_users");
+  const users = db.collection<User>("mongo_test_users");
   const insertId = await users.insertOne({
     username: "user1",
     password: "pass1",
@@ -45,7 +46,7 @@ testWithTestDBClient("testInsertOne", async (db) => {
 });
 
 testWithTestDBClient("testUpsertOne", async (db) => {
-  const users = db.collection<IUser>("mongo_test_users");
+  const users = db.collection<User>("mongo_test_users");
   await users.insertOne({
     username: "user1",
     password: "pass1",
@@ -78,7 +79,7 @@ testWithTestDBClient("testUpsertOne", async (db) => {
 });
 
 testWithTestDBClient("testInsertOneTwice", async (db) => {
-  const users = db.collection<IUser>("mongo_test_users");
+  const users = db.collection<User>("mongo_test_users");
   await users.insertOne({
     _id: "aaaaaaaaaaaaaaaaaaaaaaaa",
     username: "user1",
@@ -89,15 +90,14 @@ testWithTestDBClient("testInsertOneTwice", async (db) => {
       users.insertOne({
         _id: "aaaaaaaaaaaaaaaaaaaaaaaa",
         username: "user1",
-        // deno-lint-ignore no-explicit-any
-      }) as any,
-    undefined,
+      }),
+    MongoServerError,
     "E11000",
   );
 });
 
 testWithTestDBClient("testFindOne", async (db) => {
-  const users = db.collection<IUser>("mongo_test_users");
+  const users = db.collection<User>("mongo_test_users");
   await users.insertOne({
     username: "user1",
     password: "pass1",
@@ -122,7 +122,7 @@ testWithTestDBClient("testFindOne", async (db) => {
 });
 
 testWithTestDBClient("testInsertMany", async (db) => {
-  const users = db.collection<IUser>("mongo_test_users");
+  const users = db.collection<User>("mongo_test_users");
   const { insertedCount, insertedIds } = await users.insertMany([
     {
       username: "many",
@@ -171,7 +171,7 @@ testWithTestDBClient("testFindAndModify-delete", async (db) => {
 });
 
 testWithTestDBClient("test chain call for Find", async (db) => {
-  const users = db.collection<IUser>("mongo_test_users");
+  const users = db.collection<User>("mongo_test_users");
   await users.insertMany([
     {
       username: "user1",
@@ -191,7 +191,7 @@ testWithTestDBClient("test chain call for Find", async (db) => {
 });
 
 testWithTestDBClient("testUpdateOne", async (db) => {
-  const users = db.collection<IUser>("mongo_test_users");
+  const users = db.collection<User>("mongo_test_users");
   await users.insertOne({
     username: "user1",
     password: "pass1",
@@ -206,7 +206,7 @@ testWithTestDBClient("testUpdateOne", async (db) => {
 });
 
 testWithTestDBClient("testUpdateOne Error", async (db) => { // TODO: move tesr errors to a new file
-  const users = db.collection<IUser>("mongo_test_users");
+  const users = db.collection<User>("mongo_test_users");
   await users.insertOne({
     username: "user1",
     password: "pass1",
@@ -220,7 +220,7 @@ testWithTestDBClient("testUpdateOne Error", async (db) => { // TODO: move tesr e
 });
 
 testWithTestDBClient("testUpdateOneWithUpsert", async (db) => {
-  const users = db.collection<IUser>("mongo_test_users");
+  const users = db.collection<User>("mongo_test_users");
   await users.insertOne({
     username: "user1",
     password: "pass1",
@@ -236,7 +236,7 @@ testWithTestDBClient("testUpdateOneWithUpsert", async (db) => {
 });
 
 testWithTestDBClient("testReplaceOne", async (db) => {
-  const users = db.collection<IUser>("mongo_test_users");
+  const users = db.collection<User>("mongo_test_users");
   await users.insertOne({
     username: "user1",
     password: "pass1",
@@ -254,7 +254,7 @@ testWithTestDBClient("testReplaceOne", async (db) => {
 });
 
 testWithTestDBClient("testDeleteOne", async (db) => {
-  const users = db.collection<IUser>("mongo_test_users");
+  const users = db.collection<User>("mongo_test_users");
   await users.insertOne({
     username: "user1",
     password: "pass1",
@@ -264,7 +264,7 @@ testWithTestDBClient("testDeleteOne", async (db) => {
 });
 
 testWithTestDBClient("testFindOr", async (db) => {
-  const users = db.collection<IUser>("mongo_test_users");
+  const users = db.collection<User>("mongo_test_users");
   await users.insertMany([
     {
       username: "user1",
@@ -289,7 +289,7 @@ testWithTestDBClient("testFindOr", async (db) => {
 });
 
 testWithTestDBClient("testFind", async (db) => {
-  const users = db.collection<IUser>("mongo_test_users");
+  const users = db.collection<User>("mongo_test_users");
   await users.insertMany([
     {
       username: "user",
@@ -315,7 +315,7 @@ testWithTestDBClient("testFind", async (db) => {
 });
 
 testWithTestDBClient("test multiple queries at the same time", async (db) => {
-  const users = db.collection<IUser>("mongo_test_users");
+  const users = db.collection<User>("mongo_test_users");
   await users.insertOne({
     _id: "aaaaaaaaaaaaaaaaaaaaaaaa",
     username: "user1",
@@ -335,7 +335,7 @@ testWithTestDBClient("test multiple queries at the same time", async (db) => {
 });
 
 testWithTestDBClient("testCount", async (db) => {
-  const users = db.collection<IUser>("mongo_test_users");
+  const users = db.collection<User>("mongo_test_users");
   await users.insertMany([
     {
       username: "user",
@@ -355,7 +355,7 @@ testWithTestDBClient("testCount", async (db) => {
 });
 
 testWithTestDBClient("testCountDocuments", async (db) => {
-  const users = db.collection<IUser>("mongo_test_users");
+  const users = db.collection<User>("mongo_test_users");
   await users.insertMany([
     {
       username: "user1",
@@ -382,7 +382,7 @@ testWithTestDBClient("testCountDocuments", async (db) => {
 });
 
 testWithTestDBClient("testEstimatedDocumentCount", async (db) => {
-  const users = db.collection<IUser>("mongo_test_users");
+  const users = db.collection<User>("mongo_test_users");
   await users.insertMany([
     {
       username: "user1",
@@ -406,7 +406,7 @@ testWithTestDBClient("testEstimatedDocumentCount", async (db) => {
 });
 
 testWithTestDBClient("testAggregation", async (db) => {
-  const users = db.collection<IUser>("mongo_test_users");
+  const users = db.collection<User>("mongo_test_users");
   await users.insertMany([
     {
       username: "user1",
@@ -426,7 +426,7 @@ testWithTestDBClient("testAggregation", async (db) => {
     },
   ]);
   const docs = await users
-    .aggregate([
+    .aggregate<{ _id: string; total: number }>([
       { $match: { username: "many" } },
       { $group: { _id: "$username", total: { $sum: 1 } } },
     ])
@@ -435,7 +435,7 @@ testWithTestDBClient("testAggregation", async (db) => {
 });
 
 testWithTestDBClient("testUpdateMany", async (db) => {
-  const users = db.collection<IUser>("mongo_test_users");
+  const users = db.collection<User>("mongo_test_users");
   await users.insertMany([
     {
       username: "user1",
@@ -467,7 +467,7 @@ testWithTestDBClient("testUpdateMany", async (db) => {
 });
 
 testWithTestDBClient("testDeleteMany", async (db) => {
-  const users = db.collection<IUser>("mongo_test_users");
+  const users = db.collection<User>("mongo_test_users");
   await users.insertMany([
     {
       username: "user1",
@@ -491,7 +491,7 @@ testWithTestDBClient("testDeleteMany", async (db) => {
 });
 
 testWithTestDBClient("testDistinct", async (db) => {
-  const users = db.collection<IUser>("mongo_test_users");
+  const users = db.collection<User>("mongo_test_users");
   await users.insertMany([
     {
       username: "user1",
@@ -515,7 +515,7 @@ testWithTestDBClient("testDistinct", async (db) => {
 });
 
 testWithTestDBClient("testDropConnection", async (db) => {
-  const users = db.collection<IUser>("mongo_test_users");
+  const users = db.collection<User>("mongo_test_users");
   await users.insertOne({
     _id: "aaaaaaaaaaaaaaaaaaaaaaaa",
     username: "user1",
@@ -526,7 +526,7 @@ testWithTestDBClient("testDropConnection", async (db) => {
 });
 
 testWithTestDBClient("testFindWithSort", async (db) => {
-  const users = db.collection<IUser>("mongo_test_users");
+  const users = db.collection<User>("mongo_test_users");
 
   const condition = { uid: { $exists: true } };
 
@@ -565,7 +565,7 @@ testWithTestDBClient("testFindWithSort", async (db) => {
 });
 
 testWithTestDBClient("testFindEmptyAsyncIteration", async (db) => {
-  const users = db.collection<IUser>("mongo_test_users");
+  const users = db.collection<User>("mongo_test_users");
   for (let i = 0; i < 10; i++) {
     await users.insertOne({
       username: "testFindWithSort",
@@ -591,7 +591,7 @@ testWithClient("testFindWithMaxTimeMS", async (client) => {
     "4.2.0",
   );
 
-  const users = db.collection<IUser>("mongo_test_users");
+  const users = db.collection<User>("mongo_test_users");
   for (let i = 0; i < 10; i++) {
     await users.insertOne({
       username: "testFindWithMaxTimeMS",
