@@ -71,15 +71,13 @@ export class Srv {
     );
     if (!(srvRecord?.length > 0)) {
       throw new SRVError(
-        `Expected at least one SRV record, received ${srvRecord
-          ?.length} for url ${url}`,
+        `Expected at least one SRV record, received ${srvRecord?.length} for url ${url}`,
       );
     }
     const txtRecords = await this.resolver.resolveDns(url, "TXT");
     if (txtRecords?.length !== 1) {
       throw new SRVError(
-        `Expected exactly one TXT record, received ${txtRecords
-          ?.length} for url ${url}`,
+        `Expected exactly one TXT record, received ${txtRecords?.length} for url ${url}`,
       );
     }
 

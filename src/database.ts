@@ -3,6 +3,7 @@ import { CommandCursor } from "./protocol/mod.ts";
 import { CreateCollectionOptions, CreateUserOptions } from "./types.ts";
 import { Cluster } from "./cluster.ts";
 import { Document } from "../deps.ts";
+import { WriteConcern } from "./types/read_write_concern.ts";
 
 interface ListCollectionsReponse {
   cursor: {
@@ -28,6 +29,13 @@ export class Database {
 
   constructor(cluster: Cluster, readonly name: string) {
     this.#cluster = cluster;
+  }
+
+  async dropDatabase(writeConcern?: WriteConcern) {
+    return await this.#cluster.protocol.commandSingle(this.name, {
+      dropDatabase: 1,
+      writeConcern,
+    });
   }
 
   collection<T = Document>(name: string): Collection<T> {
