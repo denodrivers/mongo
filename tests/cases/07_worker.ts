@@ -11,6 +11,9 @@ Deno.test({
     const p = deferred<string>();
     importWorker.onmessage = (e) => p.resolve(e.data);
     importWorker.postMessage("startWorker");
-    assertEquals(await p, "done");
+
+    const result = await p;
+    importWorker.terminate();
+    assertEquals(result, "done");
   },
 });
