@@ -16,7 +16,7 @@ export class MongoClient {
 
   getCluster() {
     if (!this.#cluster) {
-      throw new MongoDriverError("MongoClient is no connected to the Database");
+      throw new MongoDriverError("MongoClient is not connected to the Database");
     }
 
     return this.#cluster;
