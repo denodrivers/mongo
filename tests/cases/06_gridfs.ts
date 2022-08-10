@@ -117,3 +117,25 @@ testWithClient(
     assert(!file[0]);
   },
 );
+
+// https://www.mongodb.com/docs/manual/reference/command/createIndexes/#considerations
+testWithClient(
+  "GridFS: Creating indexes - skip index creation on same index keys",
+  async (client) => {
+    const addAsset = async (index: number) => {
+      const db = client.database("test");
+      const bucket = new GridFSBucket(db, {
+        bucketName: "sameKeys",
+      });
+      const upstream = await bucket.openUploadStream(`test-asset-${index}`);
+      const writer = upstream.getWriter();
+      await writer.write(new TextEncoder().encode(`[asset${index}]`));
+      await writer.close();
+      return {
+        files: await db.collection("sameKeys.files").listIndexes().toArray(),
+        chunks: await db.collection("sameKeys.chunks").listIndexes().toArray(),
+      };
+    };
+    assertEquals(await addAsset(0), await addAsset(1));
+  },
+);

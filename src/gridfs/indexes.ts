@@ -1,34 +1,52 @@
-import { Document } from "../../deps.ts";
 import { Collection } from "../collection/collection.ts";
 import { Chunk, File } from "../types/gridfs.ts";
+import { IndexOptions } from "../types.ts";
 
-export function createFileIndex(collection: Collection<File>) {
-  const index = { filename: 1, uploadDate: 1 };
-
-  return collection.createIndexes({
-    indexes: [
-      {
-        name: "gridFSFiles",
-        key: index,
-        background: false,
-      },
-    ],
+async function ensureIndex<T>(
+  index: IndexOptions,
+  collection: Collection<T>,
+): Promise<ReturnType<Collection<T>["createIndexes"]>> {
+  // We need to check collection emptiness (ns not found error for listIndexes on empty collection)
+  const doc = await collection.findOne({}, { projection: { _id: 1 } });
+  if (doc === undefined) {
+    return collection.createIndexes({ indexes: [index] });
+  }
+  const keys = Object.keys(index.key);
+  const indexes = await collection.listIndexes().toArray();
+  const existing = indexes.find(({ key }) => {
+    const currentKeys = Object.keys(key);
+    return currentKeys.length === keys.length &&
+      currentKeys.every((k) => keys.includes(k));
   });
+  if (existing === undefined) {
+    return collection.createIndexes({ indexes: [index] });
+  } else {
+    return {
+      ok: 1,
+      createdCollectionAutomatically: false,
+      numIndexesBefore: indexes.length,
+      numIndexesAfter: indexes.length,
+    };
+  }
 }
-export function createChunksIndex(collection: Collection<Chunk>) {
-  // deno-lint-ignore camelcase
-  const index = { files_id: 1, n: 1 };
 
-  return collection.createIndexes({
-    indexes: [
-      {
-        name: "gridFSFiles",
-        key: index,
-        unique: true,
-        background: false,
-      },
-    ],
-  });
+const fileIndexSpec = {
+  name: "gridFSFiles",
+  key: { filename: 1, uploadDate: 1 },
+  background: false,
+};
+export function createFileIndex(collection: Collection<File>) {
+  return ensureIndex<File>(fileIndexSpec, collection);
+}
+
+const chunkIndexSpec = {
+  name: "gridFSFiles",
+  key: { files_id: 1, n: 1 },
+  unique: true,
+  background: false,
+};
+export function createChunksIndex(collection: Collection<Chunk>) {
+  return ensureIndex<Chunk>(chunkIndexSpec, collection);
 }
 
 export async function checkIndexes(
@@ -36,68 +54,7 @@ export async function checkIndexes(
   chunksCollection: Collection<Chunk>,
   hasCheckedIndexes: (value: boolean) => void,
 ) {
-  const filesCollectionIsEmpty = !(await filesCollection.findOne(
-    {},
-    {
-      projection: { _id: 1 },
-    },
-  ));
-
-  const chunksCollectionIsEmpty = !(await chunksCollection.findOne(
-    {},
-    {
-      projection: { _id: 1 },
-    },
-  ));
-
-  if (filesCollectionIsEmpty || chunksCollectionIsEmpty) {
-    // At least one collection is empty so we create indexes
-    await createFileIndex(filesCollection);
-    await createChunksIndex(chunksCollection);
-    hasCheckedIndexes(true);
-    return;
-  }
-
-  // Now check that the right indexes are there
-  const fileIndexes = await filesCollection.listIndexes().toArray();
-  let hasFileIndex = false;
-
-  if (fileIndexes) {
-    fileIndexes.forEach((index) => {
-      const keys = Object.keys(index.key);
-      if (
-        keys.length === 2 &&
-        index.key.filename === 1 &&
-        index.key.uploadDate === 1
-      ) {
-        hasFileIndex = true;
-      }
-    });
-  }
-
-  if (!hasFileIndex) {
-    await createFileIndex(filesCollection);
-  }
-
-  const chunkIndexes = await chunksCollection.listIndexes().toArray();
-  let hasChunksIndex = false;
-
-  if (chunkIndexes) {
-    chunkIndexes.forEach((index: Document) => {
-      const keys = Object.keys(index.key);
-      if (
-        keys.length === 2 &&
-        index.key.filename === 1 &&
-        index.key.uploadDate === 1 &&
-        index.options.unique
-      ) {
-        hasChunksIndex = true;
-      }
-    });
-  }
-
-  if (!hasChunksIndex) {
-    await createChunksIndex(chunksCollection);
-  }
+  await createFileIndex(filesCollection);
+  await createChunksIndex(chunksCollection);
   hasCheckedIndexes(true);
 }
