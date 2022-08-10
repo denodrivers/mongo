@@ -119,15 +119,19 @@ testWithClient(
   "GridFS: Creating indexes - skip index creation on same index keys",
   async (client) => {
     const addAsset = async (index: number) => {
-      const bucket = new GridFSBucket(client.database("test"), {
+      const db = client.database("test");
+      const bucket = new GridFSBucket(db, {
         bucketName: "sameKeys",
       });
       const upstream = await bucket.openUploadStream(`test-asset-${index}`);
       const writer = upstream.getWriter();
       await writer.write(new TextEncoder().encode(`[asset${index}]`));
       await writer.close();
+      return {
+        files: await db.collection("sameKeys.files").listIndexes().toArray(),
+        chunks: await db.collection("sameKeys.chunks").listIndexes().toArray(),
+      };
     };
-    await addAsset(0);
-    await addAsset(1);
+    assertEquals(await addAsset(0), await addAsset(1));
   },
 );
