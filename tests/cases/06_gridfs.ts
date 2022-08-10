@@ -1,9 +1,17 @@
 import { GridFSBucket } from "../../mod.ts";
 import { testWithClient } from "../common.ts";
-import { assert, assertEquals, bytesEquals } from "../test.deps.ts";
+import {
+  assert,
+  assertEquals,
+  assertNotEquals,
+  readAll,
+  readerFromStreamReader,
+} from "../test.deps.ts";
 
-function bufferEquals(a: ArrayBuffer, b: ArrayBuffer) {
-  return bytesEquals(new Uint8Array(a), new Uint8Array(b));
+async function streamReadAll(readable: ReadableStream): Promise<Uint8Array> {
+  const reader = readerFromStreamReader(readable.getReader());
+  const result = await readAll(reader);
+  return result;
 }
 
 testWithClient("GridFS: Echo small Hello World", async (client) => {
@@ -27,50 +35,46 @@ testWithClient("GridFS: Echo small Hello World", async (client) => {
 
 testWithClient("GridFS: Echo large Image", async (client) => {
   const bucket = new GridFSBucket(client.database("test"), {
-    bucketName: "deno_logo",
+    bucketName: "A",
   });
 
   // Set an impractically low chunkSize to test chunking algorithm
-  const upstream = await bucket.openUploadStream("deno_logo.png", {
+  const upstream = await bucket.openUploadStream("1.jpg", {
     chunkSizeBytes: 255 * 8,
   });
 
-  await (await fetch("https://deno.land/images/deno_logo.png")).body!.pipeTo(
-    upstream,
-  );
+  const image = await Deno.open("tests/assets/1.jpg", { read: true });
+  await image.readable.pipeTo(upstream);
 
-  const getId =
-    (await bucket.find({ filename: "deno_logo.png" }).toArray())[0]._id;
+  const [{ _id }] = await bucket.find({ filename: "1.jpg" }).toArray();
 
-  const expected = await fetch("https://deno.land/images/deno_logo.png");
-  const actual = await new Response(await bucket.openDownloadStream(getId))
-    .arrayBuffer();
+  const expected = await Deno.readFile("tests/assets/1.jpg");
+  const actual = await streamReadAll(await bucket.openDownloadStream(_id));
 
-  assert(bufferEquals(actual, await expected.arrayBuffer()));
+  assertEquals(actual, expected);
 });
 
 testWithClient(
   "GridFS: Echo large Image (compare with different Image)",
   async (client) => {
     const bucket = new GridFSBucket(client.database("test"), {
-      bucketName: "deno_logo",
+      bucketName: "A",
     });
 
-    const upstream = await bucket.openUploadStream("deno_logo.png");
+    // Set an impractically low chunkSize to test chunking algorithm
+    const upstream = await bucket.openUploadStream("1.jpg", {
+      chunkSizeBytes: 255 * 8,
+    });
 
-    await (await fetch("https://deno.land/images/deno_logo.png")).body!
-      .pipeTo(
-        upstream,
-      );
+    const image = await Deno.open("tests/assets/1.jpg", { read: true });
+    await image.readable.pipeTo(upstream);
 
-    const getId =
-      (await bucket.find({ filename: "deno_logo.png" }).toArray())[0]._id;
+    const [{ _id }] = await bucket.find({ filename: "1.jpg" }).toArray();
 
-    const expected = await fetch("https://deno.land/images/deno_logo_4.gif");
-    const actual = await new Response(await bucket.openDownloadStream(getId))
-      .arrayBuffer();
+    const notExpected = await Deno.readFile("tests/assets/2.jpg");
+    const actual = await streamReadAll(await bucket.openDownloadStream(_id));
 
-    assert(!bufferEquals(actual, await expected.arrayBuffer()));
+    assertNotEquals(actual, notExpected);
   },
 );
 

@@ -61,7 +61,7 @@ type LegacyNearSphereDocumentQuery = {
 } & DistanceConstraint;
 
 const placeDataString = await Deno.readTextFile(
-  "tests/testdata/sample_places.json",
+  "tests/assets/sample_places.json",
 );
 
 // deno-lint-ignore no-explicit-any
@@ -78,7 +78,7 @@ const placeData: IPlace[] = (JSON.parse(placeDataString) as any[])
   }));
 
 const neighborhoodsDataString = await Deno.readTextFile(
-  "tests/testdata/sample_neighborhoods.json",
+  "tests/assets/sample_neighborhoods.json",
 );
 
 const neighborhoodsData: INeighborhoods[] =
