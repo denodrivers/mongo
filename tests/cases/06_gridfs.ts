@@ -35,14 +35,14 @@ testWithClient("GridFS: Echo large Image", async (client) => {
     chunkSizeBytes: 255 * 8,
   });
 
-  await (await fetch("https://deno.land/images/deno_logo.png")).body!.pipeTo(
+  await (await fetch("https://deno.land/images/artwork/snow_den.png")).body!.pipeTo(
     upstream,
   );
 
   const getId =
     (await bucket.find({ filename: "deno_logo.png" }).toArray())[0]._id;
 
-  const expected = await fetch("https://deno.land/images/deno_logo.png");
+  const expected = await fetch("https://deno.land/images/artwork/snow_den.png");
   const actual = await new Response(await bucket.openDownloadStream(getId))
     .arrayBuffer();
 
