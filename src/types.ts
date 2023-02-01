@@ -708,7 +708,8 @@ interface UpdateOperators<T> extends Document {
       $slice?: number;
       $position?: number;
       $sort?: 1 | -1;
-    };
+      // deno-lint-ignore no-explicit-any
+    } | (T[Key] extends Array<any> ? T[Key][number] : void);
   };
   $bit?: DocumentOperator<
     T,
