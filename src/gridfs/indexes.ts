@@ -1,8 +1,9 @@
 import { Collection } from "../collection/collection.ts";
 import { Chunk, File } from "../types/gridfs.ts";
 import { IndexOptions } from "../types.ts";
+import { Document } from "../../deps.ts";
 
-async function ensureIndex<T>(
+async function ensureIndex<T extends Document>(
   index: IndexOptions,
   collection: Collection<T>,
 ): Promise<ReturnType<Collection<T>["createIndexes"]>> {

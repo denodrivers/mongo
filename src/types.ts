@@ -793,7 +793,7 @@ type Flatten<T> = T extends Array<infer Item> ? Item : T;
 
 type IsAny<T, Y, N> = 0 extends (1 & T) ? Y : N;
 
-export type InsertDocument<TDocument extends { _id?: ObjectId }> =
+export type InsertDocument<TDocument extends Document> =
   & Omit<TDocument, "_id">
   & {
     _id?: TDocument["_id"] | ObjectId;

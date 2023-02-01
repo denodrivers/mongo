@@ -38,7 +38,7 @@ export class Database {
     });
   }
 
-  collection<T = Document>(name: string): Collection<T> {
+  collection<T extends Document = Document>(name: string): Collection<T> {
     return new Collection<T>(this.#cluster.protocol, this.name, name);
   }
 
@@ -88,7 +88,7 @@ export class Database {
    *
    * https://www.mongodb.com/docs/manual/reference/command/create/#mongodb-dbcommand-dbcmd.create
    */
-  async createCollection<T>(
+  async createCollection<T extends Document>(
     name: string,
     options?: CreateCollectionOptions,
   ): Promise<Collection<T>> {
