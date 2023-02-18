@@ -7,6 +7,20 @@
   <img src="https://user-images.githubusercontent.com/47688578/168461127-aeadaaf5-224d-4664-8a1d-4789c4ee9281.jpg" width="210">
 </div>
 
+## ATTENTION
+
+**Deno have added the support for npm modules. so you can also use `npm:mongodb`
+driver from now.**\
+Each of these two drivers has its own advantages and disadvantages. you can
+follow [this](https://github.com/denodrivers/mongo/issues/380) issue for more
+details. In short:
+
+- if you want to use basic MongoDB operations and you don't care about
+  stability, this driver just works.
+- if you want most of MongoDB feature working with Deno and you don't care about
+  the possible overheads by using node compat layer, you may try the
+  `npm:mongodb` driver
+
 [![tag](https://img.shields.io/github/tag/manyuanrong/deno_mongo.svg)](https://github.com/manyuanrong/deno_mongo/releases)
 [![Build Status](https://github.com/manyuanrong/deno_mongo/workflows/ci/badge.svg?branch=main)](https://github.com/manyuanrong/deno_mongo/actions)
 [![license](https://img.shields.io/github/license/manyuanrong/deno_mongo.svg)](https://github.com/manyuanrong/deno_mongo)
