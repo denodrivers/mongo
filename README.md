@@ -20,6 +20,8 @@ details. In short:
 - if you want most of MongoDB feature working with Deno and you don't care about
   the possible overheads by using node compat layer, you may try the
   `npm:mongodb` driver
+- if you are using MongoDB Atlas, using
+  [atlas_sdk](https://github.com/erfanium/atlas_sdk) can be your best option.
 
 [![tag](https://img.shields.io/github/tag/manyuanrong/deno_mongo.svg)](https://github.com/manyuanrong/deno_mongo/releases)
 [![Build Status](https://github.com/manyuanrong/deno_mongo/workflows/ci/badge.svg?branch=main)](https://github.com/manyuanrong/deno_mongo/actions)
