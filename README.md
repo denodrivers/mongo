@@ -121,6 +121,11 @@ const all_users = await users.find({ username: { $ne: null } }).toArray();
 const user1_id = await users.findOne({
   _id: new ObjectId("SOME OBJECTID STRING"),
 });
+
+// use the option { noCursorTimeout: false } if you are using a shared cluster
+// see https://www.mongodb.com/docs/atlas/reference/free-shared-limitations/
+const user1 = await users.findOne({...},{ noCursorTimeout: false });
+const all_users = await users.find({...},{ noCursorTimeout: false }).toArray();
 ```
 
 ### Count
