@@ -692,24 +692,24 @@ interface UpdateOperators<T> extends Document {
   // deno-lint-ignore no-explicit-any
   $pop?: DocumentOperator<T, Array<any>, (1 | -1)>;
   $pull?: {
-    // deno-lint-ignore no-explicit-any
-    [Key in KeysOfType<T, Array<any>>]?:
-      | Flatten<T[Key]>
-      | FilterOperators<Flatten<T[Key]>>;
+    [Key in ArrayKeys<T>]?:
+      | Flatten<KeyWithSubKeys<T, Key>>
+      | FilterOperators<Flatten<KeyWithSubKeys<T, Key>>>;
   };
   $pullAll?: {
-    // deno-lint-ignore no-explicit-any
-    [Key in KeysOfType<T, Array<any>>]?: T[Key];
+    [Key in ArrayKeys<T>]?: KeyWithSubKeys<T, Key>;
   };
   $push?: {
-    // deno-lint-ignore no-explicit-any
-    [Key in KeysOfType<T, Array<any>>]?: {
-      $each?: T[Key];
-      $slice?: number;
-      $position?: number;
-      $sort?: 1 | -1;
-      // deno-lint-ignore no-explicit-any
-    } | (T[Key] extends Array<any> ? T[Key][number] : void);
+    [Key in ArrayKeys<T>]?:
+      | {
+        $each?: KeyWithSubKeys<T, Key>;
+        $slice?: number;
+        $position?: number;
+        $sort?: 1 | -1;
+      }
+      | (KeyWithSubKeys<T, Key> extends Array<unknown>
+        ? KeyWithSubKeys<T, Key>[number]
+        : void);
   };
   $bit?: DocumentOperator<
     T,
@@ -803,6 +803,32 @@ export type InsertDocument<TDocument extends Document> =
 type KeysOfType<T, Type> = {
   [Key in keyof T]: NonNullable<T[Key]> extends Type ? Key : never;
 }[keyof T];
+
+/*
+type ArrayKeys<T> = {
+  [K in keyof T]:
+  T[K] extends Array<unknown>
+  ? K | `${Extract<K, string>}.${ArrayKeys<T[K][number]>}`
+  : T[K] extends object
+  ? `${Extract<K, string>}.${ArrayKeys<T[K]>}`
+  : never;
+}[keyof T];
+*/
+type ArrayKeys<T> = {
+  [K in keyof T]: T[K] extends Array<unknown> ? K
+    : T[K] extends Record<string, unknown>
+      ? K extends string ? `${K}.${ArrayKeys<T[K]>}`
+      : never
+    : never;
+}[keyof T] extends infer Keys ? Keys extends string ? Keys : never : never;
+
+type Split<S extends string, D extends string> = S extends
+  `${infer T}${D}${infer U}` ? [T, ...Split<U, D>] : [S];
+
+type KeyWithSubKeys<T, K extends string> = K extends
+  `${infer Key}.${infer Rest}` ? KeyWithSubKeys<T[Extract<Key, keyof T>], Rest>
+  : K extends keyof T ? T[K]
+  : never;
 
 /** The document returned by the buildInfo command. */
 export interface BuildInfo {
