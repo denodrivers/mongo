@@ -804,7 +804,6 @@ type KeysOfType<T, Type> = {
   [Key in keyof T]: NonNullable<T[Key]> extends Type ? Key : never;
 }[keyof T];
 
-
 type ArrayKeys<T> = {
   [K in keyof T]: T[K] extends Array<unknown> ? K
     : T[K] extends Record<string, unknown>

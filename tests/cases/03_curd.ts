@@ -239,6 +239,26 @@ testWithTestDBClient("testUpdateOneWithPush", async (db) => {
     upsertedId: undefined,
   });
 });
+testWithTestDBClient("testUpdateOneWithPull", async (db) => {
+  const users = db.collection<ComplexUser>("mongo_test_users");
+  await users.insertOne({
+    likes: {
+      food: ["pizza", "pasta"],
+      drinks: [],
+      hobbies: { indoor: [], outdoor: [] },
+    },
+    friends: ["Alice", "Bob"],
+  });
+  const result = await users.updateOne({}, {
+    $pull: { friends: "Bob" },
+  });
+  assertEquals(result, {
+    matchedCount: 1,
+    modifiedCount: 1,
+    upsertedCount: 0,
+    upsertedId: undefined,
+  });
+});
 testWithTestDBClient("testUpdateOneWithNestedPush", async (db) => {
   const users = db.collection<ComplexUser>("mongo_test_users");
   await users.insertOne({
