@@ -15,6 +15,21 @@ interface User {
   date?: Date;
 }
 
+interface ComplexUser {
+  _id: string | ObjectId;
+  username?: string;
+  password?: string;
+  friends: string[];
+  likes: {
+    drinks: string[];
+    food: string[];
+    hobbies: {
+      indoor: string[];
+      outdoor: string[];
+    };
+  };
+}
+
 const dateNow = Date.now();
 
 testWithClient("testListCollectionNames", async (client) => {
@@ -197,6 +212,106 @@ testWithTestDBClient("testUpdateOne", async (db) => {
     password: "pass1",
   });
   const result = await users.updateOne({}, { $set: { username: "USER1" } });
+  assertEquals(result, {
+    matchedCount: 1,
+    modifiedCount: 1,
+    upsertedCount: 0,
+    upsertedId: undefined,
+  });
+});
+testWithTestDBClient("testUpdateOneWithPush", async (db) => {
+  const users = db.collection<ComplexUser>("mongo_test_users");
+  await users.insertOne({
+    likes: {
+      food: ["pizza", "pasta"],
+      drinks: [],
+      hobbies: { indoor: [], outdoor: [] },
+    },
+    friends: ["Alice", "Bob"],
+  });
+  const result = await users.updateOne({}, {
+    $push: { friends: { $each: ["Carol"] } },
+  });
+  assertEquals(result, {
+    matchedCount: 1,
+    modifiedCount: 1,
+    upsertedCount: 0,
+    upsertedId: undefined,
+  });
+});
+testWithTestDBClient("testUpdateOneWithPull", async (db) => {
+  const users = db.collection<ComplexUser>("mongo_test_users");
+  await users.insertOne({
+    likes: {
+      food: ["pizza", "pasta"],
+      drinks: [],
+      hobbies: { indoor: [], outdoor: [] },
+    },
+    friends: ["Alice", "Bob"],
+  });
+  const result = await users.updateOne({}, {
+    $pull: { friends: "Bob" },
+  });
+  assertEquals(result, {
+    matchedCount: 1,
+    modifiedCount: 1,
+    upsertedCount: 0,
+    upsertedId: undefined,
+  });
+});
+testWithTestDBClient("testUpdateOneWithNestedPush", async (db) => {
+  const users = db.collection<ComplexUser>("mongo_test_users");
+  await users.insertOne({
+    likes: {
+      food: ["pizza", "pasta"],
+      drinks: [],
+      hobbies: { indoor: [], outdoor: [] },
+    },
+    friends: ["Alice", "Bob"],
+  });
+  const result = await users.updateOne({}, {
+    $push: { "likes.hobbies.indoor": "board games" },
+  });
+  assertEquals(result, {
+    matchedCount: 1,
+    modifiedCount: 1,
+    upsertedCount: 0,
+    upsertedId: undefined,
+  });
+});
+testWithTestDBClient("testUpdateOneWithNestedPullAll", async (db) => {
+  const users = db.collection<ComplexUser>("mongo_test_users");
+  await users.insertOne({
+    likes: {
+      food: ["pizza", "pasta"],
+      drinks: [],
+      hobbies: { indoor: ["board games", "cooking"], outdoor: [] },
+    },
+    friends: ["Alice", "Bob"],
+  });
+  const result = await users.updateOne({}, {
+    $pullAll: { "likes.hobbies.indoor": ["board games", "cooking"] },
+  });
+  assertEquals(result, {
+    matchedCount: 1,
+    modifiedCount: 1,
+    upsertedCount: 0,
+    upsertedId: undefined,
+  });
+});
+testWithTestDBClient("testUpdateOneWithNestedPull", async (db) => {
+  const users = db.collection<ComplexUser>("mongo_test_users");
+  await users.insertOne({
+    likes: {
+      food: ["pizza", "pasta"],
+      drinks: [],
+      hobbies: { indoor: ["board games", "cooking"], outdoor: [] },
+    },
+    friends: ["Alice", "Bob"],
+  });
+  const result = await users.updateOne({}, {
+    $pull: { "likes.hobbies.indoor": "board games" },
+  });
   assertEquals(result, {
     matchedCount: 1,
     modifiedCount: 1,
