@@ -121,7 +121,7 @@ testWithTestDBClient("testFindOne", async (db) => {
   const user1 = await users.findOne();
   assertEquals(Object.keys(user1!), ["_id", "username", "password", "date"]);
 
-  const query = { test: 1 };
+  const query = { username: "does not exist" };
   const findNull = await users.findOne(query);
   assertEquals(findNull, undefined);
   const projectionUser = await users.findOne(
@@ -134,6 +134,60 @@ testWithTestDBClient("testFindOne", async (db) => {
     { projection: { username: 1 } },
   );
   assertEquals(Object.keys(projectionUserWithId!), ["_id", "username"]);
+});
+
+testWithTestDBClient("testFindOneWithNestedDocument", async (db) => {
+  const users = db.collection<ComplexUser>("mongo_test_users");
+  await users.insertOne({
+    username: "user1",
+    password: "pass1",
+    friends: ["Alice", "Bob"],
+    likes: {
+      drinks: ["coffee", "tea"],
+      food: ["pizza", "pasta"],
+      hobbies: {
+        indoor: ["puzzles", "reading"],
+        outdoor: ["hiking", "climbing"],
+      },
+    },
+  });
+  const user1 = await users.findOne({
+    "likes.hobbies.outdoor": { $elemMatch: { $eq: "climbing" } },
+  });
+  assertEquals(Object.keys(user1!), [
+    "_id",
+    "username",
+    "password",
+    "friends",
+    "likes",
+  ]);
+});
+
+testWithTestDBClient("testFindOneWithNestedDocument", async (db) => {
+  const users = db.collection<ComplexUser>("mongo_test_users");
+  await users.insertOne({
+    username: "user1",
+    password: "pass1",
+    friends: ["Alice", "Bob"],
+    likes: {
+      drinks: ["coffee", "tea"],
+      food: ["pizza", "pasta"],
+      hobbies: {
+        indoor: ["puzzles", "reading"],
+        outdoor: ["hiking", "climbing"],
+      },
+    },
+  });
+  const user1 = await users.findOne({
+    "likes.hobbies.outdoor": { $elemMatch: { $eq: "climbing" } },
+  });
+  assertEquals(Object.keys(user1!), [
+    "_id",
+    "username",
+    "password",
+    "friends",
+    "likes",
+  ]);
 });
 
 testWithTestDBClient("testInsertMany", async (db) => {
@@ -425,7 +479,7 @@ testWithTestDBClient("testFind", async (db) => {
   assert(findUsers instanceof Array);
   assertEquals(findUsers.length, 1);
 
-  const notFound = await users.find({ test: 1 }).toArray();
+  const notFound = await users.find({ username: "does not exist" }).toArray();
   assertEquals(notFound, []);
 });
 
@@ -688,7 +742,7 @@ testWithTestDBClient("testFindEmptyAsyncIteration", async (db) => {
       uid: i,
     });
   }
-  const cursor = users.find({ nonexistent: "foo" });
+  const cursor = users.find({ username: "does not exist" });
   const docs = [];
   for await (const doc of cursor) {
     docs.push(doc);
