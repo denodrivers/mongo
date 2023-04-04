@@ -618,7 +618,7 @@ type IntegerType = number | Int32 | Long;
 
 type NumericType = IntegerType | Decimal128 | Double;
 
-interface RootFilterOperators<T> extends Document {
+interface RootFilterOperators<T> {
   $and?: Filter<T>[];
   $nor?: Filter<T>[];
   $or?: Filter<T>[];
@@ -637,7 +637,7 @@ interface RootFilterOperators<T> extends Document {
  *
  * @see https://docs.mongodb.com/manual/reference/operator/query/
  */
-interface FilterOperators<TValue> extends Document {
+interface FilterOperators<TValue> {
   $eq?: TValue;
   $gt?: TValue;
   $gte?: TValue;
@@ -775,7 +775,9 @@ export type Filter<T> =
   & NotImplementedOperators<"$type">
   & RootFilterOperators<T>
   & {
-    [Key in keyof T]?: T[Key] | FilterOperators<T[Key]>;
+    [Key in AllKeys<T>]?:
+      | KeyWithSubKeys<T, Key>
+      | FilterOperators<KeyWithSubKeys<T, Key>>;
   };
 
 export type UpdateFilter<T> =
@@ -812,8 +814,12 @@ type ArrayKeys<T> = {
     : never;
 }[keyof T] extends infer Keys ? Keys extends string ? Keys : never : never;
 
-type Split<S extends string, D extends string> = S extends
-  `${infer T}${D}${infer U}` ? [T, ...Split<U, D>] : [S];
+type AllKeys<T> = T extends Document ? {
+    [K in keyof T]: T[K] extends Record<string, unknown>
+      ? `${string & K}.${AllKeys<T[K]>}` | `${string & K}`
+      : `${string & K}`;
+  }[keyof T]
+  : never;
 
 type KeyWithSubKeys<T, K extends string> = K extends
   `${infer Key}.${infer Rest}` ? KeyWithSubKeys<T[Extract<Key, keyof T>], Rest>
