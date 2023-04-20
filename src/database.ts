@@ -128,4 +128,9 @@ export class Database {
       comment: options?.comment,
     });
   }
+
+  // deno-lint-ignore no-explicit-any
+  runCommand<T = any>(body: Document): Promise<T> {
+    return this.#cluster.protocol.commandSingle(this.name, body);
+  }
 }
