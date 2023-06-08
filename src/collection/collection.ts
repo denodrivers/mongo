@@ -68,7 +68,7 @@ export class Collection<T extends Document> {
   async findAndModify(
     filter?: Filter<T>,
     options?: FindAndModifyOptions<T>,
-  ): Promise<T | undefined> {
+  ): Promise<T | null> {
     const result = await this.#protocol.commandSingle<{
       value: T;
       ok: number;
