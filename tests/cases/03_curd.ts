@@ -207,6 +207,25 @@ testWithTestDBClient("testInsertMany", async (db) => {
   assertEquals(insertedIds.length, 2);
 });
 
+testWithTestDBClient("testFindAndModify-notfound", async (db) => {
+  const users = db.collection<{ username: string; counter: number }>(
+    "mongo_test_users",
+  );
+
+  const find = await users.findAndModify(
+    {
+      // this query matches no document
+      $and: [{ username: "a" }, { username: "b" }],
+    },
+    {
+      new: false,
+    },
+  );
+
+  assert(find === null);
+  assert(find !== undefined);
+});
+
 testWithTestDBClient("testFindAndModify-update", async (db) => {
   const users = db.collection<{ username: string; counter: number }>(
     "mongo_test_users",
