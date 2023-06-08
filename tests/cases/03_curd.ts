@@ -218,6 +218,7 @@ testWithTestDBClient("testFindAndModify-notfound", async (db) => {
       $and: [{ username: "a" }, { username: "b" }],
     },
     {
+      update: { $inc: { counter: 1 } },
       new: false,
     },
   );
