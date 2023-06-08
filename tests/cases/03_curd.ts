@@ -217,7 +217,7 @@ testWithTestDBClient("testFindAndModify-update", async (db) => {
     new: true,
   });
 
-  assert(updated !== undefined);
+  assert(updated !== null);
   assertEquals(updated.counter, 6);
   assertEquals(updated.username, "counter");
 });
@@ -231,7 +231,7 @@ testWithTestDBClient("testFindAndModify-delete", async (db) => {
     remove: true,
   });
 
-  assert(updated !== undefined);
+  assert(updated !== null);
   assertEquals(updated.counter, 10);
   assertEquals(updated.username, "delete");
 
