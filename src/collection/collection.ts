@@ -157,8 +157,8 @@ export class Collection<T extends Document> {
     docs: InsertDocument<T> | InsertDocument<T>[],
     options?: InsertOptions,
   ) {
-    docs = Array.isArray(docs) ? docs : [docs];
-    return this.insertMany(docs, options);
+    const _docs = Array.isArray(docs) ? docs : [docs];
+    return this.insertMany(_docs, options);
   }
 
   async insertMany(
@@ -166,7 +166,7 @@ export class Collection<T extends Document> {
     options?: InsertOptions,
   ): Promise<
     {
-      insertedIds: (ObjectId | Required<InsertDocument<T>>["_id"])[];
+      insertedIds: Required<InsertDocument<T>>["_id"][];
       insertedCount: number;
     }
   > {
