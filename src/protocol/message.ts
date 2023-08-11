@@ -145,7 +145,7 @@ export function deserializeMessage(
 function parseDocuments(buffer: Uint8Array): Document[] {
   let pos = 0;
   const docs = [];
-  const view = new DataView(buffer);
+  const view = new DataView(buffer.buffer);
   while (pos < buffer.byteLength) {
     const docLen = view.getInt32(pos, true);
     const doc = deserialize(buffer.slice(pos, pos + docLen));
