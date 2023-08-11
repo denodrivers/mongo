@@ -1,6 +1,6 @@
-# arkiver-mongo
+# deno_mongo
 
-> **arkiver-mongo** is a fork of **deno_mongo** which is a **MongoDB** database driver developed for Deno. supports
+> **deno_mongo** is a **MongoDB** database driver developed for Deno. supports
 > Deno Deploy as well.
 
 <div align="center">
