@@ -64,13 +64,13 @@ describe(
             v: 2,
             key: { _id: 1 },
             name: "_id_",
-            ns: "test." + testCollectionName,
+            ns: `test.${testCollectionName}`,
           },
           {
             v: 2,
             key: { name: 1 },
             name: "_name",
-            ns: "test." + testCollectionName,
+            ns: `test.${testCollectionName}`,
           },
         ];
       assertEquals(
@@ -101,7 +101,7 @@ describe(
             v: 2,
             key: { _id: 1 },
             name: "_id_",
-            ns: "test.mongo_test_use2rs",
+            ns: `test.${testCollectionName}`,
           },
         ];
       assertEquals(
