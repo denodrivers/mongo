@@ -1,7 +1,3 @@
-import {
-  afterEach,
-  beforeEach,
-} from "https://deno.land/std@0.201.0/testing/bdd.ts";
 import { Database, MongoClient, ObjectId } from "../../mod.ts";
 import {
   MongoInvalidArgumentError,
@@ -10,9 +6,11 @@ import {
 import { CreateCollectionOptions } from "../../src/types.ts";
 import { cleanTestDb, getTestDb } from "../common.ts";
 import {
+  afterEach,
   assert,
   assertEquals,
   assertRejects,
+  beforeEach,
   describe,
   it,
   semver,

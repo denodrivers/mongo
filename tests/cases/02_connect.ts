@@ -1,9 +1,12 @@
-import { assert, assertEquals, describe, it } from "../test.deps.ts";
-import { MongoClient } from "../../src/client.ts";
 import {
   afterEach,
+  assert,
+  assertEquals,
   beforeEach,
-} from "https://deno.land/std@0.201.0/testing/bdd.ts";
+  describe,
+  it,
+} from "../test.deps.ts";
+import { MongoClient } from "../../src/client.ts";
 
 const hostname = "127.0.0.1";
 

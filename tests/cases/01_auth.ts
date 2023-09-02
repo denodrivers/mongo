@@ -1,4 +1,3 @@
-import { afterAll } from "https://deno.land/std@0.201.0/testing/bdd.ts";
 import { Database } from "../../mod.ts";
 import {
   cleanUsername,
@@ -8,7 +7,14 @@ import {
 } from "../../src/auth/mod.ts";
 import { MongoClient } from "../../src/client.ts";
 import { cleanTestDb, getTestDb } from "../common.ts";
-import { assert, assertEquals, beforeAll, describe, it } from "../test.deps.ts";
+import {
+  afterAll,
+  assert,
+  assertEquals,
+  beforeAll,
+  describe,
+  it,
+} from "../test.deps.ts";
 
 describe("auth", () => {
   describe("prerequisites", () => {
