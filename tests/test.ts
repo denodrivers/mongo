@@ -1,11 +1,11 @@
 import "./cases/00_uri.ts";
 import "./cases/01_auth.ts";
 import "./cases/02_connect.ts";
-import "./cases/03_curd.ts";
+import "./cases/03_crud.ts";
 import "./cases/04_indexes.ts";
 import "./cases/05_srv.ts";
 import "./cases/06_gridfs.ts";
 import "./cases/07_worker.ts";
 import "./cases/08_find_cursor.ts";
 import "./cases/09_geospatial_types.ts";
-import "./cases/99_cleanup.ts";
+import "./cases/10_command_helpers.ts";

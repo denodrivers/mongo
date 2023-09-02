@@ -2,32 +2,35 @@ import { Database, MongoClient } from "../mod.ts";
 
 const hostname = "127.0.0.1";
 
-export function testWithClient(
-  name: string,
-  fn: (client: MongoClient) => void | Promise<void>,
-) {
-  Deno.test(name, async () => {
-    const client = await getClient();
-    await fn(client);
-    client.close();
-  });
-}
-
-export function testWithTestDBClient(
-  name: string,
-  fn: (db: Database) => void | Promise<void>,
-) {
-  Deno.test(name, async () => {
-    const client = await getClient();
-    const db = client.database("test");
-    await fn(db);
-    await db.collection("mongo_test_users").drop().catch((e) => e);
-    client.close();
-  });
-}
-
-async function getClient(): Promise<MongoClient> {
+export async function getClient(): Promise<MongoClient> {
   const client = new MongoClient();
   await client.connect(`mongodb://${hostname}:27017`);
   return client;
+}
+
+export async function getTestDb(): Promise<
+  { client: MongoClient; database: Database }
+> {
+  const client = await getClient();
+  return {
+    client,
+    database: client.database("test"),
+  };
+}
+
+export async function cleanTestDb(
+  client: MongoClient,
+  database: Database,
+  collectionNames?: string[] | string,
+) {
+  if (typeof collectionNames === "string") {
+    collectionNames = [collectionNames];
+  }
+  if (collectionNames !== undefined) {
+    for (const collectionName of collectionNames) {
+      await database.collection(collectionName).drop().catch((e) => e);
+    }
+  }
+  await database.dropDatabase().catch((e) => e);
+  client.close();
 }
