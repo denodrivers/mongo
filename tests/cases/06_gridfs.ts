@@ -9,14 +9,10 @@ import {
   beforeEach,
   describe,
   it,
-  readAll,
-  readerFromStreamReader,
 } from "../test.deps.ts";
 
 async function streamReadAll(readable: ReadableStream): Promise<Uint8Array> {
-  const reader = readerFromStreamReader(readable.getReader());
-  const result = await readAll(reader);
-  return result;
+  return new Uint8Array(await new Response(readable).arrayBuffer());
 }
 
 describe("GridFS", () => {
