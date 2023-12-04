@@ -12,7 +12,7 @@ import type { Credential, Document } from "../types.ts";
 import { saslprep } from "../utils/saslprep/mod.ts";
 import { type AuthContext, AuthPlugin } from "./base.ts";
 import { pbkdf2 } from "./pbkdf2.ts";
-import { decodeBase64 } from "../utils/decodeBase64.ts";
+import { decodeBase64 } from "../utils/decode_base64.ts";
 
 type CryptoMethod = "sha1" | "sha256";
 
