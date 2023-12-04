@@ -120,6 +120,17 @@ export async function executeScram(
   return continueScramConversation(cryptoMethod, result, authContext);
 }
 
+function decodeBase64(b64: string): Uint8Array {
+  const b64Web = b64.replace(/-/g, "+").replace(/_/g, "/");
+  const binString = atob(b64Web);
+  const size = binString.length;
+  const bytes = new Uint8Array(size);
+  for (let i = 0; i < size; i++) {
+    bytes[i] = binString.charCodeAt(i);
+  }
+  return bytes;
+}
+
 export async function continueScramConversation(
   cryptoMethod: CryptoMethod,
   response: Document,
