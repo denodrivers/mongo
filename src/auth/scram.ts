@@ -6,7 +6,7 @@ import { MongoDriverError } from "../error.ts";
 import { b64, Binary, crypto as stdCrypto, Document, hex } from "../../deps.ts";
 import { driverMetadata } from "../protocol/mod.ts";
 import { pbkdf2 } from "./pbkdf2.ts";
-import { decodeBase64 } from "../utils/decodeBase64.ts";
+import { decodeBase64 } from "../utils/decode_base64.ts";
 
 type CryptoMethod = "sha1" | "sha256";
 
