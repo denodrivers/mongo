@@ -12,6 +12,7 @@ import type { Credential, Document } from "../types.ts";
 import { saslprep } from "../utils/saslprep/mod.ts";
 import { type AuthContext, AuthPlugin } from "./base.ts";
 import { pbkdf2 } from "./pbkdf2.ts";
+import { decodeBase64 } from "../utils/decodeBase64.ts";
 
 type CryptoMethod = "sha1" | "sha256";
 
@@ -118,17 +119,6 @@ export async function executeScram(
   const saslStartCmd = makeFirstMessage(cryptoMethod, credentials, nonce);
   const result = await protocol.commandSingle(db, saslStartCmd);
   return continueScramConversation(cryptoMethod, result, authContext);
-}
-
-function decodeBase64(b64: string): Uint8Array {
-  const b64Web = b64.replace(/-/g, "+").replace(/_/g, "/");
-  const binString = atob(b64Web);
-  const size = binString.length;
-  const bytes = new Uint8Array(size);
-  for (let i = 0; i < size; i++) {
-    bytes[i] = binString.charCodeAt(i);
-  }
-  return bytes;
 }
 
 export async function continueScramConversation(
