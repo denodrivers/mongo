@@ -6,6 +6,7 @@ import { MongoDriverError } from "../error.ts";
 import { b64, Binary, crypto as stdCrypto, Document, hex } from "../../deps.ts";
 import { driverMetadata } from "../protocol/mod.ts";
 import { pbkdf2 } from "./pbkdf2.ts";
+import { decodeBase64 } from "../utils/decodeBase64.ts";
 
 type CryptoMethod = "sha1" | "sha256";
 
@@ -114,17 +115,6 @@ export async function executeScram(
   return continueScramConversation(cryptoMethod, result, authContext);
 }
 
-function decodeBase64(b64: string): Uint8Array {
-  const b64Web = b64.replace(/-/g, "+").replace(/_/g, "/");
-  const binString = atob(b64Web);
-  const size = binString.length;
-  const bytes = new Uint8Array(size);
-  for (let i = 0; i < size; i++) {
-    bytes[i] = binString.charCodeAt(i);
-  }
-  return bytes;
-}
-
 export async function continueScramConversation(
   cryptoMethod: CryptoMethod,
   response: Document,
@@ -171,7 +161,7 @@ export async function continueScramConversation(
   const withoutProof = `c=biws,r=${rnonce}`;
   const saltedPassword = await HI(
     processedPassword,
-    b64.decode(salt),
+    decodeBase64(salt),
     iterations,
     cryptoMethod,
   );
