@@ -1,6 +1,4 @@
-import {
-  Document,
-} from "../../deps.ts";
+import { Document } from "../../deps.ts";
 import {
   MongoDriverError,
   MongoErrorInfo,
@@ -109,12 +107,16 @@ export class WireProtocol {
     this.#isPendingResponse = true;
     while (this.#pendingResponses.size > 0) {
       const headerBuffer = await this.#reader.read(new Uint8Array(16));
-      if (!headerBuffer.value) throw new MongoDriverError("Invalid response header");
+      if (!headerBuffer.value) {
+        throw new MongoDriverError("Invalid response header");
+      }
       const header = parseHeader(headerBuffer.value);
       const bodyBuffer = await this.#reader.read(
         new Uint8Array(header.messageLength - 16),
       );
-      if (!bodyBuffer.value) throw new MongoDriverError("Invalid response body");
+      if (!bodyBuffer.value) {
+        throw new MongoDriverError("Invalid response body");
+      }
       const reply = deserializeMessage(header, bodyBuffer.value);
       const pendingMessage = this.#pendingResponses.get(header.responseTo);
       this.#pendingResponses.delete(header.responseTo);
