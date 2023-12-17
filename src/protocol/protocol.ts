@@ -1,4 +1,4 @@
-import { Document } from "../../deps.ts";
+import { BufReader, Document, writeAll } from "../../deps.ts";
 import {
   MongoDriverError,
   MongoErrorInfo,
@@ -8,7 +8,7 @@ import { handshake } from "./handshake.ts";
 import { parseHeader } from "./header.ts";
 import { deserializeMessage, Message, serializeMessage } from "./message.ts";
 
-type Socket = ReadableStream & WritableStream;
+type Socket = Deno.Reader & Deno.Writer;
 interface CommandTask {
   requestId: number;
   db: string;
@@ -27,12 +27,12 @@ export class WireProtocol {
     // deno-lint-ignore no-explicit-any
     reject: (reason?: any) => void;
   }> = new Map();
-  #reader: ReadableStreamBYOBReader;
+  #reader: BufReader;
   #commandQueue: CommandTask[] = [];
 
   constructor(socket: Socket) {
     this.#socket = socket;
-    this.#reader = new ReadableStreamBYOBReader(this.#socket);
+    this.#reader = new BufReader(this.#socket);
   }
 
   async connect() {
@@ -97,7 +97,7 @@ export class WireProtocol {
         ],
       });
 
-      await ReadableStream.from(buffer).pipeTo(this.#socket);
+      await writeAll(this.#socket, buffer);
     }
     this.#isPendingRequest = false;
   }
@@ -106,18 +106,18 @@ export class WireProtocol {
     if (this.#isPendingResponse) return;
     this.#isPendingResponse = true;
     while (this.#pendingResponses.size > 0) {
-      const headerBuffer = await this.#reader.read(new Uint8Array(16));
-      if (!headerBuffer.value) {
+      const headerBuffer = await this.#reader.readFull(new Uint8Array(16));
+      if (!headerBuffer) {
         throw new MongoDriverError("Invalid response header");
       }
-      const header = parseHeader(headerBuffer.value);
-      const bodyBuffer = await this.#reader.read(
+      const header = parseHeader(headerBuffer);
+      const bodyBuffer = await this.#reader.readFull(
         new Uint8Array(header.messageLength - 16),
       );
-      if (!bodyBuffer.value) {
+      if (!bodyBuffer) {
         throw new MongoDriverError("Invalid response body");
       }
-      const reply = deserializeMessage(header, bodyBuffer.value);
+      const reply = deserializeMessage(header, bodyBuffer);
       const pendingMessage = this.#pendingResponses.get(header.responseTo);
       this.#pendingResponses.delete(header.responseTo);
       pendingMessage?.resolve(reply);
