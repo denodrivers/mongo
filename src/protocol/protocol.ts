@@ -1,10 +1,4 @@
-import {
-  BufReader,
-  Deferred,
-  deferred,
-  Document,
-  writeAll,
-} from "../../deps.ts";
+import { BufReader, Document, writeAll } from "../../deps.ts";
 import {
   MongoDriverError,
   MongoErrorInfo,
@@ -27,7 +21,12 @@ export class WireProtocol {
   #socket: Socket;
   #isPendingResponse = false;
   #isPendingRequest = false;
-  #pendingResponses: Map<number, Deferred<Message>> = new Map();
+  #pendingResponses: Map<number, {
+    promise: Promise<Message>;
+    resolve: (value: Message | PromiseLike<Message>) => void;
+    // deno-lint-ignore no-explicit-any
+    reject: (reason?: any) => void;
+  }> = new Map();
   #reader: BufReader;
   #commandQueue: CommandTask[] = [];
 
@@ -62,10 +61,10 @@ export class WireProtocol {
     this.#commandQueue.push(commandTask);
     this.send();
 
-    const pendingMessage = deferred<Message>();
+    const pendingMessage = Promise.withResolvers<Message>();
     this.#pendingResponses.set(requestId, pendingMessage);
     this.receive();
-    const message = await pendingMessage;
+    const message = await pendingMessage.promise;
 
     let documents: T[] = [];
 
@@ -108,12 +107,16 @@ export class WireProtocol {
     this.#isPendingResponse = true;
     while (this.#pendingResponses.size > 0) {
       const headerBuffer = await this.#reader.readFull(new Uint8Array(16));
-      if (!headerBuffer) throw new MongoDriverError("Invalid response header");
+      if (!headerBuffer) {
+        throw new MongoDriverError("Invalid response header");
+      }
       const header = parseHeader(headerBuffer);
       const bodyBuffer = await this.#reader.readFull(
         new Uint8Array(header.messageLength - 16),
       );
-      if (!bodyBuffer) throw new MongoDriverError("Invalid response body");
+      if (!bodyBuffer) {
+        throw new MongoDriverError("Invalid response body");
+      }
       const reply = deserializeMessage(header, bodyBuffer);
       const pendingMessage = this.#pendingResponses.get(header.responseTo);
       this.#pendingResponses.delete(header.responseTo);

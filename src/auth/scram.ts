@@ -65,7 +65,7 @@ export function clientFirstMessageBare(username: string, nonce: Uint8Array) {
       ...enc.encode("n="),
       ...enc.encode(username),
       ...enc.encode(",r="),
-      ...enc.encode(b64.encode(nonce)),
+      ...enc.encode(b64.encodeBase64(nonce)),
     ],
   );
 }
@@ -160,7 +160,7 @@ export async function continueScramConversation(
   const withoutProof = `c=biws,r=${rnonce}`;
   const saltedPassword = await HI(
     processedPassword,
-    b64.decode(salt),
+    b64.decodeBase64(salt),
     iterations,
     cryptoMethod,
   );
@@ -193,7 +193,7 @@ export async function continueScramConversation(
   );
   if (
     !compareDigest(
-      b64.decode(parsedResponse.v),
+      b64.decodeBase64(parsedResponse.v),
       new Uint8Array(serverSignature),
     )
   ) {
@@ -260,7 +260,7 @@ export async function passwordDigest(
     "MD5",
     enc.encode(`${username}:mongo:${password}`),
   );
-  return dec.decode(hex.encode(new Uint8Array(result)));
+  return hex.encodeHex(new Uint8Array(result));
 }
 
 // XOR two buffers
@@ -275,7 +275,7 @@ export function xor(_a: ArrayBuffer, _b: ArrayBuffer) {
     res[i] = a[i] ^ b[i];
   }
 
-  return b64.encode(res);
+  return b64.encodeBase64(res);
 }
 
 export function H(method: CryptoMethod, text: BufferSource) {
@@ -333,7 +333,7 @@ export async function HI(
   cryptoMethod: CryptoMethod,
 ): Promise<ArrayBuffer> {
   // omit the work if already generated
-  const key = [data, b64.encode(salt), iterations].join(
+  const key = [data, b64.encodeBase64(salt), iterations].join(
     "_",
   );
   if (_hiCache[key] !== undefined) {
