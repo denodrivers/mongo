@@ -1,4 +1,5 @@
-import { assertEquals, describe, it } from "../test.deps.ts";
+import { assertEquals } from "assert";
+import { describe, it } from "bdd";
 
 describe("worker", () => {
   it({

@@ -1,6 +1,6 @@
-import { WireProtocol } from "./protocol.ts";
+import { Document, Long } from "web_bson";
 import { parseNamespace } from "../utils/ns.ts";
-import { Document, Long } from "../../deps.ts";
+import { WireProtocol } from "./protocol.ts";
 
 export interface CommandCursorOptions<T> {
   id: bigint | number | string;

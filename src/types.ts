@@ -8,8 +8,7 @@ import {
   Long,
   ObjectId,
   Timestamp,
-} from "../deps.ts";
-import { WriteConcern } from "./types/read_write_concern.ts";
+} from "web_bson";
 import {
   $geoAny,
   $geoMultiPolygon,
@@ -17,6 +16,7 @@ import {
   CenterSpecifier,
   ShapeOperator,
 } from "./types/geospatial.ts";
+import { WriteConcern } from "./types/read_write_concern.ts";
 
 export interface Server {
   host: string;

@@ -1,5 +1,5 @@
-import { parseSrvUrl } from "./uri.ts";
 import { ConnectOptions } from "../types.ts";
+import { parseSrvUrl } from "./uri.ts";
 
 enum AllowedOption {
   authSource = "authSource",

@@ -1,9 +1,9 @@
+import { Document } from "web_bson";
+import { Cluster } from "./cluster.ts";
 import { Database } from "./database.ts";
+import { MongoDriverError } from "./error.ts";
 import { BuildInfo, ConnectOptions, ListDatabaseInfo } from "./types.ts";
 import { parse } from "./utils/uri.ts";
-import { MongoDriverError } from "./error.ts";
-import { Cluster } from "./cluster.ts";
-import { Document } from "../deps.ts";
 
 export class MongoClient {
   #cluster?: Cluster;

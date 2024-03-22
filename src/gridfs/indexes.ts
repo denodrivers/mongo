@@ -1,7 +1,7 @@
+import { Document } from "web_bson";
 import { Collection } from "../collection/collection.ts";
-import { Chunk, File } from "../types/gridfs.ts";
 import { IndexOptions } from "../types.ts";
-import { Document } from "../../deps.ts";
+import { Chunk, File } from "../types/gridfs.ts";
 
 async function ensureIndex<T extends Document>(
   index: IndexOptions,

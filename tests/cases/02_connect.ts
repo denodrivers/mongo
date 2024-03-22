@@ -1,11 +1,5 @@
-import {
-  afterEach,
-  assert,
-  assertEquals,
-  beforeEach,
-  describe,
-  it,
-} from "../test.deps.ts";
+import { assert, assertEquals } from "assert";
+import { afterEach, beforeEach, describe, it } from "bdd";
 import { MongoClient } from "../../src/client.ts";
 
 const hostname = "127.0.0.1";

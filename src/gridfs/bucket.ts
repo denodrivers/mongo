@@ -1,6 +1,8 @@
+import { ObjectId } from "web_bson";
 import { Collection } from "../collection/collection.ts";
 import { FindCursor } from "../collection/commands/find.ts";
 import { Database } from "../database.ts";
+import { MongoRuntimeError } from "../error.ts";
 import { Filter } from "../types.ts";
 import {
   Chunk,
@@ -12,8 +14,6 @@ import {
 } from "../types/gridfs.ts";
 import { checkIndexes } from "./indexes.ts";
 import { createUploadStream } from "./upload.ts";
-import { MongoRuntimeError } from "../error.ts";
-import { ObjectId } from "../../deps.ts";
 
 export class GridFSBucket {
   #chunksCollection: Collection<Chunk>;

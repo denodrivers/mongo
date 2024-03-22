@@ -1,8 +1,8 @@
-import { Credential } from "../types.ts";
-import { AuthContext, AuthPlugin } from "./base.ts";
+import { Document } from "web_bson";
 import { HandshakeDocument } from "../protocol/handshake.ts";
 import { driverMetadata } from "../protocol/mod.ts";
-import { Document } from "../../deps.ts";
+import { Credential } from "../types.ts";
+import { AuthContext, AuthPlugin } from "./base.ts";
 
 export interface X509Command extends Document {
   authenticate: number;

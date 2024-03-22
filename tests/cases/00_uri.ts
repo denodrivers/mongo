@@ -1,5 +1,6 @@
+import { assertEquals } from "assert";
+import { describe, it } from "bdd";
 import { parse, parseSrvUrl } from "../../src/utils/uri.ts";
-import { assertEquals, describe, it } from "./../test.deps.ts";
 
 describe("uri", () => {
   it({

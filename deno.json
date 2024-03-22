@@ -1,0 +1,27 @@
+{
+  "name": "@denodrivers/mongo",
+  "version": "0.33.0",
+  "exports": {
+    ".": "./mod.ts",
+    "./client": "./src/client.ts",
+    "./collection": "./src/collection/mod.ts",
+    "./gridfs": "./src/gridfs/bucket.ts",
+    "./types": "./src/types.ts"
+  },
+  "imports": {
+    "b64": "jsr:@std/encoding@^0.220.1/base64",
+    "io": "jsr:@std/io@^0.220.1",
+    "std_crypto": "jsr:@std/crypto@^0.220.1/crypto",
+    "hex": "jsr:@std/encoding@^0.220.1/hex",
+    "web_bson": "https://deno.land/x/web_bson@v0.3.0/mod.js",
+    "bytes_eq": "jsr:@std/bytes@^0.220.1/equals",
+    "assert": "jsr:@std/assert@^0.220.1",
+    "bdd": "jsr:@std/testing@^0.220.1/bdd",
+    "semver": "jsr:@std/semver@^0.220.1"
+  },
+  "test": {
+    "include": [
+      "tests/cases/*.ts"
+    ]
+  }
+}

@@ -1,4 +1,4 @@
-import { Document } from "../../deps.ts";
+import { Document } from "web_bson";
 import {
   GeoJsonObject,
   GeometryCollection,

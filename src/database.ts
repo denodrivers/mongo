@@ -1,8 +1,8 @@
+import { Document } from "web_bson";
+import { Cluster } from "./cluster.ts";
 import { Collection } from "./collection/mod.ts";
 import { CommandCursor } from "./protocol/mod.ts";
 import { CreateCollectionOptions, CreateUserOptions } from "./types.ts";
-import { Cluster } from "./cluster.ts";
-import { Document } from "../deps.ts";
 import { WriteConcern } from "./types/read_write_concern.ts";
 
 interface ListCollectionsReponse {

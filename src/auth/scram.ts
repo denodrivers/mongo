@@ -1,10 +1,13 @@
+import { decodeBase64, encodeBase64 } from "b64";
+import { encodeHex } from "hex";
+import { crypto as stdCrypto } from "std_crypto";
+import { Binary, Document } from "web_bson";
+import { MongoDriverError } from "../error.ts";
+import { HandshakeDocument } from "../protocol/handshake.ts";
+import { driverMetadata } from "../protocol/mod.ts";
 import { Credential } from "../types.ts";
 import { saslprep } from "../utils/saslprep/mod.ts";
 import { AuthContext, AuthPlugin } from "./base.ts";
-import { HandshakeDocument } from "../protocol/handshake.ts";
-import { MongoDriverError } from "../error.ts";
-import { b64, Binary, crypto as stdCrypto, Document, hex } from "../../deps.ts";
-import { driverMetadata } from "../protocol/mod.ts";
 import { pbkdf2 } from "./pbkdf2.ts";
 
 type CryptoMethod = "sha1" | "sha256";
@@ -65,7 +68,7 @@ export function clientFirstMessageBare(username: string, nonce: Uint8Array) {
       ...enc.encode("n="),
       ...enc.encode(username),
       ...enc.encode(",r="),
-      ...enc.encode(b64.encodeBase64(nonce)),
+      ...enc.encode(encodeBase64(nonce)),
     ],
   );
 }
@@ -160,7 +163,7 @@ export async function continueScramConversation(
   const withoutProof = `c=biws,r=${rnonce}`;
   const saltedPassword = await HI(
     processedPassword,
-    b64.decodeBase64(salt),
+    decodeBase64(salt),
     iterations,
     cryptoMethod,
   );
@@ -193,7 +196,7 @@ export async function continueScramConversation(
   );
   if (
     !compareDigest(
-      b64.decodeBase64(parsedResponse.v),
+      decodeBase64(parsedResponse.v),
       new Uint8Array(serverSignature),
     )
   ) {
@@ -260,7 +263,7 @@ export async function passwordDigest(
     "MD5",
     enc.encode(`${username}:mongo:${password}`),
   );
-  return hex.encodeHex(new Uint8Array(result));
+  return encodeHex(new Uint8Array(result));
 }
 
 // XOR two buffers
@@ -275,7 +278,7 @@ export function xor(_a: ArrayBuffer, _b: ArrayBuffer) {
     res[i] = a[i] ^ b[i];
   }
 
-  return b64.encodeBase64(res);
+  return encodeBase64(res);
 }
 
 export function H(method: CryptoMethod, text: BufferSource) {
@@ -333,7 +336,7 @@ export async function HI(
   cryptoMethod: CryptoMethod,
 ): Promise<ArrayBuffer> {
   // omit the work if already generated
-  const key = [data, b64.encodeBase64(salt), iterations].join(
+  const key = [data, encodeBase64(salt), iterations].join(
     "_",
   );
   if (_hiCache[key] !== undefined) {

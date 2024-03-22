@@ -1,8 +1,7 @@
-import { WireProtocol } from "./protocol/mod.ts";
-import { ConnectOptions } from "./types.ts";
 import { AuthContext, ScramAuthPlugin, X509AuthPlugin } from "./auth/mod.ts";
 import { MongoDriverError } from "./error.ts";
-import { Server } from "./types.ts";
+import { WireProtocol } from "./protocol/mod.ts";
+import { ConnectOptions, Server } from "./types.ts";
 
 export class Cluster {
   #options: ConnectOptions;

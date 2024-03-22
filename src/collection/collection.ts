@@ -1,4 +1,4 @@
-import { Document, ObjectId } from "../../deps.ts";
+import { Document, ObjectId } from "web_bson";
 import {
   MongoDriverError,
   MongoInvalidArgumentError,

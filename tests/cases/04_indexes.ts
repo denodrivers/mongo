@@ -1,13 +1,8 @@
+import { assertEquals } from "assert";
+import { afterEach, beforeEach, describe, it } from "bdd";
+import { greaterOrEqual, parse } from "semver";
 import { Collection, Database, Document, MongoClient } from "../../mod.ts";
 import { cleanTestDb, getTestDb } from "../common.ts";
-import {
-  afterEach,
-  assertEquals,
-  beforeEach,
-  describe,
-  it,
-  semver,
-} from "../test.deps.ts";
 
 describe(
   "indexes",
@@ -54,7 +49,11 @@ describe(
       const cursor = collection.listIndexes();
       const indexes = await cursor.toArray();
 
-      const expected = semver.gte(client.buildInfo!.version, "4.4.0")
+      const expected = greaterOrEqual(parse(client.buildInfo!.version), {
+          major: 4,
+          minor: 4,
+          patch: 0,
+        })
         ? [
           { v: 2, key: { _id: 1 }, name: "_id_" },
           { v: 2, key: { name: 1 }, name: "_name" },
@@ -92,7 +91,11 @@ describe(
       });
 
       const indexes = await collection.listIndexes().toArray();
-      const expected = semver.gte(client.buildInfo!.version, "4.4.0")
+      const expected = greaterOrEqual(parse(client.buildInfo!.version), {
+          major: 4,
+          minor: 4,
+          patch: 0,
+        })
         ? [
           { v: 2, key: { _id: 1 }, name: "_id_" },
         ]

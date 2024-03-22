@@ -1,3 +1,6 @@
+import { assert, assertEquals, assertRejects } from "assert";
+import { afterEach, beforeEach, describe, it } from "bdd";
+import { greaterOrEqual, parse } from "semver";
 import { Database, MongoClient, ObjectId } from "../../mod.ts";
 import {
   MongoInvalidArgumentError,
@@ -5,16 +8,6 @@ import {
 } from "../../src/error.ts";
 import { CreateCollectionOptions } from "../../src/types.ts";
 import { cleanTestDb, getTestDb } from "../common.ts";
-import {
-  afterEach,
-  assert,
-  assertEquals,
-  assertRejects,
-  beforeEach,
-  describe,
-  it,
-  semver,
-} from "../test.deps.ts";
 
 interface User {
   _id: string | ObjectId;
@@ -799,9 +792,9 @@ describe("crud operations", () => {
   });
 
   it("testFindWithMaxTimeMS", async () => {
-    const supportsMaxTimeMSInFindOne = semver.gte(
-      client.buildInfo!.version,
-      "4.2.0",
+    const supportsMaxTimeMSInFindOne = greaterOrEqual(
+      parse(client.buildInfo!.version),
+      { major: 4, minor: 2, patch: 0 },
     );
 
     const users = database.collection<User>("mongo_test_users");

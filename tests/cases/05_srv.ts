@@ -1,4 +1,5 @@
-import { assertEquals, assertRejects, describe, it } from "../test.deps.ts";
+import { assertEquals, assertRejects } from "assert";
+import { describe, it } from "bdd";
 import { Srv } from "../../src/utils/srv.ts";
 
 function mockResolver(

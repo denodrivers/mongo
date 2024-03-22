@@ -1,4 +1,4 @@
-import { Document } from "../../../deps.ts";
+import { Document } from "web_bson";
 import { CommandCursor } from "../../protocol/cursor.ts";
 import { WireProtocol } from "../../protocol/protocol.ts";
 import { AggregateOptions } from "../../types.ts";
