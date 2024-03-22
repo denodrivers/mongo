@@ -23,7 +23,10 @@ export class Cluster {
     );
   }
 
-  connectToServer(server: Server, options: ConnectOptions) {
+  connectToServer(
+    server: Server,
+    options: ConnectOptions,
+  ): Promise<Deno.TlsConn | Deno.TcpConn> {
     const denoConnectOps: Deno.ConnectTlsOptions = {
       hostname: server.host,
       port: server.port,
@@ -56,7 +59,10 @@ export class Cluster {
     );
   }
 
-  async authenticateToServer(conn: Deno.Conn, options: ConnectOptions) {
+  async authenticateToServer(
+    conn: Deno.Conn,
+    options: ConnectOptions,
+  ): Promise<WireProtocol> {
     const protocol = new WireProtocol(conn);
     if (options.credential) {
       const authContext = new AuthContext(
@@ -110,7 +116,7 @@ export class Cluster {
     };
   }
 
-  get protocol() {
+  get protocol(): WireProtocol {
     return this.getMaster().protocol;
   }
 

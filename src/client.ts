@@ -10,11 +10,11 @@ export class MongoClient {
   #defaultDbName = "admin";
   #buildInfo?: BuildInfo;
 
-  get buildInfo() {
+  get buildInfo(): BuildInfo | undefined {
     return this.#buildInfo;
   }
 
-  getCluster() {
+  getCluster(): Cluster {
     if (!this.#cluster) {
       throw new MongoDriverError(
         "MongoClient is not connected to the Database",
@@ -69,7 +69,7 @@ export class MongoClient {
     return this.getCluster().protocol.commandSingle(db, body);
   }
 
-  database(name = this.#defaultDbName): Database {
+  database(name: string = this.#defaultDbName): Database {
     return new Database(this.getCluster(), name);
   }
 

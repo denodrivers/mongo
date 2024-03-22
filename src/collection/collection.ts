@@ -145,7 +145,10 @@ export class Collection<T extends Document> {
     return 0;
   }
 
-  async insertOne(doc: InsertDocument<T>, options?: InsertOptions) {
+  async insertOne(
+    doc: InsertDocument<T>,
+    options?: InsertOptions,
+  ): Promise<Required<InsertDocument<T>>["_id"]> {
     const { insertedIds } = await this.insertMany([doc], options);
     return insertedIds[0];
   }
@@ -156,7 +159,9 @@ export class Collection<T extends Document> {
   insert(
     docs: InsertDocument<T> | InsertDocument<T>[],
     options?: InsertOptions,
-  ) {
+  ): Promise<
+    { insertedIds: Required<InsertDocument<T>>["_id"][]; insertedCount: number }
+  > {
     const _docs = Array.isArray(docs) ? docs : [docs];
     return this.insertMany(_docs, options);
   }
@@ -201,7 +206,14 @@ export class Collection<T extends Document> {
     filter: Filter<T>,
     update: UpdateFilter<T>,
     options?: UpdateOptions,
-  ) {
+  ): Promise<
+    {
+      upsertedId: ObjectId | undefined;
+      upsertedCount: number;
+      matchedCount: number;
+      modifiedCount: number;
+    }
+  > {
     const {
       upsertedIds,
       upsertedCount,
@@ -223,7 +235,14 @@ export class Collection<T extends Document> {
     filter: Filter<T>,
     doc: UpdateFilter<T>,
     options?: UpdateOptions,
-  ) {
+  ): Promise<
+    {
+      upsertedIds: ObjectId[] | undefined;
+      upsertedCount: number;
+      modifiedCount: number;
+      matchedCount: number;
+    }
+  > {
     if (!hasAtomicOperators(doc)) {
       throw new MongoInvalidArgumentError(
         "Update document requires atomic operators",
@@ -240,7 +259,14 @@ export class Collection<T extends Document> {
     filter: Filter<T>,
     replacement: InsertDocument<T>,
     options?: UpdateOptions,
-  ) {
+  ): Promise<
+    {
+      upsertedId: ObjectId | undefined;
+      upsertedCount: number;
+      matchedCount: number;
+      modifiedCount: number;
+    }
+  > {
     if (hasAtomicOperators(replacement)) {
       throw new MongoInvalidArgumentError(
         "Replacement document must not contain atomic operators",
@@ -294,7 +320,7 @@ export class Collection<T extends Document> {
   deleteOne(
     filter: Filter<T>,
     options?: DeleteOptions,
-  ) {
+  ): Promise<number> {
     return this.delete(filter, { ...options, limit: 1 });
   }
 
@@ -305,7 +331,11 @@ export class Collection<T extends Document> {
     });
   }
 
-  async distinct(key: string, query?: Filter<T>, options?: DistinctOptions) {
+  async distinct(
+    key: string,
+    query?: Filter<T>,
+    options?: DistinctOptions,
+  ) {
     const { values } = await this.#protocol.commandSingle(this.#dbName, {
       distinct: this.name,
       key,
@@ -328,7 +358,16 @@ export class Collection<T extends Document> {
     });
   }
 
-  async createIndexes(options: CreateIndexOptions) {
+  async createIndexes(
+    options: CreateIndexOptions,
+  ): Promise<
+    {
+      ok: number;
+      createdCollectionAutomatically: boolean;
+      numIndexesBefore: number;
+      numIndexesAfter: number;
+    }
+  > {
     const res = await this.#protocol.commandSingle<{
       ok: number;
       createdCollectionAutomatically: boolean;
@@ -341,7 +380,10 @@ export class Collection<T extends Document> {
     return res;
   }
 
-  async dropIndexes(options: DropIndexOptions) {
+  async dropIndexes(options: DropIndexOptions): Promise<{
+    ok: number;
+    nIndexesWas: number;
+  }> {
     const res = await this.#protocol.commandSingle<{
       ok: number;
       nIndexesWas: number;
@@ -356,7 +398,9 @@ export class Collection<T extends Document> {
     return res;
   }
 
-  listIndexes() {
+  listIndexes(): ListIndexesCursor<
+    { v: number; key: Document; name: string; ns?: string }
+  > {
     return new ListIndexesCursor<
       { v: number; key: Document; name: string; ns?: string }
     >({

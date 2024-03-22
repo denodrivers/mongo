@@ -47,7 +47,10 @@ export class GridFSBucket {
    * that use generic type parameters, this method may be omitted since
    * the TFileId type might not be an ObjectId.
    */
-  openUploadStream(filename: string, options?: GridFSUploadOptions) {
+  openUploadStream(
+    filename: string,
+    options?: GridFSUploadOptions,
+  ): Promise<WritableStream<Uint8Array>> {
     return this.openUploadStreamWithId(
       new ObjectId(),
       filename,
@@ -65,7 +68,7 @@ export class GridFSBucket {
     id: FileId,
     filename: string,
     options?: GridFSUploadOptions,
-  ) {
+  ): Promise<WritableStream<Uint8Array>> {
     if (!this.#checkedIndexes) await this.#checkIndexes();
     return createUploadStream(this.getBucketData(), filename, id, options);
   }
@@ -121,7 +124,7 @@ export class GridFSBucket {
    *
    * Returns a Stream.
    */
-  async openDownloadStream(id: FileId) {
+  async openDownloadStream(id: FileId): Promise<ReadableStream<Uint8Array>> {
     if (!this.#checkedIndexes) await this.#checkIndexes();
 
     return new ReadableStream<Uint8Array>({

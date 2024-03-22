@@ -31,7 +31,7 @@ export class Database {
     this.#cluster = cluster;
   }
 
-  async dropDatabase(writeConcern?: WriteConcern) {
+  async dropDatabase(writeConcern?: WriteConcern): Promise<Document> {
     return await this.#cluster.protocol.commandSingle(this.name, {
       dropDatabase: 1,
       writeConcern,
@@ -104,7 +104,7 @@ export class Database {
     username: string,
     password: string,
     options?: CreateUserOptions,
-  ) {
+  ): Promise<Document> {
     return this.#cluster.protocol.commandSingle(this.name, {
       createUser: options?.username ?? username,
       pwd: options?.password ?? password,
@@ -121,7 +121,7 @@ export class Database {
   dropUser(username: string, options: {
     writeConcern?: Document;
     comment?: Document;
-  } = {}) {
+  } = {}): Promise<Document> {
     return this.#cluster.protocol.commandSingle(this.name, {
       dropUser: username,
       writeConcern: options?.writeConcern,
