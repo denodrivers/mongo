@@ -1,4 +1,5 @@
-import { Document, ObjectId } from "web-bson";
+import { ObjectId } from "web-bson";
+import { Document } from "../../mod.ts";
 import {
   MongoDriverError,
   MongoInvalidArgumentError,
@@ -335,7 +336,7 @@ export class Collection<T extends Document> {
     key: string,
     query?: Filter<T>,
     options?: DistinctOptions,
-  ) {
+  ): Promise<any> {
     const { values } = await this.#protocol.commandSingle(this.#dbName, {
       distinct: this.name,
       key,

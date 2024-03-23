@@ -3,6 +3,7 @@ export { Database } from "./src/database.ts";
 export { Collection } from "./src/collection/mod.ts";
 export * from "./src/types.ts";
 export * as Bson from "web-bson";
+export type Document = Record<string, any>;
 export {
   Binary,
   BSONRegExp,
@@ -10,7 +11,6 @@ export {
   Code,
   DBRef,
   Decimal128,
-  type Document,
   Double,
   Int32,
   Long,

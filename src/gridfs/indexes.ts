@@ -1,4 +1,4 @@
-import { Document } from "web-bson";
+import { Document } from "../../mod.ts";
 import { Collection } from "../collection/collection.ts";
 import { IndexOptions } from "../types.ts";
 import { Chunk, File } from "../types/gridfs.ts";

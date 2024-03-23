@@ -1,4 +1,4 @@
-import { Document } from "web-bson";
+import { Document } from "../../mod.ts";
 import { WireProtocol } from "../protocol/mod.ts";
 import { ConnectOptions, Credential } from "../types.ts";
 

@@ -1,4 +1,4 @@
-import { Document } from "web-bson";
+import { Document } from "../mod.ts";
 import { Cluster } from "./cluster.ts";
 import { Collection } from "./collection/mod.ts";
 import { CommandCursor } from "./protocol/mod.ts";

@@ -1,4 +1,4 @@
-import { Document } from "web-bson";
+import { Document } from "../../mod.ts";
 import { HandshakeDocument } from "../protocol/handshake.ts";
 import { driverMetadata } from "../protocol/mod.ts";
 import { Credential } from "../types.ts";

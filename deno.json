@@ -8,6 +8,9 @@
     "./gridfs": "./src/gridfs/bucket.ts",
     "./types": "./src/types.ts"
   },
+  "publish": {
+    "exclude": [".github", "tests", ".gitattributes", ".gitignore", "deno.lock"]
+  },
   "imports": {
     "b64": "jsr:@std/encoding@^0.220.1/base64",
     "io": "jsr:@std/io@^0.220.1",

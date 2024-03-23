@@ -1,4 +1,5 @@
-import { Document, ObjectId } from "web-bson";
+import { ObjectId } from "web-bson";
+import { Document } from "../../../mod.ts";
 import { WireProtocol } from "../../protocol/mod.ts";
 import { UpdateOptions } from "../../types.ts";
 
