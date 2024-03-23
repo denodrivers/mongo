@@ -558,7 +558,7 @@ describe("crud operations", () => {
         password: "pass3",
       },
     ]);
-    const count = await users.count({ username: "many" });
+    const count = await users.countDocuments({ username: "many" });
     assertEquals(count, 2);
   });
 
