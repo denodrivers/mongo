@@ -110,6 +110,8 @@ export class WireProtocol {
         throw new MongoDriverError("Invalid response header");
       }
       const header = parseHeader(headerBuffer);
+      let bodyBytes = header.messageLength - 16;
+      if (bodyBytes < 0) bodyBytes = 0;
       const bodyBuffer = await this.read_socket(header.messageLength - 16);
       if (!bodyBuffer) {
         throw new MongoDriverError("Invalid response body");
