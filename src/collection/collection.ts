@@ -336,6 +336,7 @@ export class Collection<T extends Document> {
     key: string,
     query?: Filter<T>,
     options?: DistinctOptions,
+    // deno-lint-ignore no-explicit-any
   ): Promise<any> {
     const { values } = await this.#protocol.commandSingle(this.#dbName, {
       distinct: this.name,

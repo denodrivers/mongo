@@ -46,6 +46,7 @@ export interface CountOptions {
   collation?: Document;
 }
 
+// deno-lint-ignore no-explicit-any
 export type Document = Record<string, any>;
 
 export interface FindOptions {
