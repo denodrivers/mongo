@@ -1,5 +1,5 @@
 {
-  "name": "@denodrivers/mongo",
+  "name": "@db/mongo",
   "version": "0.33.0",
   "exports": {
     ".": "./mod.ts",
