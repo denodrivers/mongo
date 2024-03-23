@@ -1,4 +1,3 @@
-import { BufReader, writeAll } from "../../deps.ts";
 import {
   MongoDriverError,
   MongoErrorInfo,
@@ -9,7 +8,6 @@ import { handshake } from "./handshake.ts";
 import { parseHeader } from "./header.ts";
 import { deserializeMessage, Message, serializeMessage } from "./message.ts";
 
-type Socket = Deno.Reader & Deno.Writer;
 interface CommandTask {
   requestId: number;
   db: string;
@@ -19,7 +17,7 @@ interface CommandTask {
 let nextRequestId = 0;
 
 export class WireProtocol {
-  #socket: Socket;
+  conn: Deno.Conn;
   #isPendingResponse = false;
   #isPendingRequest = false;
   #pendingResponses: Map<number, {
@@ -28,12 +26,10 @@ export class WireProtocol {
     // deno-lint-ignore no-explicit-any
     reject: (reason?: any) => void;
   }> = new Map();
-  #reader: BufReader;
   #commandQueue: CommandTask[] = [];
 
-  constructor(socket: Socket) {
-    this.#socket = socket;
-    this.#reader = new BufReader(this.#socket);
+  constructor(socket: Deno.Conn) {
+    this.conn = socket;
   }
 
   async connect() {
@@ -98,7 +94,9 @@ export class WireProtocol {
         ],
       });
 
-      await writeAll(this.#socket, buffer);
+      const { write, releaseLock } = this.conn.writable.getWriter();
+      await write(buffer);
+      releaseLock();
     }
     this.#isPendingRequest = false;
   }
@@ -107,14 +105,12 @@ export class WireProtocol {
     if (this.#isPendingResponse) return;
     this.#isPendingResponse = true;
     while (this.#pendingResponses.size > 0) {
-      const headerBuffer = await this.#reader.readFull(new Uint8Array(16));
+      const headerBuffer = await this.read_socket(16);
       if (!headerBuffer) {
         throw new MongoDriverError("Invalid response header");
       }
       const header = parseHeader(headerBuffer);
-      const bodyBuffer = await this.#reader.readFull(
-        new Uint8Array(header.messageLength - 16),
-      );
+      const bodyBuffer = await this.read_socket(header.messageLength - 16);
       if (!bodyBuffer) {
         throw new MongoDriverError("Invalid response body");
       }
@@ -124,5 +120,14 @@ export class WireProtocol {
       pendingMessage?.resolve(reply);
     }
     this.#isPendingResponse = false;
+  }
+
+  private async read_socket(
+    b: number,
+  ): Promise<Uint8Array | undefined> {
+    const reader = this.conn.readable.getReader({ mode: "byob" });
+    const { value } = await reader.read(new Uint8Array(b));
+    reader.releaseLock();
+    return value;
   }
 }
