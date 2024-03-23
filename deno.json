@@ -12,15 +12,15 @@
     "exclude": [".github", "tests", ".gitattributes", ".gitignore", "deno.lock"]
   },
   "imports": {
-    "b64": "jsr:@std/encoding@^0.220.1/base64",
-    "io": "jsr:@std/io@^0.220.1",
-    "std_crypto": "jsr:@std/crypto@^0.220.1/crypto",
-    "hex": "jsr:@std/encoding@^0.220.1/hex",
-    "web-bson": "jsr:@lucsoft/web-bson@^0.3.1",
-    "bytes_eq": "jsr:@std/bytes@^0.220.1/equals",
     "assert": "jsr:@std/assert@^0.220.1",
+    "b64": "jsr:@std/encoding@^0.220.1/base64",
     "bdd": "jsr:@std/testing@^0.220.1/bdd",
-    "semver": "jsr:@std/semver@^0.220.1"
+    "bytes_eq": "jsr:@std/bytes@^0.220.1/equals",
+    "hex": "jsr:@std/encoding@^0.220.1/hex",
+    "io": "jsr:@std/io@^0.220.1",
+    "semver": "jsr:@std/semver@^0.220.1",
+    "std_crypto": "jsr:@std/crypto@^0.220.1/crypto",
+    "web-bson": "jsr:@lucsoft/web-bson@^0.3.1"
   },
   "test": {
     "include": [
