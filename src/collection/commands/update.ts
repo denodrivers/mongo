@@ -1,6 +1,6 @@
-import { Document, ObjectId } from "../../../deps.ts";
-import { UpdateOptions } from "../../types.ts";
+import { ObjectId } from "../../../deps.ts";
 import { WireProtocol } from "../../protocol/mod.ts";
+import { Document, UpdateOptions } from "../../types.ts";
 
 interface UpdateResponse {
   ok: number;

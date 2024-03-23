@@ -12,9 +12,10 @@ import {
   assertRejects,
   beforeEach,
   describe,
+  greaterOrEqual,
   it,
-  semver,
-} from "../test.deps.ts";
+  parse,
+} from "../deps.ts";
 
 interface User {
   _id: string | ObjectId;
@@ -565,7 +566,7 @@ describe("crud operations", () => {
         password: "pass3",
       },
     ]);
-    const count = await users.count({ username: "many" });
+    const count = await users.countDocuments({ username: "many" });
     assertEquals(count, 2);
   });
 
@@ -799,9 +800,9 @@ describe("crud operations", () => {
   });
 
   it("testFindWithMaxTimeMS", async () => {
-    const supportsMaxTimeMSInFindOne = semver.gte(
-      client.buildInfo!.version,
-      "4.2.0",
+    const supportsMaxTimeMSInFindOne = greaterOrEqual(
+      parse(client.buildInfo!.version),
+      { major: 4, minor: 2, patch: 0 },
     );
 
     const users = database.collection<User>("mongo_test_users");

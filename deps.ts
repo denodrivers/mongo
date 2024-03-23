@@ -1,6 +1,22 @@
-export * from "https://deno.land/x/web_bson@v0.3.0/mod.js";
-export { writeAll } from "https://deno.land/std@0.209.0/streams/write_all.ts";
-export { crypto } from "https://deno.land/std@0.209.0/crypto/mod.ts";
-export { BufReader } from "https://deno.land/std@0.209.0/io/mod.ts";
-export * as b64 from "https://deno.land/std@0.209.0/encoding/base64.ts";
-export * as hex from "https://deno.land/std@0.209.0/encoding/hex.ts";
+export {
+  Binary,
+  BSONRegExp,
+  BSONSymbol,
+  Code,
+  DBRef,
+  Decimal128,
+  deserialize,
+  Double,
+  Int32,
+  Long,
+  MaxKey,
+  MinKey,
+  ObjectId,
+  serialize,
+  Timestamp,
+  UUID,
+} from "jsr:@lucsoft/web-bson@^0.3.1";
+export { crypto as stdCrypto } from "jsr:@std/crypto@^0.220.1/crypto";
+export { decodeBase64, encodeBase64 } from "jsr:@std/encoding@^0.220.1/base64";
+export { encodeHex } from "jsr:@std/encoding@^0.220.1/hex";
+export { BufReader, writeAll } from "jsr:@std/io@^0.220.1";

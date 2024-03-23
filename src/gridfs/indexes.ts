@@ -1,7 +1,6 @@
 import { Collection } from "../collection/collection.ts";
+import { Document, IndexOptions } from "../types.ts";
 import { Chunk, File } from "../types/gridfs.ts";
-import { IndexOptions } from "../types.ts";
-import { Document } from "../../deps.ts";
 
 async function ensureIndex<T extends Document>(
   index: IndexOptions,

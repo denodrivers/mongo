@@ -1,8 +1,11 @@
+import { Cluster } from "./cluster.ts";
 import { Collection } from "./collection/mod.ts";
 import { CommandCursor } from "./protocol/mod.ts";
-import { CreateCollectionOptions, CreateUserOptions } from "./types.ts";
-import { Cluster } from "./cluster.ts";
-import { Document } from "../deps.ts";
+import {
+  CreateCollectionOptions,
+  CreateUserOptions,
+  Document,
+} from "./types.ts";
 import { WriteConcern } from "./types/read_write_concern.ts";
 
 interface ListCollectionsReponse {
@@ -24,6 +27,7 @@ export interface ListCollectionsResult {
   type: "collection";
 }
 
+/** A Database on a MongoDB Server */
 export class Database {
   #cluster: Cluster;
 
@@ -31,17 +35,20 @@ export class Database {
     this.#cluster = cluster;
   }
 
-  async dropDatabase(writeConcern?: WriteConcern) {
+  /** Drop a database, optionally providing a writeConcern */
+  async dropDatabase(writeConcern?: WriteConcern): Promise<Document> {
     return await this.#cluster.protocol.commandSingle(this.name, {
       dropDatabase: 1,
       writeConcern,
     });
   }
 
+  /** Get a collection by name */
   collection<T extends Document = Document>(name: string): Collection<T> {
     return new Collection<T>(this.#cluster.protocol, this.name, name);
   }
 
+  /** List all collections in the database */
   listCollections(options: {
     filter?: Document;
     nameOnly?: boolean;
@@ -66,6 +73,7 @@ export class Database {
     );
   }
 
+  /** List all collection names in the database */
   async listCollectionNames(options: {
     filter?: Document;
     authorizedCollections?: boolean;
@@ -100,11 +108,12 @@ export class Database {
     return this.collection<T>(name);
   }
 
+  /** Create a user on the Database */
   createUser(
     username: string,
     password: string,
     options?: CreateUserOptions,
-  ) {
+  ): Promise<Document> {
     return this.#cluster.protocol.commandSingle(this.name, {
       createUser: options?.username ?? username,
       pwd: options?.password ?? password,
@@ -121,7 +130,7 @@ export class Database {
   dropUser(username: string, options: {
     writeConcern?: Document;
     comment?: Document;
-  } = {}) {
+  } = {}): Promise<Document> {
     return this.#cluster.protocol.commandSingle(this.name, {
       dropUser: username,
       writeConcern: options?.writeConcern,
@@ -129,6 +138,7 @@ export class Database {
     });
   }
 
+  /** Run a command on the Database */
   // deno-lint-ignore no-explicit-any
   runCommand<T = any>(body: Document): Promise<T> {
     return this.#cluster.protocol.commandSingle(this.name, body);

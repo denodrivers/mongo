@@ -1,9 +1,10 @@
-import { BufReader, Document, writeAll } from "../../deps.ts";
+import { BufReader, writeAll } from "../../deps.ts";
 import {
   MongoDriverError,
   MongoErrorInfo,
   MongoServerError,
 } from "../error.ts";
+import { Document } from "../types.ts";
 import { handshake } from "./handshake.ts";
 import { parseHeader } from "./header.ts";
 import { deserializeMessage, Message, serializeMessage } from "./message.ts";

@@ -9,7 +9,7 @@ import {
   beforeEach,
   describe,
   it,
-} from "../test.deps.ts";
+} from "../deps.ts";
 
 async function streamReadAll(readable: ReadableStream): Promise<Uint8Array> {
   return new Uint8Array(await new Response(readable).arrayBuffer());

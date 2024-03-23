@@ -1,0 +1,20 @@
+{
+  "name": "@db/mongo",
+  "version": "0.33.0",
+  "exports": {
+    ".": "./mod.ts",
+    "./client": "./src/client.ts",
+    "./collection": "./src/collection/collection.ts",
+    "./gridfs": "./src/gridfs/bucket.ts",
+    "./types": "./src/types.ts"
+  },
+  "publish": {
+    "exclude": [".github", "tests", ".gitattributes", ".gitignore", "deno.lock"]
+  },
+  "test": {
+    "include": [
+      "tests/cases/*.ts"
+    ]
+  },
+  "lock": false
+}

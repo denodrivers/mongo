@@ -1,3 +1,4 @@
+import { MongoClient } from "../../src/client.ts";
 import {
   afterEach,
   assert,
@@ -5,8 +6,7 @@ import {
   beforeEach,
   describe,
   it,
-} from "../test.deps.ts";
-import { MongoClient } from "../../src/client.ts";
+} from "../deps.ts";
 
 const hostname = "127.0.0.1";
 

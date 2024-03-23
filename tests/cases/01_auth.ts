@@ -14,7 +14,7 @@ import {
   beforeAll,
   describe,
   it,
-} from "../test.deps.ts";
+} from "../deps.ts";
 
 describe("auth", () => {
   describe("prerequisites", () => {

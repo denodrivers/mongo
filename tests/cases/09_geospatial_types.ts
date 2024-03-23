@@ -1,5 +1,6 @@
 import { type Database } from "../../mod.ts";
 import { type Collection } from "../../src/collection/collection.ts";
+import { Geometry, GeometryObject, Point } from "../../src/types/geojson.ts";
 import {
   $box,
   $center,
@@ -17,9 +18,8 @@ import {
   LegacyPoint,
   ShapeOperator,
 } from "../../src/types/geospatial.ts";
-import { Geometry, GeometryObject, Point } from "../../src/types/geojson.ts";
 import { getClient } from "../common.ts";
-import { afterAll, assert, assertEquals, describe, it } from "../test.deps.ts";
+import { afterAll, assert, assertEquals, describe, it } from "../deps.ts";
 
 interface IPlace {
   _id: string;
