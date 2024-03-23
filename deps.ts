@@ -19,4 +19,3 @@ export {
 export { crypto as stdCrypto } from "jsr:@std/crypto@^0.220.1/crypto";
 export { decodeBase64, encodeBase64 } from "jsr:@std/encoding@^0.220.1/base64";
 export { encodeHex } from "jsr:@std/encoding@^0.220.1/hex";
-export { BufReader, writeAll } from "jsr:@std/io@^0.220.1";
