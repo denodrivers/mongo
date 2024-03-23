@@ -17,7 +17,7 @@ interface CommandTask {
 let nextRequestId = 0;
 
 export class WireProtocol {
-  conn: Deno.Conn;
+  #conn: Deno.Conn;
   #isPendingResponse = false;
   #isPendingRequest = false;
   #pendingResponses: Map<number, {
@@ -29,7 +29,7 @@ export class WireProtocol {
   #commandQueue: CommandTask[] = [];
 
   constructor(socket: Deno.Conn) {
-    this.conn = socket;
+    this.#conn = socket;
   }
 
   async connect() {
@@ -94,7 +94,7 @@ export class WireProtocol {
         ],
       });
 
-      const { write, releaseLock } = this.conn.writable.getWriter();
+      const { write, releaseLock } = this.#conn.writable.getWriter();
       await write(buffer);
       releaseLock();
     }
@@ -125,7 +125,7 @@ export class WireProtocol {
   private async read_socket(
     b: number,
   ): Promise<Uint8Array | undefined> {
-    const reader = this.conn.readable.getReader({ mode: "byob" });
+    const reader = this.#conn.readable.getReader({ mode: "byob" });
     const { value } = await reader.read(new Uint8Array(b));
     reader.releaseLock();
     return value;
