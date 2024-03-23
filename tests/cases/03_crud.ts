@@ -1,6 +1,3 @@
-import { assert, assertEquals, assertRejects } from "assert";
-import { afterEach, beforeEach, describe, it } from "bdd";
-import { greaterOrEqual, parse } from "semver";
 import { Database, MongoClient, ObjectId } from "../../mod.ts";
 import {
   MongoInvalidArgumentError,
@@ -8,6 +5,17 @@ import {
 } from "../../src/error.ts";
 import { CreateCollectionOptions } from "../../src/types.ts";
 import { cleanTestDb, getTestDb } from "../common.ts";
+import {
+  afterEach,
+  assert,
+  assertEquals,
+  assertRejects,
+  beforeEach,
+  describe,
+  greaterOrEqual,
+  it,
+  parse,
+} from "../deps.ts";
 
 interface User {
   _id: string | ObjectId;

@@ -7,7 +7,7 @@ import {
   Long,
   ObjectId,
   Timestamp,
-} from "web-bson";
+} from "../deps.ts";
 import {
   $geoAny,
   $geoMultiPolygon,
@@ -303,7 +303,6 @@ export interface DropOptions {
   comment?: any;
 }
 
-// TODO: figure out what this is
 export interface DistinctOptions {
   /**
    * The preferred read preference (ReadPreference.PRIMARY, ReadPreference.PRIMARY_PREFERRED, ReadPreference.SECONDARY, ReadPreference.SECONDARY_PREFERRED, ReadPreference.NEAREST).
@@ -812,7 +811,10 @@ export type UpdateFilter<T> =
   & UpdateOperators<T>
   & Partial<T>;
 
-// TODO: what
+/**
+ * Aggregation pipelines are used to process many documents
+ * @see https://www.mongodb.com/docs/manual/core/aggregation-pipeline/
+ */
 export type AggregatePipeline<T> =
   & NotImplementedOperators<AggregateOperators>
   & Document

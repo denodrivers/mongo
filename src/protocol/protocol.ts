@@ -1,4 +1,4 @@
-import { BufReader, writeAll } from "io";
+import { BufReader, writeAll } from "../../deps.ts";
 import {
   MongoDriverError,
   MongoErrorInfo,

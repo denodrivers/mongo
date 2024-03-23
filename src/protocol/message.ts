@@ -1,4 +1,4 @@
-import { deserialize, serialize } from "web-bson";
+import { deserialize, serialize } from "../../deps.ts";
 import { Document } from "../types.ts";
 import { MessageHeader, OpCode, setHeader } from "./header.ts";
 

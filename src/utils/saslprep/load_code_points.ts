@@ -1,4 +1,4 @@
-import { decodeBase64 } from "b64";
+import { decodeBase64 } from "../../../deps.ts";
 import { Bitfield } from "./sparse_bitfield.ts";
 
 /** Reads an uint32 from the specified buffer offset. */

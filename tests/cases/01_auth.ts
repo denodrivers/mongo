@@ -1,5 +1,3 @@
-import { assert, assertEquals } from "assert";
-import { afterAll, beforeAll, describe, it } from "bdd";
 import { Database } from "../../mod.ts";
 import {
   cleanUsername,
@@ -9,6 +7,14 @@ import {
 } from "../../src/auth/mod.ts";
 import { MongoClient } from "../../src/client.ts";
 import { cleanTestDb, getTestDb } from "../common.ts";
+import {
+  afterAll,
+  assert,
+  assertEquals,
+  beforeAll,
+  describe,
+  it,
+} from "../deps.ts";
 
 describe("auth", () => {
   describe("prerequisites", () => {

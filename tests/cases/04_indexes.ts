@@ -1,8 +1,14 @@
-import { assertEquals } from "assert";
-import { afterEach, beforeEach, describe, it } from "bdd";
-import { greaterOrEqual, parse } from "semver";
 import { Collection, Database, Document, MongoClient } from "../../mod.ts";
 import { cleanTestDb, getTestDb } from "../common.ts";
+import {
+  afterEach,
+  assertEquals,
+  beforeEach,
+  describe,
+  greaterOrEqual,
+  it,
+  parse,
+} from "../deps.ts";
 
 describe(
   "indexes",

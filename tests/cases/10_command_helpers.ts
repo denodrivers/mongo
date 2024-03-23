@@ -1,6 +1,5 @@
-import { assert, assertEquals } from "assert";
-import { describe, it } from "bdd";
 import { MongoClient } from "../../mod.ts";
+import { assert, assertEquals, describe, it } from "../deps.ts";
 
 describe("command helpers", () => {
   it({

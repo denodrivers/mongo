@@ -1,7 +1,15 @@
-import { assert, assertEquals, assertNotEquals } from "assert";
-import { afterAll, afterEach, beforeEach, describe, it } from "bdd";
 import { GridFSBucket, MongoClient } from "../../mod.ts";
 import { getClient } from "../common.ts";
+import {
+  afterAll,
+  afterEach,
+  assert,
+  assertEquals,
+  assertNotEquals,
+  beforeEach,
+  describe,
+  it,
+} from "../deps.ts";
 
 async function streamReadAll(readable: ReadableStream): Promise<Uint8Array> {
   return new Uint8Array(await new Response(readable).arrayBuffer());

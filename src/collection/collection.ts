@@ -1,4 +1,4 @@
-import { ObjectId } from "web-bson";
+import { ObjectId } from "../../deps.ts";
 import {
   MongoDriverError,
   MongoInvalidArgumentError,
@@ -382,7 +382,6 @@ export class Collection<T extends Document> {
     });
   }
 
-  // TODO: add docs for this
   async distinct(
     key: string,
     query?: Filter<T>,

@@ -2,8 +2,8 @@ import { WireProtocol } from "../protocol/mod.ts";
 import { ConnectOptions, Credential, Document } from "../types.ts";
 
 export abstract class AuthPlugin {
-  abstract prepare(authContext: AuthContext): Document;
   abstract auth(authContext: AuthContext): Document;
+  abstract prepare(authContext: AuthContext): Document;
 }
 
 /** Context used during authentication */

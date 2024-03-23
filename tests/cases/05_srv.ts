@@ -1,6 +1,5 @@
-import { assertEquals, assertRejects } from "assert";
-import { describe, it } from "bdd";
 import { Srv } from "../../src/utils/srv.ts";
+import { assertEquals, assertRejects, describe, it } from "../deps.ts";
 
 function mockResolver(
   srvRecords: Partial<Deno.SRVRecord>[] = [],
