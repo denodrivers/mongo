@@ -1,11 +1,11 @@
 import { decodeBase64, encodeBase64 } from "b64";
 import { encodeHex } from "hex";
 import { crypto as stdCrypto } from "std_crypto";
-import { Binary, Document } from "web-bson";
+import { Binary } from "web-bson";
 import { MongoDriverError } from "../error.ts";
 import { HandshakeDocument } from "../protocol/handshake.ts";
 import { driverMetadata } from "../protocol/mod.ts";
-import { Credential } from "../types.ts";
+import { Credential, Document } from "../types.ts";
 import { saslprep } from "../utils/saslprep/mod.ts";
 import { AuthContext, AuthPlugin } from "./base.ts";
 import { pbkdf2 } from "./pbkdf2.ts";

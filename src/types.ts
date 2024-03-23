@@ -2,7 +2,6 @@ import {
   Binary,
   BSONRegExp,
   Decimal128,
-  Document,
   Double,
   Int32,
   Long,
@@ -46,6 +45,8 @@ export interface CountOptions {
   readConcern?: Document;
   collation?: Document;
 }
+
+export type Document = Record<string, any>;
 
 export interface FindOptions {
   findOne?: boolean;

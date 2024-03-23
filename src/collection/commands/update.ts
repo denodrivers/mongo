@@ -1,7 +1,6 @@
 import { ObjectId } from "web-bson";
-import { Document } from "../../../mod.ts";
 import { WireProtocol } from "../../protocol/mod.ts";
-import { UpdateOptions } from "../../types.ts";
+import { Document, UpdateOptions } from "../../types.ts";
 
 interface UpdateResponse {
   ok: number;

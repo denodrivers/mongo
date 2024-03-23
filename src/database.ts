@@ -1,8 +1,11 @@
-import { Document } from "../mod.ts";
 import { Cluster } from "./cluster.ts";
 import { Collection } from "./collection/mod.ts";
 import { CommandCursor } from "./protocol/mod.ts";
-import { CreateCollectionOptions, CreateUserOptions } from "./types.ts";
+import {
+  CreateCollectionOptions,
+  CreateUserOptions,
+  Document,
+} from "./types.ts";
 import { WriteConcern } from "./types/read_write_concern.ts";
 
 interface ListCollectionsReponse {

@@ -1,4 +1,4 @@
-import { Document } from "../../mod.ts";
+import { Document } from "../types.ts";
 import { WireProtocol } from "./protocol.ts";
 
 export const driverMetadata = {

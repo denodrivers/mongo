@@ -1,5 +1,5 @@
 import { Long } from "web-bson";
-import { Document } from "../../mod.ts";
+import { Document } from "../types.ts";
 import { parseNamespace } from "../utils/ns.ts";
 import { WireProtocol } from "./protocol.ts";
 

@@ -1,8 +1,12 @@
-import { Document } from "../mod.ts";
 import { Cluster } from "./cluster.ts";
 import { Database } from "./database.ts";
 import { MongoDriverError } from "./error.ts";
-import { BuildInfo, ConnectOptions, ListDatabaseInfo } from "./types.ts";
+import {
+  BuildInfo,
+  ConnectOptions,
+  Document,
+  ListDatabaseInfo,
+} from "./types.ts";
 import { parse } from "./utils/uri.ts";
 
 export class MongoClient {

@@ -1,5 +1,4 @@
 import { ObjectId } from "web-bson";
-import { Document } from "../../mod.ts";
 import {
   MongoDriverError,
   MongoInvalidArgumentError,
@@ -13,6 +12,7 @@ import {
   CreateIndexOptions,
   DeleteOptions,
   DistinctOptions,
+  Document,
   DropIndexOptions,
   DropOptions,
   Filter,

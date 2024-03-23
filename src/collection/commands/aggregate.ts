@@ -1,7 +1,6 @@
-import { Document } from "../../../mod.ts";
 import { CommandCursor } from "../../protocol/cursor.ts";
 import { WireProtocol } from "../../protocol/protocol.ts";
-import { AggregateOptions } from "../../types.ts";
+import { AggregateOptions, Document } from "../../types.ts";
 
 interface AggregateCursorContext {
   dbName: string;
