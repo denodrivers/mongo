@@ -94,9 +94,9 @@ export class WireProtocol {
         ],
       });
 
-      const { write, releaseLock } = this.#conn.writable.getWriter();
-      await write(buffer);
-      releaseLock();
+      const w = this.#conn.writable.getWriter();
+      await w.write(buffer);
+      w.releaseLock();
     }
     this.#isPendingRequest = false;
   }
