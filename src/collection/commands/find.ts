@@ -1,4 +1,4 @@
-import { Document } from "web_bson";
+import { Document } from "web-bson";
 import { CommandCursor, WireProtocol } from "../../protocol/mod.ts";
 import { FindOptions } from "../../types.ts";
 

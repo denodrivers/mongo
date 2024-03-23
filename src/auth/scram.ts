@@ -1,7 +1,7 @@
 import { decodeBase64, encodeBase64 } from "b64";
 import { encodeHex } from "hex";
 import { crypto as stdCrypto } from "std_crypto";
-import { Binary, Document } from "web_bson";
+import { Binary, Document } from "web-bson";
 import { MongoDriverError } from "../error.ts";
 import { HandshakeDocument } from "../protocol/handshake.ts";
 import { driverMetadata } from "../protocol/mod.ts";

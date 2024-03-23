@@ -1,4 +1,4 @@
-import { Document } from "web_bson";
+import { Document } from "web-bson";
 import {
   GeoJsonObject,
   GeometryCollection,

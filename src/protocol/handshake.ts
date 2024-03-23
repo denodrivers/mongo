@@ -1,4 +1,4 @@
-import { Document } from "web_bson";
+import { Document } from "web-bson";
 import { WireProtocol } from "./protocol.ts";
 
 export const driverMetadata = {

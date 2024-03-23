@@ -1,4 +1,4 @@
-import { Document } from "web_bson";
+import { Document } from "web-bson";
 import { Cluster } from "./cluster.ts";
 import { Database } from "./database.ts";
 import { MongoDriverError } from "./error.ts";

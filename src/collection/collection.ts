@@ -1,4 +1,4 @@
-import { Document, ObjectId } from "web_bson";
+import { Document, ObjectId } from "web-bson";
 import {
   MongoDriverError,
   MongoInvalidArgumentError,

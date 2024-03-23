@@ -1,4 +1,4 @@
-import { deserialize, Document, serialize } from "web_bson";
+import { deserialize, Document, serialize } from "web-bson";
 import { MessageHeader, OpCode, setHeader } from "./header.ts";
 
 type MessageFlags = number;

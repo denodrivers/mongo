@@ -1,5 +1,5 @@
 import { BufReader, writeAll } from "io";
-import { Document } from "web_bson";
+import { Document } from "web-bson";
 import {
   MongoDriverError,
   MongoErrorInfo,

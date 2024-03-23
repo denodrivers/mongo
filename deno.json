@@ -13,7 +13,7 @@
     "io": "jsr:@std/io@^0.220.1",
     "std_crypto": "jsr:@std/crypto@^0.220.1/crypto",
     "hex": "jsr:@std/encoding@^0.220.1/hex",
-    "web_bson": "https://deno.land/x/web_bson@v0.3.0/mod.js",
+    "web-bson": "jsr:@lucsoft/web-bson@^0.3.1",
     "bytes_eq": "jsr:@std/bytes@^0.220.1/equals",
     "assert": "jsr:@std/assert@^0.220.1",
     "bdd": "jsr:@std/testing@^0.220.1/bdd",

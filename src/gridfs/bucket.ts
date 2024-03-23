@@ -1,4 +1,4 @@
-import { ObjectId } from "web_bson";
+import { ObjectId } from "web-bson";
 import { Collection } from "../collection/collection.ts";
 import { FindCursor } from "../collection/commands/find.ts";
 import { Database } from "../database.ts";

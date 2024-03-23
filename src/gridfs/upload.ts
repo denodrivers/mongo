@@ -1,4 +1,4 @@
-import { Binary, ObjectId } from "web_bson";
+import { Binary, ObjectId } from "web-bson";
 import { Collection } from "../collection/mod.ts";
 import { Chunk, File, GridFSUploadOptions } from "../types/gridfs.ts";
 

@@ -8,7 +8,7 @@ import {
   Long,
   ObjectId,
   Timestamp,
-} from "web_bson";
+} from "web-bson";
 import {
   $geoAny,
   $geoMultiPolygon,
