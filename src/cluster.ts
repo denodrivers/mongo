@@ -124,8 +124,8 @@ export class Cluster {
     for (const conn of this.#connections) {
       try {
         conn.close();
-      } catch (error) {
-        console.error(`Error closing connection: ${error}`);
+      } catch {
+        // this is safe to ignore
       }
     }
   }

@@ -15,6 +15,12 @@ import {
 import { checkIndexes } from "./indexes.ts";
 import { createUploadStream } from "./upload.ts";
 
+/**
+ * GridFSBucket is a representation of a GridFSBucket on a Database.
+ * @module
+ */
+
+/** Representation of a GridFSBucket on a Database */
 export class GridFSBucket {
   #chunksCollection: Collection<Chunk>;
   #filesCollection: Collection<File>;
