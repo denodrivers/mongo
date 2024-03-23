@@ -1,6 +1,6 @@
 {
-  "name": "@jersey/test",
-  "version": "0.3.9",
+  "name": "@db/mongo",
+  "version": "0.33.0",
   "exports": {
     ".": "./mod.ts",
     "./client": "./src/client.ts",
