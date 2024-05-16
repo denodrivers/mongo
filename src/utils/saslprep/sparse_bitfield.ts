@@ -1,4 +1,4 @@
-import { Page, Pager } from "./memory_pager.ts";
+import { Pager, type Page } from "./memory_pager.ts";
 
 /** Is the given number a power of two? */
 function powerOfTwo(x: number): boolean {

@@ -1,4 +1,4 @@
-import {
+import type {
   Binary,
   BSONRegExp,
   Decimal128,
@@ -8,14 +8,14 @@ import {
   ObjectId,
   Timestamp,
 } from "../deps.ts";
-import {
+import type {
   $geoAny,
   $geoMultiPolygon,
   $geoPolygon,
   CenterSpecifier,
   ShapeOperator,
 } from "./types/geospatial.ts";
-import { WriteConcern } from "./types/read_write_concern.ts";
+import type { WriteConcern } from "./types/read_write_concern.ts";
 
 /**
  * The types used by the MongoDB driver.

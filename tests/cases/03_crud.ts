@@ -1,9 +1,9 @@
-import { Database, MongoClient, ObjectId } from "../../mod.ts";
+import type { Database, MongoClient, ObjectId } from "../../mod.ts";
 import {
   MongoInvalidArgumentError,
   MongoServerError,
 } from "../../src/error.ts";
-import { CreateCollectionOptions } from "../../src/types.ts";
+import type { CreateCollectionOptions } from "../../src/types.ts";
 import { cleanTestDb, getTestDb } from "../common.ts";
 import {
   afterEach,

@@ -4,8 +4,8 @@ import {
   MongoInvalidArgumentError,
   MongoServerError,
 } from "../error.ts";
-import { WireProtocol } from "../protocol/mod.ts";
-import {
+import type { WireProtocol } from "../protocol/mod.ts";
+import type {
   AggregateOptions,
   AggregatePipeline,
   CountOptions,

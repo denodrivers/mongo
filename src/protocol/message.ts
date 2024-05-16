@@ -1,6 +1,6 @@
 import { deserialize, serialize } from "../../deps.ts";
-import { Document } from "../types.ts";
-import { MessageHeader, OpCode, setHeader } from "./header.ts";
+import type { Document } from "../types.ts";
+import { OpCode, setHeader, type MessageHeader } from "./header.ts";
 
 type MessageFlags = number;
 

@@ -1,10 +1,10 @@
 import { ObjectId } from "../../deps.ts";
-import { Collection } from "../collection/collection.ts";
-import { FindCursor } from "../collection/commands/find.ts";
-import { Database } from "../database.ts";
+import type { Collection } from "../collection/collection.ts";
+import type { FindCursor } from "../collection/commands/find.ts";
+import type { Database } from "../database.ts";
 import { MongoRuntimeError } from "../error.ts";
-import { Filter } from "../types.ts";
-import {
+import type { Filter } from "../types.ts";
+import type {
   Chunk,
   File,
   FileId,

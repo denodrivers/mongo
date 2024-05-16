@@ -1,4 +1,4 @@
-import { GridFSBucket, MongoClient } from "../../mod.ts";
+import { GridFSBucket, type MongoClient } from "../../mod.ts";
 import { getClient } from "../common.ts";
 import {
   afterAll,
