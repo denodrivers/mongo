@@ -116,10 +116,14 @@ export class WireProtocol {
       if (!bodyBuffer) {
         throw new MongoDriverError("Invalid response body");
       }
-      const reply = deserializeMessage(header, bodyBuffer);
       const pendingMessage = this.#pendingResponses.get(header.responseTo);
       this.#pendingResponses.delete(header.responseTo);
-      pendingMessage?.resolve(reply);
+      try {
+        const reply = deserializeMessage(header, bodyBuffer);
+        pendingMessage?.resolve(reply);
+      } catch (e) {
+        pendingMessage?.reject(e)
+      }
     }
     this.#isPendingResponse = false;
   }
