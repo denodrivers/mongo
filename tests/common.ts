@@ -1,4 +1,4 @@
-import { MongoClient, type Database } from "../mod.ts";
+import { type Database, MongoClient } from "../mod.ts";
 
 const hostname = "127.0.0.1";
 

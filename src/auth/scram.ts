@@ -10,7 +10,7 @@ import type { HandshakeDocument } from "../protocol/handshake.ts";
 import { driverMetadata } from "../protocol/mod.ts";
 import type { Credential, Document } from "../types.ts";
 import { saslprep } from "../utils/saslprep/mod.ts";
-import { AuthPlugin, type AuthContext } from "./base.ts";
+import { type AuthContext, AuthPlugin } from "./base.ts";
 import { pbkdf2 } from "./pbkdf2.ts";
 
 type CryptoMethod = "sha1" | "sha256";

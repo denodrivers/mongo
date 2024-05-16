@@ -1,6 +1,10 @@
 import type { Database } from "../../mod.ts";
 import type { Collection } from "../../src/collection/collection.ts";
-import type { Geometry, GeometryObject, Point } from "../../src/types/geojson.ts";
+import type {
+  Geometry,
+  GeometryObject,
+  Point,
+} from "../../src/types/geojson.ts";
 import type {
   $box,
   $center,

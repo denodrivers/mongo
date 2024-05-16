@@ -1,7 +1,7 @@
 import type { HandshakeDocument } from "../protocol/handshake.ts";
 import { driverMetadata } from "../protocol/mod.ts";
 import type { Credential, Document } from "../types.ts";
-import { AuthPlugin, type AuthContext } from "./base.ts";
+import { type AuthContext, AuthPlugin } from "./base.ts";
 
 export interface X509Command extends Document {
   authenticate: number;

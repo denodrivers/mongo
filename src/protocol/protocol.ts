@@ -1,12 +1,16 @@
 import {
   MongoDriverError,
-  MongoServerError,
   type MongoErrorInfo,
+  MongoServerError,
 } from "../error.ts";
 import type { Document } from "../types.ts";
 import { handshake } from "./handshake.ts";
 import { parseHeader } from "./header.ts";
-import { deserializeMessage, serializeMessage, type Message } from "./message.ts";
+import {
+  deserializeMessage,
+  type Message,
+  serializeMessage,
+} from "./message.ts";
 
 interface CommandTask {
   requestId: number;
