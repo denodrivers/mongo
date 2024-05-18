@@ -1,4 +1,4 @@
-import { Database } from "../../mod.ts";
+import type { Database } from "../../mod.ts";
 import {
   cleanUsername,
   clientFirstMessageBare,

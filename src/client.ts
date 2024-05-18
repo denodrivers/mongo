@@ -1,7 +1,7 @@
 import { Cluster } from "./cluster.ts";
 import { Database } from "./database.ts";
 import { MongoDriverError } from "./error.ts";
-import {
+import type {
   BuildInfo,
   ConnectOptions,
   Document,

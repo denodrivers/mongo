@@ -1,16 +1,18 @@
-name: ci
+name: jsr
 
-on: [push, pull_request]
+on:
+  release:
+    types: [published]
 
 jobs:
-  build:
+  publish:
     name: ubuntu-latest
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    permissions:
+      contents: read
+      id-token: write
 
-    strategy:
-      matrix:
-        mongo: ["4.0", "4.2", "4.4", "5.0", "6.0"]
     steps:
       - name: Setup Environment
         run: |
@@ -29,18 +31,6 @@ jobs:
         run: |
           deno --version
 
-      # Lint & Format
-      - name: Lint & Format TS
+      - name: Publish to JSR
         run: |
-          deno lint
-          deno fmt --check
-
-      # Start MongoDB
-      - name: Start MongoDB (Linux)
-        uses: wbari/start-mongoDB@v0.2
-        with:
-          mongoDBVersion: ${{ matrix.mongo }}
-
-      # Tests
-      - name: Test TS
-        run: deno test -A
+          deno publish

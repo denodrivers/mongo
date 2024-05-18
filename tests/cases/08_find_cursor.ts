@@ -1,5 +1,5 @@
 import { FindCursor } from "../../src/collection/commands/find.ts";
-import { WireProtocol } from "../../src/protocol/protocol.ts";
+import type { WireProtocol } from "../../src/protocol/protocol.ts";
 import { assertEquals, describe, it } from "../deps.ts";
 
 describe("find cursor", () => {

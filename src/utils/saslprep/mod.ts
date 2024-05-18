@@ -3,7 +3,7 @@
 //ORIGINAL PROJECT AND LICENSE IN: https://github.com/chiefbiiko/sparse-bitfield
 //ORIGINAL PROJECT AND LICENSE IN: https://github.com/chiefbiiko/memory-pager
 import { loadCodePoints } from "./load_code_points.ts";
-import { Bitfield } from "./sparse_bitfield.ts";
+import type { Bitfield } from "./sparse_bitfield.ts";
 
 const {
   unassigned_code_points,
