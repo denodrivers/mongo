@@ -126,7 +126,7 @@ export class WireProtocol {
         const reply = deserializeMessage(header, bodyBuffer);
         pendingMessage?.resolve(reply);
       } catch (e) {
-        pendingMessage?.reject(e)
+        pendingMessage?.reject(e);
       }
     }
     this.#isPendingResponse = false;
