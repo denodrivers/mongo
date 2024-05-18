@@ -1,4 +1,4 @@
-import { Collection, Database, Document, MongoClient } from "../../mod.ts";
+import type { Collection, Database, Document, MongoClient } from "../../mod.ts";
 import { cleanTestDb, getTestDb } from "../common.ts";
 import {
   afterEach,

@@ -1,4 +1,4 @@
-import { CommandCursor, WireProtocol } from "../../protocol/mod.ts";
+import { CommandCursor, type WireProtocol } from "../../protocol/mod.ts";
 
 interface ListIndexesCursorContext {
   dbName: string;
