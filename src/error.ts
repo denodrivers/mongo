@@ -73,7 +73,7 @@ export class MongoRuntimeError extends MongoDriverError {
     super(message);
   }
 
-  get name(): string {
+  override get name(): string {
     return "MongoRuntimeError";
   }
 }

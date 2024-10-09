@@ -2,8 +2,8 @@ import { Srv } from "../../src/utils/srv.ts";
 import { assertEquals, assertRejects, describe, it } from "../deps.ts";
 
 function mockResolver(
-  srvRecords: Partial<Deno.SRVRecord>[] = [],
-  txtRecords: string[][] = [],
+  srvRecords: Partial<Deno.SrvRecord>[] = [],
+  txtRecords: string[][] = []
 ) {
   return {
     resolveDns: (_url: string, type: Deno.RecordType) => {
@@ -21,19 +21,18 @@ describe("SRV", () => {
       assertRejects(
         () => new Srv().resolve("foo.bar"),
         Error,
-        "Expected url in format 'host.domain.tld', received foo.bar",
+        "Expected url in format 'host.domain.tld', received foo.bar"
       );
     },
   });
 
   it({
-    name:
-      "SRV: it throws an error if SRV resolution doesn't return any SRV records",
+    name: "SRV: it throws an error if SRV resolution doesn't return any SRV records",
     fn() {
       assertRejects(
         () => new Srv(mockResolver()).resolve("mongohost.mongodomain.com"),
         Error,
-        "Expected at least one SRV record, received 0 for url mongohost.mongodomain.com",
+        "Expected at least one SRV record, received 0 for url mongohost.mongodomain.com"
       );
     },
   });
@@ -43,29 +42,28 @@ describe("SRV", () => {
     fn() {
       assertRejects(
         () =>
-          new Srv(mockResolver([{ target: "mongohost1.mongodomain.com" }]))
-            .resolve("mongohost.mongodomain.com"),
+          new Srv(
+            mockResolver([{ target: "mongohost1.mongodomain.com" }])
+          ).resolve("mongohost.mongodomain.com"),
         Error,
-        "Expected exactly one TXT record, received 0 for url mongohost.mongodomain.com",
+        "Expected exactly one TXT record, received 0 for url mongohost.mongodomain.com"
       );
     },
   });
 
   it({
-    name:
-      "SRV: it throws an error if TXT resolution returns more than one record",
+    name: "SRV: it throws an error if TXT resolution returns more than one record",
     fn() {
       assertRejects(
         () =>
           new Srv(
             mockResolver(
               [{ target: "mongohost1.mongodomain.com" }],
-              [["replicaSet=rs-0"], ["authSource=admin"]],
-            ),
-          )
-            .resolve("mongohost.mongodomain.com"),
+              [["replicaSet=rs-0"], ["authSource=admin"]]
+            )
+          ).resolve("mongohost.mongodomain.com"),
         Error,
-        "Expected exactly one TXT record, received 2 for url mongohost.mongodomain.com",
+        "Expected exactly one TXT record, received 2 for url mongohost.mongodomain.com"
       );
     },
   });
@@ -78,12 +76,11 @@ describe("SRV", () => {
           new Srv(
             mockResolver(
               [{ target: "mongohost1.mongodomain.com" }],
-              [["replicaSet=rs-0&authSource=admin&ssl=true"]],
-            ),
-          )
-            .resolve("mongohost.mongodomain.com"),
+              [["replicaSet=rs-0&authSource=admin&ssl=true"]]
+            )
+          ).resolve("mongohost.mongodomain.com"),
         Error,
-        "Illegal uri options: ssl=true",
+        "Illegal uri options: ssl=true"
       );
     },
   });
@@ -92,23 +89,26 @@ describe("SRV", () => {
     name: "SRV: it correctly parses seedlist and options for valid records",
     async fn() {
       const result = await new Srv(
-        mockResolver([
-          {
-            target: "mongohost1.mongodomain.com",
-            port: 27015,
-          },
-          {
-            target: "mongohost2.mongodomain.com",
-            port: 27017,
-          },
-        ], [["replicaSet=rs-0&authSource=admin"]]),
+        mockResolver(
+          [
+            {
+              target: "mongohost1.mongodomain.com",
+              port: 27015,
+            },
+            {
+              target: "mongohost2.mongodomain.com",
+              port: 27017,
+            },
+          ],
+          [["replicaSet=rs-0&authSource=admin"]]
+        )
       ).resolve("mongohost.mongodomain.com");
       assertEquals(result.servers.length, 2);
       const server1 = result.servers.find(
-        (server) => server.host === "mongohost1.mongodomain.com",
+        (server) => server.host === "mongohost1.mongodomain.com"
       );
-      const server2 = result.servers.find((server) =>
-        server.host === "mongohost2.mongodomain.com"
+      const server2 = result.servers.find(
+        (server) => server.host === "mongohost2.mongodomain.com"
       );
       assertEquals(server1!.port, 27015);
       assertEquals(server2!.port, 27017);
@@ -119,27 +119,29 @@ describe("SRV", () => {
   });
 
   it({
-    name:
-      "SRV: it correctly parses seedlist and options for options split in two strings",
+    name: "SRV: it correctly parses seedlist and options for options split in two strings",
     async fn() {
       const result = await new Srv(
-        mockResolver([
-          {
-            target: "mongohost1.mongodomain.com",
-            port: 27015,
-          },
-          {
-            target: "mongohost2.mongodomain.com",
-            port: 27017,
-          },
-        ], [["replicaS", "et=rs-0&authSource=admin"]]),
+        mockResolver(
+          [
+            {
+              target: "mongohost1.mongodomain.com",
+              port: 27015,
+            },
+            {
+              target: "mongohost2.mongodomain.com",
+              port: 27017,
+            },
+          ],
+          [["replicaS", "et=rs-0&authSource=admin"]]
+        )
       ).resolve("mongohost.mongodomain.com");
       assertEquals(result.servers.length, 2);
       const server1 = result.servers.find(
-        (server) => server.host === "mongohost1.mongodomain.com",
+        (server) => server.host === "mongohost1.mongodomain.com"
       );
-      const server2 = result.servers.find((server) =>
-        server.host === "mongohost2.mongodomain.com"
+      const server2 = result.servers.find(
+        (server) => server.host === "mongohost2.mongodomain.com"
       );
       assertEquals(server1!.port, 27015);
       assertEquals(server2!.port, 27017);
