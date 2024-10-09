@@ -104,7 +104,7 @@ describe("crud operations", () => {
           date: new Date(dateNow),
         },
       },
-      { upsert: true }
+      { upsert: true },
     );
 
     assert(upsertedId);
@@ -135,7 +135,7 @@ describe("crud operations", () => {
           username: "user1",
         }),
       MongoServerError,
-      "E11000"
+      "E11000",
     );
   });
 
@@ -154,12 +154,12 @@ describe("crud operations", () => {
     assertEquals(findNull, undefined);
     const projectionUser = await users.findOne(
       {},
-      { projection: { _id: 0, username: 1 } }
+      { projection: { _id: 0, username: 1 } },
     );
     assertEquals(Object.keys(projectionUser!), ["username"]);
     const projectionUserWithId = await users.findOne(
       {},
-      { projection: { username: 1 } }
+      { projection: { username: 1 } },
     );
     assertEquals(Object.keys(projectionUserWithId!), ["_id", "username"]);
   });
@@ -237,7 +237,7 @@ describe("crud operations", () => {
 
   it("testFindAndModify-notfound", async () => {
     const users = database.collection<{ username: string; counter: number }>(
-      "mongo_test_users"
+      "mongo_test_users",
     );
 
     const find = await users.findAndModify(
@@ -248,7 +248,7 @@ describe("crud operations", () => {
       {
         update: { $inc: { counter: 1 } },
         new: false,
-      }
+      },
     );
 
     assert(find === null);
@@ -257,7 +257,7 @@ describe("crud operations", () => {
 
   it("testFindAndModify-update", async () => {
     const users = database.collection<{ username: string; counter: number }>(
-      "mongo_test_users"
+      "mongo_test_users",
     );
     await users.insertOne({ username: "counter", counter: 5 });
     const updated = await users.findAndModify(
@@ -265,7 +265,7 @@ describe("crud operations", () => {
       {
         update: { $inc: { counter: 1 } },
         new: true,
-      }
+      },
     );
 
     assert(updated !== null);
@@ -275,14 +275,14 @@ describe("crud operations", () => {
 
   it("testFindAndModify-delete", async () => {
     const users = database.collection<{ username: string; counter: number }>(
-      "mongo_test_users"
+      "mongo_test_users",
     );
     await users.insertOne({ username: "delete", counter: 10 });
     const updated = await users.findAndModify(
       { username: "delete" },
       {
         remove: true,
-      }
+      },
     );
 
     assert(updated !== null);
@@ -341,7 +341,7 @@ describe("crud operations", () => {
       {},
       {
         $push: { friends: { $each: ["Carol"] } },
-      }
+      },
     );
     assertEquals(result, {
       matchedCount: 1,
@@ -364,7 +364,7 @@ describe("crud operations", () => {
       {},
       {
         $pull: { friends: "Bob" },
-      }
+      },
     );
     assertEquals(result, {
       matchedCount: 1,
@@ -387,7 +387,7 @@ describe("crud operations", () => {
       {},
       {
         $push: { "likes.hobbies.indoor": "board games" },
-      }
+      },
     );
     assertEquals(result, {
       matchedCount: 1,
@@ -410,7 +410,7 @@ describe("crud operations", () => {
       {},
       {
         $pullAll: { "likes.hobbies.indoor": ["board games", "cooking"] },
-      }
+      },
     );
     assertEquals(result, {
       matchedCount: 1,
@@ -433,7 +433,7 @@ describe("crud operations", () => {
       {},
       {
         $pull: { "likes.hobbies.indoor": "board games" },
-      }
+      },
     );
     assertEquals(result, {
       matchedCount: 1,
@@ -467,7 +467,7 @@ describe("crud operations", () => {
     const result = await users.updateOne(
       { username: "user2" },
       { $set: { username: "USER2" } },
-      { upsert: true }
+      { upsert: true },
     );
     assertEquals(result.matchedCount, 1);
     assertEquals(result.modifiedCount, 0);
@@ -484,7 +484,7 @@ describe("crud operations", () => {
       { username: "user1" },
       {
         username: "user2",
-      }
+      },
     );
 
     assertEquals(result, {
@@ -698,7 +698,7 @@ describe("crud operations", () => {
     ]);
     const result = await users.updateMany(
       { username: "many" },
-      { $set: { username: "MANY" } }
+      { $set: { username: "MANY" } },
     );
     assertEquals(result, {
       matchedCount: 2,
@@ -794,13 +794,13 @@ describe("crud operations", () => {
       acceding,
       all.sort((lhs, rhs) => {
         return lhs.uid! - rhs.uid!;
-      })
+      }),
     );
     assertEquals(
       descending,
       all.sort((lhs, rhs) => {
         return -lhs.uid! - rhs.uid!;
-      })
+      }),
     );
 
     await database.collection("mongo_test_users").drop();
@@ -828,7 +828,7 @@ describe("crud operations", () => {
   it("testFindWithMaxTimeMS", async () => {
     const supportsMaxTimeMSInFindOne = greaterOrEqual(
       parse(client.buildInfo!.version),
-      { major: 4, minor: 2, patch: 0 }
+      { major: 4, minor: 2, patch: 0 },
     );
 
     const users = database.collection<User>("mongo_test_users");
@@ -844,7 +844,7 @@ describe("crud operations", () => {
         {
           uid: 0,
         },
-        { maxTimeMS: 100 }
+        { maxTimeMS: 100 },
       )
       .toArray();
 
@@ -854,7 +854,7 @@ describe("crud operations", () => {
       {
         uid: 0,
       },
-      { maxTimeMS: 100 }
+      { maxTimeMS: 100 },
     );
 
     assertEquals(user1!.uid, 0);
@@ -866,7 +866,7 @@ describe("crud operations", () => {
             uid: 0,
             $where: "sleep(10) || true",
           },
-          { maxTimeMS: 1 }
+          { maxTimeMS: 1 },
         )
         .toArray();
       assert(false);
@@ -884,7 +884,7 @@ describe("crud operations", () => {
             uid: 0,
             $where: "sleep(10) || true",
           },
-          { maxTimeMS: 1 }
+          { maxTimeMS: 1 },
         );
         assert(false);
       } catch (e) {
@@ -969,7 +969,7 @@ describe("crud operations", () => {
 
     const createdCollection = await database.createCollection<IStudents>(
       testCollectionName,
-      options
+      options,
     );
 
     assert(createdCollection);
@@ -1004,10 +1004,10 @@ describe("crud operations", () => {
       () =>
         database.createCollection<{ _id: string; name: string }>(
           testCollectionName,
-          invalidOptions
+          invalidOptions,
         ),
       // error with the message "the 'size' field is required when 'capped' is true"
-      MongoServerError
+      MongoServerError,
     );
   });
 });
