@@ -41,9 +41,7 @@ export class MongoClient {
    *
    * @param options Connection options or a MongoDB URI
    */
-  async connect(
-    options: ConnectOptions | string,
-  ): Promise<Database> {
+  async connect(options: ConnectOptions | string): Promise<Database> {
     try {
       const parsedOptions = typeof options === "string"
         ? await parse(options)
@@ -59,8 +57,10 @@ export class MongoClient {
       this.#buildInfo = await this.runCommand(this.#defaultDbName, {
         buildInfo: 1,
       });
-    } catch (e) {
-      throw new MongoDriverError(`Connection failed: ${e.message || e}`);
+    } catch (e: unknown) {
+      throw new MongoDriverError(
+        `Connection failed: ${e instanceof Error ? e.message : "unknown"}`,
+      );
     }
     return this.database((options as ConnectOptions).db);
   }
@@ -71,12 +71,14 @@ export class MongoClient {
    * @param options Options to pass to the `listDatabases` command
    * @returns A list of databases including their name, size on disk, and whether they are empty
    */
-  async listDatabases(options: {
-    filter?: Document;
-    nameOnly?: boolean;
-    authorizedCollections?: boolean;
-    comment?: Document;
-  } = {}): Promise<ListDatabaseInfo[]> {
+  async listDatabases(
+    options: {
+      filter?: Document;
+      nameOnly?: boolean;
+      authorizedCollections?: boolean;
+      comment?: Document;
+    } = {},
+  ): Promise<ListDatabaseInfo[]> {
     const { databases } = await this.getCluster().protocol.commandSingle(
       "admin",
       {

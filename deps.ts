@@ -16,6 +16,6 @@ export {
   Timestamp,
   UUID,
 } from "jsr:@lucsoft/web-bson@^0.3.1";
-export { crypto as stdCrypto } from "jsr:@std/crypto@^0.224.0/crypto";
-export { decodeBase64, encodeBase64 } from "jsr:@std/encoding@^0.224.0/base64";
-export { encodeHex } from "jsr:@std/encoding@^0.224.0/hex";
+export { crypto as stdCrypto } from "jsr:@std/crypto@^1.0.3/crypto";
+export { decodeBase64, encodeBase64 } from "jsr:@std/encoding@^1.0.5/base64";
+export { encodeHex } from "jsr:@std/encoding@^1.0.5/hex";

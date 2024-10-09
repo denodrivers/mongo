@@ -1,3 +1,4 @@
+import { assertInstanceOf } from "jsr:@std/assert@^0.220.1/assert_instance_of";
 import type { Database, MongoClient, ObjectId } from "../../mod.ts";
 import {
   MongoInvalidArgumentError,
@@ -259,10 +260,13 @@ describe("crud operations", () => {
       "mongo_test_users",
     );
     await users.insertOne({ username: "counter", counter: 5 });
-    const updated = await users.findAndModify({ username: "counter" }, {
-      update: { $inc: { counter: 1 } },
-      new: true,
-    });
+    const updated = await users.findAndModify(
+      { username: "counter" },
+      {
+        update: { $inc: { counter: 1 } },
+        new: true,
+      },
+    );
 
     assert(updated !== null);
     assertEquals(updated.counter, 6);
@@ -274,9 +278,12 @@ describe("crud operations", () => {
       "mongo_test_users",
     );
     await users.insertOne({ username: "delete", counter: 10 });
-    const updated = await users.findAndModify({ username: "delete" }, {
-      remove: true,
-    });
+    const updated = await users.findAndModify(
+      { username: "delete" },
+      {
+        remove: true,
+      },
+    );
 
     assert(updated !== null);
     assertEquals(updated.counter, 10);
@@ -330,9 +337,12 @@ describe("crud operations", () => {
       },
       friends: ["Alice", "Bob"],
     });
-    const result = await users.updateOne({}, {
-      $push: { friends: { $each: ["Carol"] } },
-    });
+    const result = await users.updateOne(
+      {},
+      {
+        $push: { friends: { $each: ["Carol"] } },
+      },
+    );
     assertEquals(result, {
       matchedCount: 1,
       modifiedCount: 1,
@@ -350,9 +360,12 @@ describe("crud operations", () => {
       },
       friends: ["Alice", "Bob"],
     });
-    const result = await users.updateOne({}, {
-      $pull: { friends: "Bob" },
-    });
+    const result = await users.updateOne(
+      {},
+      {
+        $pull: { friends: "Bob" },
+      },
+    );
     assertEquals(result, {
       matchedCount: 1,
       modifiedCount: 1,
@@ -370,9 +383,12 @@ describe("crud operations", () => {
       },
       friends: ["Alice", "Bob"],
     });
-    const result = await users.updateOne({}, {
-      $push: { "likes.hobbies.indoor": "board games" },
-    });
+    const result = await users.updateOne(
+      {},
+      {
+        $push: { "likes.hobbies.indoor": "board games" },
+      },
+    );
     assertEquals(result, {
       matchedCount: 1,
       modifiedCount: 1,
@@ -390,9 +406,12 @@ describe("crud operations", () => {
       },
       friends: ["Alice", "Bob"],
     });
-    const result = await users.updateOne({}, {
-      $pullAll: { "likes.hobbies.indoor": ["board games", "cooking"] },
-    });
+    const result = await users.updateOne(
+      {},
+      {
+        $pullAll: { "likes.hobbies.indoor": ["board games", "cooking"] },
+      },
+    );
     assertEquals(result, {
       matchedCount: 1,
       modifiedCount: 1,
@@ -410,9 +429,12 @@ describe("crud operations", () => {
       },
       friends: ["Alice", "Bob"],
     });
-    const result = await users.updateOne({}, {
-      $pull: { "likes.hobbies.indoor": "board games" },
-    });
+    const result = await users.updateOne(
+      {},
+      {
+        $pull: { "likes.hobbies.indoor": "board games" },
+      },
+    );
     assertEquals(result, {
       matchedCount: 1,
       modifiedCount: 1,
@@ -421,7 +443,8 @@ describe("crud operations", () => {
     });
   });
 
-  it("testUpdateOne Error", async () => { // TODO: move tesr errors to a new file
+  it("testUpdateOne Error", async () => {
+    // TODO: move tesr errors to a new file
     const users = database.collection<User>("mongo_test_users");
     await users.insertOne({
       username: "user1",
@@ -457,9 +480,12 @@ describe("crud operations", () => {
       username: "user1",
       password: "pass1",
     });
-    const result = await users.replaceOne({ username: "user1" }, {
-      username: "user2",
-    });
+    const result = await users.replaceOne(
+      { username: "user1" },
+      {
+        username: "user2",
+      },
+    );
 
     assertEquals(result, {
       matchedCount: 1,
@@ -813,25 +839,39 @@ describe("crud operations", () => {
         uid: i,
       });
     }
-    const users1 = await users.find({
-      uid: 0,
-    }, { maxTimeMS: 100 }).toArray();
+    const users1 = await users
+      .find(
+        {
+          uid: 0,
+        },
+        { maxTimeMS: 100 },
+      )
+      .toArray();
 
     assertEquals(users1.length, 1);
 
-    const user1 = await users.findOne({
-      uid: 0,
-    }, { maxTimeMS: 100 });
+    const user1 = await users.findOne(
+      {
+        uid: 0,
+      },
+      { maxTimeMS: 100 },
+    );
 
     assertEquals(user1!.uid, 0);
 
     try {
-      await users.find({
-        uid: 0,
-        $where: "sleep(10) || true",
-      }, { maxTimeMS: 1 }).toArray();
+      await users
+        .find(
+          {
+            uid: 0,
+            $where: "sleep(10) || true",
+          },
+          { maxTimeMS: 1 },
+        )
+        .toArray();
       assert(false);
     } catch (e) {
+      assertInstanceOf(e, MongoServerError);
       assertEquals(e.ok, 0);
       assertEquals(e.codeName, "MaxTimeMSExpired");
       assertEquals(e.errmsg, "operation exceeded time limit");
@@ -839,12 +879,16 @@ describe("crud operations", () => {
 
     if (supportsMaxTimeMSInFindOne) {
       try {
-        await users.findOne({
-          uid: 0,
-          $where: "sleep(10) || true",
-        }, { maxTimeMS: 1 });
+        await users.findOne(
+          {
+            uid: 0,
+            $where: "sleep(10) || true",
+          },
+          { maxTimeMS: 1 },
+        );
         assert(false);
       } catch (e) {
+        assertInstanceOf(e, MongoServerError);
         assertEquals(e.ok, 0);
         assertEquals(e.codeName, "MaxTimeMSExpired");
         assertEquals(e.errmsg, "operation exceeded time limit");
@@ -854,128 +898,116 @@ describe("crud operations", () => {
     await database.collection("mongo_test_users").drop();
   });
 
-  it(
-    "createCollection should create a collection without options",
-    async () => {
-      const createdCollection = await database
-        .createCollection<{ _id: string; name: string }>(
-          testCollectionName,
-        );
+  it("createCollection should create a collection without options", async () => {
+    const createdCollection = await database.createCollection<{
+      _id: string;
+      name: string;
+    }>(testCollectionName);
 
-      assert(createdCollection);
+    assert(createdCollection);
 
-      await database.collection(testCollectionName).drop();
-    },
-  );
+    await database.collection(testCollectionName).drop();
+  });
 
-  it(
-    "createCollection should create a collection with options",
-    async () => {
-      interface IStudents {
-        _id: string;
-        name: string;
-        year: number;
-        major: string;
-        gpa?: number;
-        address: {
-          city: string;
-          street: string;
-        };
-      }
+  it("createCollection should create a collection with options", async () => {
+    interface IStudents {
+      _id: string;
+      name: string;
+      year: number;
+      major: string;
+      gpa?: number;
+      address: {
+        city: string;
+        street: string;
+      };
+    }
 
-      // Example from https://www.mongodb.com/docs/manual/reference/operator/query/jsonSchema/#mongodb-query-op.-jsonSchema
-      const options: CreateCollectionOptions = {
-        validator: {
-          $jsonSchema: {
-            bsonType: "object",
-            required: ["name", "year", "major", "address"],
-            properties: {
-              name: {
-                bsonType: "string",
-                description: "must be a string and is required",
-              },
-              year: {
-                bsonType: "int",
-                minimum: 2017,
-                maximum: 3017,
-                description:
-                  "must be an integer in [ 2017, 3017 ] and is required",
-              },
-              major: {
-                enum: ["Math", "English", "Computer Science", "History", null],
-                description:
-                  "can only be one of the enum values and is required",
-              },
-              gpa: {
-                bsonType: ["double"],
-                description: "must be a double if the field exists",
-              },
-              address: {
-                bsonType: "object",
-                required: ["city"],
-                properties: {
-                  street: {
-                    bsonType: "string",
-                    description: "must be a string if the field exists",
-                  },
-                  city: {
-                    bsonType: "string",
-                    "description": "must be a string and is required",
-                  },
+    // Example from https://www.mongodb.com/docs/manual/reference/operator/query/jsonSchema/#mongodb-query-op.-jsonSchema
+    const options: CreateCollectionOptions = {
+      validator: {
+        $jsonSchema: {
+          bsonType: "object",
+          required: ["name", "year", "major", "address"],
+          properties: {
+            name: {
+              bsonType: "string",
+              description: "must be a string and is required",
+            },
+            year: {
+              bsonType: "int",
+              minimum: 2017,
+              maximum: 3017,
+              description:
+                "must be an integer in [ 2017, 3017 ] and is required",
+            },
+            major: {
+              enum: ["Math", "English", "Computer Science", "History", null],
+              description: "can only be one of the enum values and is required",
+            },
+            gpa: {
+              bsonType: ["double"],
+              description: "must be a double if the field exists",
+            },
+            address: {
+              bsonType: "object",
+              required: ["city"],
+              properties: {
+                street: {
+                  bsonType: "string",
+                  description: "must be a string if the field exists",
+                },
+                city: {
+                  bsonType: "string",
+                  description: "must be a string and is required",
                 },
               },
             },
           },
         },
-      };
+      },
+    };
 
-      const createdCollection = await database
-        .createCollection<IStudents>(
+    const createdCollection = await database.createCollection<IStudents>(
+      testCollectionName,
+      options,
+    );
+
+    assert(createdCollection);
+
+    // sanity test to check whether the speicified validator from options works
+    // error with message: "Document failed validation"
+    await assertRejects(() =>
+      createdCollection.insertOne({
+        name: "Alice",
+        year: 2019,
+        major: "History",
+        gpa: 3,
+        address: {
+          city: "NYC",
+          street: "33rd Street",
+        },
+      })
+    );
+
+    // TODO: refactor to clean up the test collection properly.
+    // It should clean up the collection when above insertion succeeds in any case, which is unwanted result.
+    // Refactor when test utility is more provided.
+    await database.collection(testCollectionName).drop();
+  });
+
+  it("createCollection should throw an error with invalid options", async () => {
+    const invalidOptions: CreateCollectionOptions = {
+      capped: true,
+    };
+
+    await assertRejects(
+      () =>
+        database.createCollection<{ _id: string; name: string }>(
           testCollectionName,
-          options,
-        );
-
-      assert(createdCollection);
-
-      // sanity test to check whether the speicified validator from options works
-      // error with message: "Document failed validation"
-      await assertRejects(
-        () =>
-          createdCollection.insertOne({
-            name: "Alice",
-            year: 2019,
-            major: "History",
-            gpa: 3,
-            address: {
-              city: "NYC",
-              street: "33rd Street",
-            },
-          }),
-      );
-
-      // TODO: refactor to clean up the test collection properly.
-      // It should clean up the collection when above insertion succeeds in any case, which is unwanted result.
-      // Refactor when test utility is more provided.
-      await database.collection(testCollectionName).drop();
-    },
-  );
-
-  it(
-    "createCollection should throw an error with invalid options",
-    async () => {
-      const invalidOptions: CreateCollectionOptions = {
-        capped: true,
-      };
-
-      await assertRejects(
-        () =>
-          database.createCollection<{ _id: string; name: string }>(
-            testCollectionName,
-            invalidOptions,
-          ),
-        // error with the message "the 'size' field is required when 'capped' is true"
-        MongoServerError,
-      );
-    },
-  );
+          invalidOptions,
+        ),
+      // error with the message "the 'size' field is required when 'capped' is true"
+      MongoServerError,
+    );
+  });
 });
