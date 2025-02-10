@@ -1,8 +1,10 @@
-import { Collection } from "../collection/collection.ts";
-import { FindCursor } from "../collection/commands/find.ts";
-import { Database } from "../database.ts";
-import { Filter } from "../types.ts";
-import {
+import { ObjectId } from "../../deps.ts";
+import type { Collection } from "../collection/collection.ts";
+import type { FindCursor } from "../collection/commands/find.ts";
+import type { Database } from "../database.ts";
+import { MongoRuntimeError } from "../error.ts";
+import type { Filter } from "../types.ts";
+import type {
   Chunk,
   File,
   FileId,
@@ -12,9 +14,13 @@ import {
 } from "../types/gridfs.ts";
 import { checkIndexes } from "./indexes.ts";
 import { createUploadStream } from "./upload.ts";
-import { MongoRuntimeError } from "../error.ts";
-import { ObjectId } from "../../deps.ts";
 
+/**
+ * GridFSBucket is a representation of a GridFSBucket on a Database.
+ * @module
+ */
+
+/** Representation of a GridFSBucket on a Database */
 export class GridFSBucket {
   #chunksCollection: Collection<Chunk>;
   #filesCollection: Collection<File>;
@@ -47,7 +53,10 @@ export class GridFSBucket {
    * that use generic type parameters, this method may be omitted since
    * the TFileId type might not be an ObjectId.
    */
-  openUploadStream(filename: string, options?: GridFSUploadOptions) {
+  openUploadStream(
+    filename: string,
+    options?: GridFSUploadOptions,
+  ): Promise<WritableStream<Uint8Array>> {
     return this.openUploadStreamWithId(
       new ObjectId(),
       filename,
@@ -65,7 +74,7 @@ export class GridFSBucket {
     id: FileId,
     filename: string,
     options?: GridFSUploadOptions,
-  ) {
+  ): Promise<WritableStream<Uint8Array>> {
     if (!this.#checkedIndexes) await this.#checkIndexes();
     return createUploadStream(this.getBucketData(), filename, id, options);
   }
@@ -121,7 +130,7 @@ export class GridFSBucket {
    *
    * Returns a Stream.
    */
-  async openDownloadStream(id: FileId) {
+  async openDownloadStream(id: FileId): Promise<ReadableStream<Uint8Array>> {
     if (!this.#checkedIndexes) await this.#checkIndexes();
 
     return new ReadableStream<Uint8Array>({

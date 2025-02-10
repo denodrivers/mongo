@@ -1,29 +1,35 @@
-import {
+import type {
   Binary,
   BSONRegExp,
   Decimal128,
-  Document,
   Double,
   Int32,
   Long,
   ObjectId,
   Timestamp,
 } from "../deps.ts";
-import { WriteConcern } from "./types/read_write_concern.ts";
-import {
+import type {
   $geoAny,
   $geoMultiPolygon,
   $geoPolygon,
   CenterSpecifier,
   ShapeOperator,
 } from "./types/geospatial.ts";
+import type { WriteConcern } from "./types/read_write_concern.ts";
 
+/**
+ * The types used by the MongoDB driver.
+ * @module
+ */
+
+/** A representation of a server */
 export interface Server {
   host: string;
   port: number;
   domainSocket?: string;
 }
 
+/** Options used to connect to the server */
 export interface ConnectOptions {
   compression?: string[];
   certFile?: string;
@@ -38,6 +44,7 @@ export interface ConnectOptions {
   appname?: string;
 }
 
+/** Options for counting Documents */
 export interface CountOptions {
   limit?: number;
   skip?: number;
@@ -47,6 +54,11 @@ export interface CountOptions {
   collation?: Document;
 }
 
+/** A generic document */
+// deno-lint-ignore no-explicit-any
+export type Document = Record<string, any>;
+
+/** Options used when finding a document */
 export interface FindOptions {
   findOne?: boolean;
   skip?: number;
@@ -60,12 +72,14 @@ export interface FindOptions {
   maxTimeMS?: number;
 }
 
+/** Information about a database on the server */
 export interface ListDatabaseInfo {
   name: string;
   sizeOnDisk?: number;
   empty?: false;
 }
 
+/** Options used when inserting a document */
 export interface InsertOptions {
   /**
    * Optional. If true, then when an insert of a document fails, return without inserting any remaining documents listed in the inserts array.
@@ -89,6 +103,8 @@ export interface InsertOptions {
    */
   comment?: Document;
 }
+
+/** Options used when updating a document */
 export interface UpdateOptions {
   /**
    * Optional. A document expressing the write concern of the update command. Omit to use the default write concern.
@@ -236,6 +252,7 @@ export interface FindAndModifyOptions<T = Document> {
   maxTimeMS?: number;
 }
 
+/** Options used when deleting Documents */
 export interface DeleteOptions {
   /**
    * Optional. If true, then when a delete statement fails, return without performing the remaining delete statements.
@@ -272,6 +289,7 @@ export interface DeleteOptions {
   hint?: Document | string;
 }
 
+/** Options to pass when dropping a collection */
 export interface DropOptions {
   /**
    * Optional. A document expressing the write concern of the drop command. Omit to use the default write concern.
@@ -304,6 +322,7 @@ export interface DistinctOptions {
   // session?:ClientSession;
 }
 
+/** Options for running aggregations */
 export interface AggregateOptions {
   /**
    * The preferred read preference (ReadPreference.PRIMARY, ReadPreference.PRIMARY_PREFERRED, ReadPreference.SECONDARY, ReadPreference.SECONDARY_PREFERRED, ReadPreference.NEAREST).
@@ -371,6 +390,7 @@ export interface AggregateOptions {
   // session?:ClientSession;
 }
 
+/** Options given to MongoDB when creating a user */
 export interface CreateUserOptions {
   /**
    * The name of the new user.
@@ -422,6 +442,7 @@ export interface CreateUserOptions {
   comment?: Document;
 }
 
+/** Credentials used to authenticate with the server */
 export interface Credential {
   /**
    * The username to authenticate with. This applies to all mechanisms but may be omitted when authenticating via MONGODB-X509.
@@ -444,6 +465,7 @@ export interface Credential {
   mechanism?: "SCRAM-SHA-1" | "SCRAM-SHA-256" | "MONGODB-X509";
 }
 
+/** Options used when creating an index */
 export interface IndexOptions {
   /**
    * Specifies the index’s fields. For each field, specify a key-value pair in which
@@ -574,6 +596,7 @@ export interface IndexOptions {
   wildcardProjection?: Document;
 }
 
+/** Options given to MongoDB when creating an index */
 export interface CreateIndexOptions {
   /**
    * Specifies the indexes to create. Each document in the array specifies a separate index.
@@ -594,6 +617,7 @@ export interface CreateIndexOptions {
   comment?: Document;
 }
 
+/** Options to provide when dropping an index */
 export interface DropIndexOptions {
   /**
    * Specifies the indexes to drop.
@@ -771,6 +795,7 @@ type NotImplementedOperators<Operators extends string, Value = any> = {
   [Key in Operators]?: Value;
 };
 
+/** A filter used when querying data */
 export type Filter<T> =
   & NotImplementedOperators<"$type">
   & RootFilterOperators<T>
@@ -780,11 +805,16 @@ export type Filter<T> =
       | FilterOperators<KeyWithSubKeys<T, Key>>;
   };
 
+/** The filter used when updating a document */
 export type UpdateFilter<T> =
   & NotImplementedOperators<"$addToSet">
   & UpdateOperators<T>
   & Partial<T>;
 
+/**
+ * Aggregation pipelines are used to process many documents
+ * @see https://www.mongodb.com/docs/manual/core/aggregation-pipeline/
+ */
 export type AggregatePipeline<T> =
   & NotImplementedOperators<AggregateOperators>
   & Document
@@ -796,6 +826,7 @@ type Flatten<T> = T extends Array<infer Item> ? Item : T;
 
 type IsAny<T, Y, N> = 0 extends (1 & T) ? Y : N;
 
+/** An inserted document */
 export type InsertDocument<TDocument extends Document> =
   Extract<TDocument["_id"], ObjectId> extends ObjectId
     ? Omit<TDocument, "_id"> & { _id?: TDocument["_id"] }
@@ -905,6 +936,7 @@ export const enum ReadPreference {
   Nearest = "nearest",
 }
 
+/** the unit of time used when dealing with a time series */
 export type TimeSeriesGranularity = "seconds" | "minutes" | "hours";
 export type ValidationLevel = "off" | "strict" | "moderate";
 export type ValidationAction = "error" | "warn";

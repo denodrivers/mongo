@@ -23,7 +23,7 @@ jobs:
       - name: Install Deno
         uses: denolib/setup-deno@master
         with:
-          deno-version: 1.x.x
+          deno-version: 2.x.x
 
       - name: Log versions
         run: |
@@ -32,7 +32,7 @@ jobs:
       # Lint & Format
       - name: Lint & Format TS
         run: |
-          deno lint --ignore=./bson/bson.d.ts
+          deno lint
           deno fmt --check
 
       # Start MongoDB

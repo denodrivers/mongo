@@ -1,20 +1,17 @@
 import {
-  BufReader,
-  Deferred,
-  deferred,
-  Document,
-  writeAll,
-} from "../../deps.ts";
-import {
   MongoDriverError,
-  MongoErrorInfo,
+  type MongoErrorInfo,
   MongoServerError,
 } from "../error.ts";
+import type { Document } from "../types.ts";
 import { handshake } from "./handshake.ts";
 import { parseHeader } from "./header.ts";
-import { deserializeMessage, Message, serializeMessage } from "./message.ts";
+import {
+  deserializeMessage,
+  type Message,
+  serializeMessage,
+} from "./message.ts";
 
-type Socket = Deno.Reader & Deno.Writer;
 interface CommandTask {
   requestId: number;
   db: string;
@@ -24,16 +21,19 @@ interface CommandTask {
 let nextRequestId = 0;
 
 export class WireProtocol {
-  #socket: Socket;
+  #conn: Deno.Conn;
   #isPendingResponse = false;
   #isPendingRequest = false;
-  #pendingResponses: Map<number, Deferred<Message>> = new Map();
-  #reader: BufReader;
+  #pendingResponses: Map<number, {
+    promise: Promise<Message>;
+    resolve: (value: Message | PromiseLike<Message>) => void;
+    // deno-lint-ignore no-explicit-any
+    reject: (reason?: any) => void;
+  }> = new Map();
   #commandQueue: CommandTask[] = [];
 
-  constructor(socket: Socket) {
-    this.#socket = socket;
-    this.#reader = new BufReader(this.#socket);
+  constructor(socket: Deno.Conn) {
+    this.#conn = socket;
   }
 
   async connect() {
@@ -62,10 +62,10 @@ export class WireProtocol {
     this.#commandQueue.push(commandTask);
     this.send();
 
-    const pendingMessage = deferred<Message>();
+    const pendingMessage = Promise.withResolvers<Message>();
     this.#pendingResponses.set(requestId, pendingMessage);
     this.receive();
-    const message = await pendingMessage;
+    const message = await pendingMessage.promise;
 
     let documents: T[] = [];
 
@@ -98,7 +98,9 @@ export class WireProtocol {
         ],
       });
 
-      await writeAll(this.#socket, buffer);
+      const w = this.#conn.writable.getWriter();
+      await w.write(buffer);
+      w.releaseLock();
     }
     this.#isPendingRequest = false;
   }
@@ -108,23 +110,25 @@ export class WireProtocol {
     this.#isPendingResponse = true;
     while (this.#pendingResponses.size > 0) {
       try {
-        const headerBuffer = await this.#reader.readFull(new Uint8Array(16));
+        const headerBuffer = await this.read_socket(16);
         if (!headerBuffer) {
           throw new MongoDriverError("Invalid response header");
         }
         const header = parseHeader(headerBuffer);
+        let bodyBytes = header.messageLength - 16;
+        if (bodyBytes < 0) bodyBytes = 0;
+        const bodyBuffer = await this.read_socket(header.messageLength - 16);
+        if (!bodyBuffer) {
+          throw new MongoDriverError("Invalid response body");
+        }
         const pendingMessage = this.#pendingResponses.get(header.responseTo);
+        this.#pendingResponses.delete(header.responseTo);
         try {
-          const bodyBuffer = await this.#reader.readFull(
-            new Uint8Array(header.messageLength - 16),
-          );
-          if (!bodyBuffer) throw new MongoDriverError("Invalid response body");
           const reply = deserializeMessage(header, bodyBuffer);
           pendingMessage?.resolve(reply);
-        } catch (error) {
-          pendingMessage?.reject(error);
+        } catch (e) {
+          pendingMessage?.reject(e);
         }
-        this.#pendingResponses.delete(header.responseTo);
       } catch (error) {
         // If an error occurred in the above block, we won't be able to know for
         // sure which specific message triggered the error.
@@ -140,5 +144,14 @@ export class WireProtocol {
       }
     }
     this.#isPendingResponse = false;
+  }
+
+  private async read_socket(
+    b: number,
+  ): Promise<Uint8Array | undefined> {
+    const reader = this.#conn.readable.getReader({ mode: "byob" });
+    const { value } = await reader.read(new Uint8Array(b));
+    reader.releaseLock();
+    return value;
   }
 }

@@ -1,6 +1,6 @@
-import { Binary, ObjectId } from "../../deps.ts";
-import { Collection } from "../collection/mod.ts";
-import { Chunk, File, GridFSUploadOptions } from "../types/gridfs.ts";
+import { Binary, type ObjectId } from "../../deps.ts";
+import type { Collection } from "../collection/mod.ts";
+import type { Chunk, File, GridFSUploadOptions } from "../types/gridfs.ts";
 
 export interface BucketInfo {
   filesCollection: Collection<File>;

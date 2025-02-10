@@ -2,8 +2,8 @@
 //ORIGINAL PROJECT AND LICENSE IN: https://github.com/chiefbiiko/saslprep
 //ORIGINAL PROJECT AND LICENSE IN: https://github.com/chiefbiiko/sparse-bitfield
 //ORIGINAL PROJECT AND LICENSE IN: https://github.com/chiefbiiko/memory-pager
-import { Bitfield } from "./deps.ts";
 import { loadCodePoints } from "./load_code_points.ts";
+import type { Bitfield } from "./sparse_bitfield.ts";
 
 const {
   unassigned_code_points,

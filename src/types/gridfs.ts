@@ -1,6 +1,6 @@
-import { Binary, Document, ObjectId } from "../../deps.ts";
-import { ReadPreference } from "../types.ts";
-import { ReadConcern, WriteConcern } from "../types/read_write_concern.ts";
+import type { Binary, ObjectId } from "../../deps.ts";
+import type { Document, ReadPreference } from "../types.ts";
+import type { ReadConcern, WriteConcern } from "../types/read_write_concern.ts";
 
 export type FileId = ObjectId;
 

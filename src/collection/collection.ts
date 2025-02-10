@@ -1,17 +1,18 @@
-import { Document, ObjectId } from "../../deps.ts";
+import { ObjectId } from "../../deps.ts";
 import {
   MongoDriverError,
   MongoInvalidArgumentError,
   MongoServerError,
 } from "../error.ts";
-import { WireProtocol } from "../protocol/mod.ts";
-import {
+import type { WireProtocol } from "../protocol/mod.ts";
+import type {
   AggregateOptions,
   AggregatePipeline,
   CountOptions,
   CreateIndexOptions,
   DeleteOptions,
   DistinctOptions,
+  Document,
   DropIndexOptions,
   DropOptions,
   Filter,
@@ -27,6 +28,12 @@ import { FindCursor } from "./commands/find.ts";
 import { ListIndexesCursor } from "./commands/list_indexes.ts";
 import { update } from "./commands/update.ts";
 
+/**
+ * A collection within a MongoDB Database
+ * @module
+ */
+
+/** A collection within a MongoDB Database */
 export class Collection<T extends Document> {
   #protocol: WireProtocol;
   #dbName: string;
@@ -36,6 +43,13 @@ export class Collection<T extends Document> {
     this.#dbName = dbName;
   }
 
+  /**
+   * Get a FindCursor for the given filter
+   *
+   * @param filter The query used to match documents
+   * @param options Additional options for the operation
+   * @returns A cursor for the query
+   */
   find(
     filter?: Filter<T>,
     options?: FindOptions,
@@ -49,6 +63,13 @@ export class Collection<T extends Document> {
     });
   }
 
+  /**
+   * Find one Document using the given filter
+   *
+   * @param filter The query used to match for a document
+   * @param options Additional options for the operation
+   * @returns The document matched, or undefined if no document was found
+   */
   findOne(
     filter?: Filter<T>,
     options?: FindOptions,
@@ -86,25 +107,12 @@ export class Collection<T extends Document> {
   }
 
   /**
-   * @deprecated Use `countDocuments` or `estimatedDocumentCount` instead
+   * Count the number of documents matching the given filter
+   *
+   * @param filter The query used to match documents
+   * @param options Additional options for the operation
+   * @returns The number of documents matching the filter
    */
-  async count(
-    filter?: Filter<T>,
-    options?: CountOptions,
-  ): Promise<number> {
-    const res = await this.#protocol.commandSingle(this.#dbName, {
-      count: this.name,
-      query: filter,
-      ...options,
-    });
-    const { n, ok } = res;
-    if (ok === 1) {
-      return n;
-    } else {
-      return 0;
-    }
-  }
-
   async countDocuments(
     filter?: Filter<T>,
     options?: CountOptions,
@@ -134,6 +142,7 @@ export class Collection<T extends Document> {
     return 0;
   }
 
+  /** A function that returns the estimated number of documents in the collection */
   async estimatedDocumentCount(): Promise<number> {
     const pipeline = [
       { $collStats: { count: {} } },
@@ -145,22 +154,28 @@ export class Collection<T extends Document> {
     return 0;
   }
 
-  async insertOne(doc: InsertDocument<T>, options?: InsertOptions) {
+  /**
+   * Insert a single document into the collection
+   *
+   * @param doc The document to insert
+   * @param options Additional options for the operation
+   * @returns The inserted document's ID
+   */
+  async insertOne(
+    doc: InsertDocument<T>,
+    options?: InsertOptions,
+  ): Promise<Required<InsertDocument<T>>["_id"]> {
     const { insertedIds } = await this.insertMany([doc], options);
     return insertedIds[0];
   }
 
   /**
-   * @deprecated Use `insertOne, insertMany` or `bulkWrite` instead.
+   * Insert multiple documents into the collection
+   *
+   * @param docs An array of documents to insert
+   * @param options Additional options for the operation
+   * @returns The inserted documents' IDs and the number of documents inserted
    */
-  insert(
-    docs: InsertDocument<T> | InsertDocument<T>[],
-    options?: InsertOptions,
-  ) {
-    const _docs = Array.isArray(docs) ? docs : [docs];
-    return this.insertMany(_docs, options);
-  }
-
   async insertMany(
     docs: InsertDocument<T>[],
     options?: InsertOptions,
@@ -197,11 +212,26 @@ export class Collection<T extends Document> {
     };
   }
 
+  /**
+   * Update a single document matching the given filter
+   *
+   * @param filter The query used to match the document
+   * @param update The update to apply to the document
+   * @param options Additional options for the operation
+   * @returns The number of documents matched, modified, and upserted
+   */
   async updateOne(
     filter: Filter<T>,
     update: UpdateFilter<T>,
     options?: UpdateOptions,
-  ) {
+  ): Promise<
+    {
+      upsertedId: ObjectId | undefined;
+      upsertedCount: number;
+      matchedCount: number;
+      modifiedCount: number;
+    }
+  > {
     const {
       upsertedIds,
       upsertedCount,
@@ -219,11 +249,26 @@ export class Collection<T extends Document> {
     };
   }
 
+  /**
+   * Update multiple documents matching the given filter
+   *
+   * @param filter The query used to match the documents
+   * @param doc The update to apply to the documents
+   * @param options Additional options for the operation
+   * @returns The number of documents matched, modified, and upserted
+   */
   updateMany(
     filter: Filter<T>,
     doc: UpdateFilter<T>,
     options?: UpdateOptions,
-  ) {
+  ): Promise<
+    {
+      upsertedIds: ObjectId[] | undefined;
+      upsertedCount: number;
+      modifiedCount: number;
+      matchedCount: number;
+    }
+  > {
     if (!hasAtomicOperators(doc)) {
       throw new MongoInvalidArgumentError(
         "Update document requires atomic operators",
@@ -236,11 +281,26 @@ export class Collection<T extends Document> {
     });
   }
 
+  /**
+   * Replace a single document matching the given filter
+   *
+   * @param filter The query used to match the document
+   * @param replacement The replacement document
+   * @param options Additional options for the operation
+   * @returns The number of documents matched, modified, and upserted
+   */
   async replaceOne(
     filter: Filter<T>,
     replacement: InsertDocument<T>,
     options?: UpdateOptions,
-  ) {
+  ): Promise<
+    {
+      upsertedId: ObjectId | undefined;
+      upsertedCount: number;
+      matchedCount: number;
+      modifiedCount: number;
+    }
+  > {
     if (hasAtomicOperators(replacement)) {
       throw new MongoInvalidArgumentError(
         "Replacement document must not contain atomic operators",
@@ -268,6 +328,13 @@ export class Collection<T extends Document> {
     };
   }
 
+  /**
+   * Delete multiple documents matching the given filter
+   *
+   * @param filter The query used to match the documents
+   * @param options Additional options for the operation
+   * @returns The number of documents deleted
+   */
   async deleteMany(
     filter: Filter<T>,
     options?: DeleteOptions,
@@ -289,15 +356,25 @@ export class Collection<T extends Document> {
     return res.n;
   }
 
-  delete = this.deleteMany;
-
+  /**
+   * Delete a single document matching the given filter
+   *
+   * @param filter The query used to match the document
+   * @param options Additional options for the operation
+   * @returns The number of documents deleted
+   */
   deleteOne(
     filter: Filter<T>,
     options?: DeleteOptions,
-  ) {
-    return this.delete(filter, { ...options, limit: 1 });
+  ): Promise<number> {
+    return this.deleteMany(filter, { ...options, limit: 1 });
   }
 
+  /**
+   * Drop the collection from the database
+   *
+   * @param options Additional options for the operation
+   */
   async drop(options?: DropOptions): Promise<void> {
     const _res = await this.#protocol.commandSingle(this.#dbName, {
       drop: this.name,
@@ -305,7 +382,12 @@ export class Collection<T extends Document> {
     });
   }
 
-  async distinct(key: string, query?: Filter<T>, options?: DistinctOptions) {
+  async distinct(
+    key: string,
+    query?: Filter<T>,
+    options?: DistinctOptions,
+    // deno-lint-ignore no-explicit-any
+  ): Promise<any> {
     const { values } = await this.#protocol.commandSingle(this.#dbName, {
       distinct: this.name,
       key,
@@ -315,6 +397,13 @@ export class Collection<T extends Document> {
     return values;
   }
 
+  /**
+   * Perform aggregation on the collection
+   *
+   * @param pipeline The aggregation pipeline
+   * @param options Additional options for the operation
+   * @returns A cursor for the aggregation
+   */
   aggregate<U = T>(
     pipeline: AggregatePipeline<U>[],
     options?: AggregateOptions,
@@ -328,7 +417,22 @@ export class Collection<T extends Document> {
     });
   }
 
-  async createIndexes(options: CreateIndexOptions) {
+  /**
+   * Create an index on the collection
+   *
+   * @param options The options for the operation
+   * @returns The result of the operation
+   */
+  async createIndexes(
+    options: CreateIndexOptions,
+  ): Promise<
+    {
+      ok: number;
+      createdCollectionAutomatically: boolean;
+      numIndexesBefore: number;
+      numIndexesAfter: number;
+    }
+  > {
     const res = await this.#protocol.commandSingle<{
       ok: number;
       createdCollectionAutomatically: boolean;
@@ -341,7 +445,16 @@ export class Collection<T extends Document> {
     return res;
   }
 
-  async dropIndexes(options: DropIndexOptions) {
+  /**
+   * Drop an index from the collection
+   *
+   * @param options The options for the operation
+   * @returns The result of the operation
+   */
+  async dropIndexes(options: DropIndexOptions): Promise<{
+    ok: number;
+    nIndexesWas: number;
+  }> {
     const res = await this.#protocol.commandSingle<{
       ok: number;
       nIndexesWas: number;
@@ -356,7 +469,14 @@ export class Collection<T extends Document> {
     return res;
   }
 
-  listIndexes() {
+  /**
+   * List the indexes on the collection
+   *
+   * @returns A cursor for the indexes
+   */
+  listIndexes(): ListIndexesCursor<
+    { v: number; key: Document; name: string; ns?: string }
+  > {
     return new ListIndexesCursor<
       { v: number; key: Document; name: string; ns?: string }
     >({
@@ -367,7 +487,13 @@ export class Collection<T extends Document> {
   }
 }
 
-export function hasAtomicOperators(doc: Document | Document[]) {
+/**
+ * Check if a document contains atomic operators
+ *
+ * @param doc The document to check
+ * @returns Whether the document contains atomic operators
+ */
+export function hasAtomicOperators(doc: Document | Document[]): boolean {
   if (Array.isArray(doc)) {
     for (const document of doc) {
       if (hasAtomicOperators(document)) {

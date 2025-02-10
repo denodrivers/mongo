@@ -1,6 +1,5 @@
-import { Document } from "../../../deps.ts";
-import { CommandCursor, WireProtocol } from "../../protocol/mod.ts";
-import { FindOptions } from "../../types.ts";
+import { CommandCursor, type WireProtocol } from "../../protocol/mod.ts";
+import type { Document, FindOptions } from "../../types.ts";
 
 interface FindCursorContext {
   dbName: string;

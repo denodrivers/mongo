@@ -1,8 +1,21 @@
-export * from "https://deno.land/x/web_bson@v0.3.0/mod.js";
-export { crypto } from "https://deno.land/std@0.154.0/crypto/mod.ts";
-export { BufReader } from "https://deno.land/std@0.154.0/io/mod.ts";
-export { writeAll } from "https://deno.land/std@0.154.0/streams/conversion.ts";
-export { deferred } from "https://deno.land/std@0.154.0/async/deferred.ts";
-export type { Deferred } from "https://deno.land/std@0.154.0/async/deferred.ts";
-export * as b64 from "https://deno.land/std@0.154.0/encoding/base64.ts";
-export * as hex from "https://deno.land/std@0.154.0/encoding/hex.ts";
+export {
+  Binary,
+  BSONRegExp,
+  BSONSymbol,
+  Code,
+  DBRef,
+  Decimal128,
+  deserialize,
+  Double,
+  Int32,
+  Long,
+  MaxKey,
+  MinKey,
+  ObjectId,
+  serialize,
+  Timestamp,
+  UUID,
+} from "jsr:@lucsoft/web-bson@^0.4.0";
+export { crypto as stdCrypto } from "jsr:@std/crypto@^1.0.3/crypto";
+export { decodeBase64, encodeBase64 } from "jsr:@std/encoding@^1.0.5/base64";
+export { encodeHex } from "jsr:@std/encoding@^1.0.5/hex";

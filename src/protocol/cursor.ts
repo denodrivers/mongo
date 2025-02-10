@@ -1,6 +1,7 @@
-import { WireProtocol } from "./protocol.ts";
+import { Long } from "../../deps.ts";
+import type { Document } from "../types.ts";
 import { parseNamespace } from "../utils/ns.ts";
-import { Document, Long } from "../../deps.ts";
+import type { WireProtocol } from "./protocol.ts";
 
 export interface CommandCursorOptions<T> {
   id: bigint | number | string;

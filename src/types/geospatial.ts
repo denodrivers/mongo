@@ -1,5 +1,5 @@
-import { Document } from "../../deps.ts";
-import {
+import type { Document } from "../types.ts";
+import type {
   GeoJsonObject,
   GeometryCollection,
   GeometryObject,

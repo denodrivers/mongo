@@ -1,8 +1,7 @@
-import { WireProtocol } from "./protocol/mod.ts";
-import { ConnectOptions } from "./types.ts";
 import { AuthContext, ScramAuthPlugin, X509AuthPlugin } from "./auth/mod.ts";
 import { MongoDriverError } from "./error.ts";
-import { Server } from "./types.ts";
+import { WireProtocol } from "./protocol/mod.ts";
+import type { ConnectOptions, Server } from "./types.ts";
 
 export class Cluster {
   #options: ConnectOptions;
@@ -24,7 +23,10 @@ export class Cluster {
     );
   }
 
-  connectToServer(server: Server, options: ConnectOptions) {
+  connectToServer(
+    server: Server,
+    options: ConnectOptions,
+  ): Promise<Deno.TlsConn | Deno.TcpConn> {
     const denoConnectOps: Deno.ConnectTlsOptions = {
       hostname: server.host,
       port: server.port,
@@ -57,7 +59,10 @@ export class Cluster {
     );
   }
 
-  async authenticateToServer(conn: Deno.Conn, options: ConnectOptions) {
+  async authenticateToServer(
+    conn: Deno.Conn,
+    options: ConnectOptions,
+  ): Promise<WireProtocol> {
     const protocol = new WireProtocol(conn);
     if (options.credential) {
       const authContext = new AuthContext(
@@ -111,7 +116,7 @@ export class Cluster {
     };
   }
 
-  get protocol() {
+  get protocol(): WireProtocol {
     return this.getMaster().protocol;
   }
 
@@ -119,8 +124,8 @@ export class Cluster {
     for (const conn of this.#connections) {
       try {
         conn.close();
-      } catch (error) {
-        console.error(`Error closing connection: ${error}`);
+      } catch {
+        // this is safe to ignore
       }
     }
   }
