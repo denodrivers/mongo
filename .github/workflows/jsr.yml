@@ -3,6 +3,7 @@ name: jsr
 on:
   release:
     types: [published]
+  workflow_dispatch:
 
 jobs:
   publish:
@@ -18,7 +19,6 @@ jobs:
         run: |
           git config --global core.autocrlf false
           git config --global core.eol lf
-
       - name: Clone repository
         uses: actions/checkout@v2
 
@@ -30,7 +30,6 @@ jobs:
       - name: Log versions
         run: |
           deno --version
-
       - name: Publish to JSR
         run: |
           deno publish
