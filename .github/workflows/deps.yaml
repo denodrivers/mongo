@@ -1,0 +1,17 @@
+name: deps
+
+on:
+  schedule:
+    - cron: "0 23 * * *"
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: williamhorning/deno-outdated-action@v1
+        with:
+          branch_name: "bump-version"
+          commit_message: "chores: update Deno dependencies"
+          deno_version: "2.x"
+          pull_request_title: "chore: update Deno dependencies"
